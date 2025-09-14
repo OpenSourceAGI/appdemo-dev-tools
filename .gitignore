@@ -17,3 +17,4 @@ migrations/*
 .docusaurus/*
 */.next/*
 apps/docs/.next/*
+bun.lock
