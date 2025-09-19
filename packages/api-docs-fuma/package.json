@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "next build --turbo; echo 'grab.js.org' > ./dist/CNAME;",
-    "build:api": "node ./scripts/generate-api-docs.mjs",
+    "build:api": "node ./scripts/generate-api-docs.mjs ./openapi.yml",
     "dev": "next dev --turbo",
     "start": "bunx concurrently \"npx serve -l 3000 ./dist --single\" \"sleep 2 && bunx open-cli http://localhost:3000\"", 
     
