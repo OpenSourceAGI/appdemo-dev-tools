@@ -1,6 +1,7 @@
 {
   "pages": [
     "index",
+    "guides",
     "(api)",
     "comparisons/tool-rank",
     "comparisons",

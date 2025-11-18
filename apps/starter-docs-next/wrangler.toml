@@ -24,6 +24,7 @@ NODE_ENV = "production"
 # GITHUB_CLIENT_ID
 # GITHUB_CLIENT_SECRET
 # RESEND_API_KEY
-# STRIPE_SECRET_KEY
-# STRIPE_WEBHOOK_SECRET
-# NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
+# Stripe Configuration
+# STRIPE_SECRET_KEY=sk_live_your_stripe_secret_key_here
+# STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+# NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_your_stripe_publishable_key_here 

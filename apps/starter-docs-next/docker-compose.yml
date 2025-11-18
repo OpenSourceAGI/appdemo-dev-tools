@@ -54,7 +54,9 @@ services:
       - DATABASE_URL_PRODUCTION=postgresql://startstack_user:startstack_password@postgres:5432/startstack
       - BETTER_AUTH_SECRET=your-better-auth-secret-here
       - RESEND_API_KEY=your-resend-api-key-here
-      - DODO_API_KEY=your-dodo-api-key-here
+      - STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
+      - STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
       - NEXT_PUBLIC_CACHE_ENCRYPTION_KEY=your-cache-encryption-key-here
     volumes:

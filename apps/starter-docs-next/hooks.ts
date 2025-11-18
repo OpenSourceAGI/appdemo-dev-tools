@@ -145,3 +145,43 @@ export const useCachedSession = () => {
   };
 };
 
+// Mobile detection hook
+export const useMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  return isMobile;
+};
+
+// Toast hook
+import { toast as sonnerToast } from "sonner";
+
+export const useToast = () => {
+  const toast = (options: {
+    title?: string;
+    description?: string;
+    variant?: "default" | "destructive";
+  }) => {
+    if (options.variant === "destructive") {
+      sonnerToast.error(options.title || "Error", {
+        description: options.description,
+      });
+    } else {
+      sonnerToast.success(options.title || "Success", {
+        description: options.description,
+      });
+    }
+  };
+
+  return { toast };
+};

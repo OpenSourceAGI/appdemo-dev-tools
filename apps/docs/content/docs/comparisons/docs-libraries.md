@@ -1,5 +1,5 @@
 ---
-title: 📚 Documentation 
+title: 📚 API Documentation 
 ---
 
 The documentation framework landscape offers diverse solutions ranging from React-based platforms to specialized API documentation tools [^4][^5][^6]. Each framework targets specific use cases and developer preferences, with varying levels of complexity and feature richness [^7][^8][^9].

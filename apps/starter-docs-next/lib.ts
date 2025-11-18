@@ -1,11 +1,49 @@
+// Utility functions
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+// Metadata utilities
+import env from "@/env";
+import type { Metadata } from "next/types";
+
+const APP_NAME =
+  process.env.NODE_ENV === "development" ? "DEV - Startstack" : "Startstack";
+
+export function createMetadata(override: Metadata): Metadata {
+  return {
+    ...override,
+    openGraph: {
+      title: override.title ?? undefined,
+      description: override.description ?? undefined,
+      url: env.NEXT_PUBLIC_APP_URL,
+      images: "https://demo.better-auth.com/og.png",
+      siteName: APP_NAME,
+      ...override.openGraph,
+    },
+    twitter: {
+      card: "summary_large_image",
+      creator: "@warisareshi",
+      title: override.title ?? undefined,
+      description: override.description ?? undefined,
+      images: "https://demo.better-auth.com/og.png",
+      ...override.twitter,
+    },
+    metadataBase: override.metadataBase ?? new URL(env.NEXT_PUBLIC_APP_URL),
+  };
+}
+
+// Action client utilities
 import {
   createSafeActionClient,
   DEFAULT_SERVER_ERROR_MESSAGE,
 } from "next-safe-action";
 import { headers } from "next/headers";
 import { z } from "zod";
-import { auth } from "./auth/server";
-import { APP_NAME } from "@/lib";
+import { auth } from "./lib/auth";
 
 const actionClient = createSafeActionClient({
   handleServerError(e) {
@@ -67,3 +105,10 @@ export const authActionClient = actionClient
       data: z.any(),
     }),
   );
+
+// Constants
+type PaymentProvider = "stripe" | "paddle";
+
+export const APP_NAME =
+  process.env.NODE_ENV === "development" ? "DEV - Startstack" : "Startstack";
+export const PAYMENT_PROVIDER: PaymentProvider = "stripe";

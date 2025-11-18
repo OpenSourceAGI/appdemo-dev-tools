@@ -4,10 +4,9 @@ import React from "react";
 import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import Image from 'next/image';
 import { Header } from "@/app/_components/header";
 import { Footer } from "@/app/_components/footer";
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { subscription } from "@/lib/auth";
 
 
 // Define your pricing plans
@@ -18,11 +17,12 @@ const pricingPlans = [
     frequency: "month",
     description: "Perfect for individuals and small projects",
     features: [
-      "Feature 1",
-      "Feature 2",
-      "Feature 3",
+      "5 Projects",
+      "10GB Storage",
+      "Email Support",
+      "Basic Analytics",
     ],
-    productId: "prod_basic123", // Replace with your actual DODO product ID
+    planName: "basic",
     isPopular: false,
   },
   {
@@ -31,42 +31,53 @@ const pricingPlans = [
     frequency: "month",
     description: "Best for growing teams and businesses",
     features: [
-      "All Basic features",
-      "Feature 4",
-      "Feature 5",
-      "Feature 6",
+      "20 Projects",
+      "50GB Storage",
+      "Priority Support",
+      "Advanced Analytics",
+      "14-day Free Trial",
     ],
-    productId: "pdt_a1EG4eSKFx8iPO1t53SPM", // Replace with your actual DODO product ID
+    planName: "pro",
     isPopular: true,
   },
   {
     title: "Enterprise",
     price: "$49.99",
-frequency: "month",
+    frequency: "month",
     description: "Advanced features for larger organizations",
     features: [
-      "All Pro features",
-      "Feature 7",
-      "Feature 8",
-      "Feature 9",
-      "Feature 10",
+      "100 Projects",
+      "500GB Storage",
+      "24/7 Phone Support",
+      "Custom Analytics",
+      "Team Management",
+      "API Access",
     ],
-    productId: "prod_enterprise789", // Replace with your actual DODO product ID
+    planName: "enterprise",
     isPopular: false,
   },
 ];
 
-// New Client Component for handling subscriptions
-// New Client Component for handling subscriptions
-function SubscriptionHandler({ productId, planName }: { productId: string; planName: string }) {
+// Subscription handler component using Better Auth Stripe integration
+function SubscriptionHandler({ planName }: { planName: string }) {
   const { toast } = useToast();
-  const router = useRouter(); // Use useRouter hook
 
-  const handleSubscription = () => {
+  const handleSubscription = async () => {
     try {
-      // 1.  Redirect to Dodo Payments checkout page.
-      const dodoCheckoutURL = `https://www.checkout.dodopayments.com/buy/${productId}`;
-      window.location.href = dodoCheckoutURL;
+      const { error } = await subscription.upgrade({
+        plan: planName,
+        successUrl: "/dashboard?subscription=success",
+        cancelUrl: "/pricing",
+        annual: false, // Set to true for annual billing
+      });
+
+      if (error) {
+        toast({
+          title: "Subscription Error",
+          description: error.message || "Failed to create subscription. Please try again.",
+          variant: "destructive",
+        });
+      }
     } catch (error: any) {
       console.error('Error creating subscription:', error);
       toast({
@@ -104,7 +115,7 @@ export default function PricingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {pricingPlans.map((plan) => (
               <div
-                key={plan.productId}
+                key={plan.planName}
                 className={`relative rounded-lg border p-6 shadow-sm flex flex-col ${plan.isPopular ? 'border-primary ring-2 ring-primary' : 'border-border'}`}
               >
                 {plan.isPopular && (
@@ -143,7 +154,7 @@ export default function PricingPage() {
                   ))}
                 </ul>
                  <div className="mt-auto w-full">
-                <SubscriptionHandler productId={plan.productId} planName={plan.title} />
+                <SubscriptionHandler planName={plan.planName} />
                 </div>
               </div>
             ))}
@@ -157,14 +168,6 @@ export default function PricingPage() {
         </div>
       </div>
 
-      <div className="flex justify-center">
-        <Image
-          src="/dodo_payments_banner.jpg"
-          alt="Dodo Payments Banner"
-          width={585}
-          height={121}
-        />
-      </div>
 
       <Footer />
     </section>

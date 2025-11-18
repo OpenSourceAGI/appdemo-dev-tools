@@ -18,9 +18,8 @@ const env = createEnv({
     RESEND_API_KEY: z.string(),
 
     // Payments
-    DODO_API_KEY: z.string(),
-    STRIPE_SECRET_KEY: z.string().optional(),
-    STRIPE_WEBHOOK_SECRET: z.string().optional(),
+    STRIPE_SECRET_KEY: z.string(),
+    STRIPE_WEBHOOK_SECRET: z.string(),
   },
 
   // Client-side public environment variables
@@ -34,7 +33,7 @@ const env = createEnv({
     NEXT_PUBLIC_POSTHOG_HOST: z.string().optional(),
 
     // Payments
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string(),
   },
 
   // Linking runtime environment variables
@@ -62,7 +61,6 @@ const env = createEnv({
     NEXT_PUBLIC_POSTHOG_HOST: process.env.POSTHOG_HOST,
 
     // Payments
-    DODO_API_KEY: process.env.DODO_API_KEY,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,

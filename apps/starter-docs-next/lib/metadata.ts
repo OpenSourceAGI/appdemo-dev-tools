@@ -1,4 +1,4 @@
-import { APP_NAME } from "@/constants";
+import { APP_NAME } from "@/lib";
 import env from "@/env";
 import type { Metadata } from "next/types";
 

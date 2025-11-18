@@ -1,8 +1,4 @@
-# A Free Full-Stack production-ready SaaS starter kit.
-
-![Screenshot](public/images/landing_ss.png)
-
-NOTE: THE V1 WILL BE LAUNCHED IN END OF Q1 AS THE OP HAS PAUSED WORK ON IT.
+# Full Stack Kit - React Next.js  BetterAuth Drizzle Shadcn
 
 ## Features
 
@@ -11,7 +7,7 @@ NOTE: THE V1 WILL BE LAUNCHED IN END OF Q1 AS THE OP HAS PAUSED WORK ON IT.
 - Modern UI/UX: Tailwind CSS, dark/light mode, and dashboards.
 - Type-Safe Development: TypeScript, Drizzle ORM, PostgreSQL, Zod validation.
 - Analytics: PostHog integration.
-- Payments (upcoming): Stripe, DodoPayments, and billing options.
+- Payments: Stripe integration with Better Auth for subscriptions and billing.
 
 ## Tech Stack
 
@@ -42,10 +38,59 @@ NOTE: THE V1 WILL BE LAUNCHED IN END OF Q1 AS THE OP HAS PAUSED WORK ON IT.
 
 ### Upcoming
 
-- [ ] Payments (Stripe and DodoPayments integration)
+- [x] Payments (Stripe integration with Better Auth)
 - [ ] Minor fixes here and there to Improve UX & DX
 - [ ] Ship v1
 - [ ] Create full setup tutorial
+
+## Stripe Setup
+
+This project uses Stripe for payments and subscriptions, integrated with Better Auth.
+
+### Prerequisites
+
+1. **Stripe Account**: Create a Stripe account at [stripe.com](https://stripe.com)
+2. **Stripe Products & Prices**: Create products and prices in your Stripe dashboard
+3. **Webhook Endpoint**: Set up webhook endpoint in Stripe dashboard
+
+### Configuration Steps
+
+1. **Get Stripe Keys**:
+   - Go to Stripe Dashboard → Developers → API Keys
+   - Copy your Publishable Key and Secret Key
+   - Add them to your `.env` file
+
+2. **Create Products & Prices**:
+   - Create products in Stripe Dashboard → Products
+   - Create prices for each product (monthly/yearly)
+   - Copy the Price IDs (e.g., `price_1234567890`)
+
+3. **Update Price IDs**:
+   - Edit `lib/auth/server.ts`
+   - Replace placeholder price IDs with your actual Stripe Price IDs:
+     ```typescript
+     plans: [
+       {
+         name: "basic",
+         priceId: "price_your_basic_monthly_id", // Replace with actual ID
+         // ...
+       },
+       // ...
+     ]
+     ```
+
+4. **Set up Webhooks**:
+   - Go to Stripe Dashboard → Developers → Webhooks
+   - Add endpoint: `https://your-domain.com/api/auth/stripe/webhook`
+   - Select events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
+   - Copy webhook signing secret to `STRIPE_WEBHOOK_SECRET` in `.env`
+
+5. **Environment Variables**:
+   ```bash
+   STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
+   STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
+   ```
 
 ## Docker Setup
 
@@ -55,6 +100,7 @@ This project includes Docker and Docker Compose configuration for easy developme
 
 - Docker and Docker Compose installed
 - Bun package manager (recommended) or Node.js
+- Stripe account and API keys (see Stripe Setup above)
 
 ### Quick Start with Docker
 
@@ -63,7 +109,7 @@ This project includes Docker and Docker Compose configuration for easy developme
    git clone <repository-url>
    cd starter-next-better-drizzle
    cp env.example .env
-   # Edit .env with your actual values
+   # Edit .env with your actual values including Stripe keys
    ```
 
 2. **Start development environment:**

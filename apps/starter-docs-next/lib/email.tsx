@@ -2,7 +2,7 @@ import { Resend } from "resend";
 
 import env from "@/env";
 import { ReactNode } from "react";
-import { APP_NAME } from "@/constants";
+import { APP_NAME } from "@/lib";
 const resend = new Resend(env.RESEND_API_KEY);
 
 const DEFAULT_SENDER_NAME = APP_NAME;
