@@ -1,0 +1,7 @@
+1:"$Sreact.fragment"
+2:I[321581,["/_next/static/chunks/b1d6f1a2206066e7.js","/_next/static/chunks/713f3b769c74520b.js"],"ViewportBoundary"]
+4:I[321581,["/_next/static/chunks/b1d6f1a2206066e7.js","/_next/static/chunks/713f3b769c74520b.js"],"MetadataBoundary"]
+5:"$Sreact.suspense"
+0:{"buildId":"z-0cgayA3ujvAfrTUsIj0","rsc":["$","$1","h",{"children":[null,["$","$L2",null,{"children":"$@3"}],["$","div",null,{"hidden":true,"children":["$","$L4",null,{"children":["$","$5",null,{"name":"Next.Metadata","children":"$@6"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"loading":null,"isPartial":false}
+3:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+6:[["$","title","0",{"children":"🤖 AI Code Editors"}],["$","meta","1",{"property":"og:title","content":"🤖 AI Code Editors"}],["$","meta","2",{"property":"og:image","content":"http://localhost:3000/docs-og/comparisons/ai-code-editors/image.png"}],["$","meta","3",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","4",{"name":"twitter:title","content":"🤖 AI Code Editors"}],["$","meta","5",{"name":"twitter:image","content":"http://localhost:3000/docs-og/comparisons/ai-code-editors/image.png"}]]
