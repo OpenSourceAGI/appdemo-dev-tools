@@ -11,5 +11,5 @@ export const source = loader({
 });
 
 export const openapi = createOpenAPI({
-  input: ['./openapi.yml'],
+  input: ['./qwksearch-openapi.yml'],
 });
