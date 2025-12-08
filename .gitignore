@@ -16,5 +16,10 @@ bun.lockb
 migrations/*
 .docusaurus/*
 */.next/*
+*/dist/*
 apps/docs/.next/*
 bun.lock
+
+dist/
+packages/template-fumadocs/.next/*
+.next/

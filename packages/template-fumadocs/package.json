@@ -1,0 +1,43 @@
+{
+  "name": "research-agent-docs",
+  "description": "FumaDocs Starter - Search, Docs Sidebar, API Docs",
+  "version": "1.1.0",
+  "private": true,
+  "scripts": {
+    "build": "next build --turbo; echo 'airesearch.js.org' > ./dist/CNAME;",
+    "build:api": "node ./scripts/generate-api-docs.mjs ./qwksearch-openapi.yml",
+    "dev": "next dev --turbo",
+    "copy": "rm -rf ../web/static/docs; mkdir ../web/static/docs; cp -r ./dist/* ../web/static/docs/",
+    "start": "bunx concurrently \"npx serve -l 3000 ./dist --single\" \"sleep 2 && bunx open-cli http://localhost:3000\"",
+    "check": "fumadocs-mdx && tsc --noEmit"
+  },
+  "dependencies": {
+    "@fumadocs/mdx-remote": "^1.4.3",
+    "@orama/orama": "^3.1.16",
+    "class-variance-authority": "^0.7.1",
+    "fumadocs-core": "^16.1.0",
+    "fumadocs-mdx": "^14.0.3",
+    "fumadocs-openapi": "^10.0.11",
+    "fumadocs-typescript": "^4.0.13",
+    "fumadocs-ui": "^16.1.0",
+    "lucide-react": "^0.555.0",
+    "next": "^16.0.5",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "shiki": "^3.17.0",
+    "tailwind-merge": "^3.4.0",
+    "unist-util-remove-position": "^5.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/mdx": "^2.0.13",
+    "@types/node": "24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "baseline-browser-mapping": "^2.8.32",
+    "postcss": "^8.5.6",
+    "rimraf": "^6.1.2",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.9.3"
+  }
+}

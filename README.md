@@ -49,6 +49,66 @@ bun create starter-app
 
 ✅ [Vitest](https://vitest.dev/guide/ui) - unit testing UI
 
+### 📦 Available Starter Templates
+
+The `packages/` folder contains production-ready starter templates for different use cases:
+
+#### 1. **template-svelte-auth-drizzle-shadcn** (Main Template)
+Full-stack SvelteKit starter with authentication and database integration.
+
+**Tech Stack:**
+- **Framework:** SvelteKit with Cloudflare adapter
+- **Database:** Drizzle ORM with Cloudflare D1
+- **Auth:** Better Auth with Google OAuth
+- **UI:** Tailwind CSS + shadcn-svelte + Bits UI
+- **Forms:** Formsnap + Superforms with Zod validation
+- **Email:** Resend for transactional emails
+- **Testing:** Vitest with UI
+- **Deployment:** Cloudflare Pages
+
+#### 2. **template-nextjs-drizzle-betterauth**
+Modern Next.js SaaS boilerplate with comprehensive authentication.
+
+**Tech Stack:**
+- **Framework:** Next.js 15 with App Router
+- **Database:** PostgreSQL with Drizzle ORM
+- **Auth:** Better Auth with Better Auth UI components
+- **UI:** shadcn/ui + Tailwind CSS
+- **Payments:** Stripe integration
+- **Uploads:** UploadThing for file management
+- **Email:** Resend
+- **Monorepo:** Turborepo
+- **Linting:** Biome
+
+#### 3. **template-nextjs-betterauth-prisma-shadcn**
+Next.js starter focused on authentication with Prisma.
+
+**Tech Stack:**
+- **Framework:** Next.js 15
+- **Database:** PostgreSQL with Prisma ORM
+- **Auth:** Better Auth (Google OAuth + Credentials)
+- **UI:** shadcn + Tailwind CSS
+
+#### 4. **template-fumadocs**
+Documentation site template with search and API documentation.
+
+**Tech Stack:**
+- **Framework:** Next.js with Fumadocs
+- **UI:** Fumadocs UI components
+- **Search:** Orama search engine
+- **API Docs:** Fumadocs OpenAPI + TypeScript support
+- **Styling:** Tailwind CSS
+
+#### 5. **template-docusaurus**
+Documentation template using Docusaurus with OpenAPI support.
+
+**Tech Stack:**
+- **Framework:** Docusaurus 3
+- **Search:** Lunr Search
+- **API Docs:** OpenAPI Docs plugin + TypeDoc
+- **Styling:** Tailwind CSS
+- **React:** React 19
+
 ### 🖼️ Screenshots
 
 <img width="350px" src="https://i.imgur.com/jIaL6yP.png" /><img width="350px" src="https://i.imgur.com/NlkjlWI.png" />

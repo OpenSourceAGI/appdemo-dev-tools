@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "ESNext",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -15,36 +12,29 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "fumadocs-mdx:collections/*": [
-        "./.source/*"
-      ]
+      "@/*": ["./src/*"],
+      "fumadocs-mdx:collections/*": [".source/*"]
     },
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "ignoreDeprecations": "5.0"
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "../docs-old/types/**/*.ts",
-    "./docs/types/**/*.ts",
-    ".next/types/**/*.ts",
     "next-env.d.ts",
-    "./dist/types/**/*.ts",
-    "dist/types/**/*.ts",
-    "dist/dev/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    "**/*.ts",
+    "**/*.mts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "next.config.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
