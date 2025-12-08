@@ -8,15 +8,14 @@ export default function HomePage() {
         <div className="text-center mb-6">
 
           {/* Main Logo */}
-          <div className="mb-4">
-            <img width="350px" src="https://i.imgur.com/PE4kQWy.png" />
-
+          <div className="mb-4 w-fit mx-auto">
+            <img width="350px" src="https://i.imgur.com/PE4kQWy.png" alt="Main Logo" />
           </div>
 
           {/* Install Command */}
-          <div className="bg-gray-900 text-green-400 p-3 rounded-lg font-mono text-base mb-4 inline-block shadow-lg">
+          {/* <div className="bg-gray-900 text-green-400 p-3 rounded-lg font-mono text-base mb-4 inline-block shadow-lg">
             npm i grab-url
-          </div>
+          </div> */}
         </div>
 
         {/* Badges Section */}
