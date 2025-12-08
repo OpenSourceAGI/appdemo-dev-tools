@@ -10,9 +10,7 @@ export default function DocsPage(): ReactElement {
       <h1 className='font-semibold text-2xl md:text-3xl'>
         Welcome to the Starter Kit
       </h1>
-      <p className='mt-1 text-fd-muted-foreground text-lg'>
-        Get started with Fumadocs.
-      </p>
+     
 
       <div className='mt-8 grid grid-cols-1 gap-4 text-left md:grid-cols-2'>
         <DocumentationItem
@@ -23,10 +21,10 @@ export default function DocsPage(): ReactElement {
         />
 
         <DocumentationItem
-          title='API Reference'
+          title='Tool Rank'
           description="Get started with Fumadocs's API reference feature."
           icon={{ icon: WebhookIcon, id: 'api-reference' }}
-          href='/docs/api-reference'
+          href='/docs/comparisons/_tool_rank'
         />
       </div>
     </main>

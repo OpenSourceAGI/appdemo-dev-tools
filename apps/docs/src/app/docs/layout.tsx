@@ -43,29 +43,21 @@ export default function Layout({ children }: LayoutProps<'/docs'>) {
         },
       }}
       tabMode='navbar'
-      searchToggle={{
-        components: {
-          lg: (
-            <div className='flex gap-1.5 max-md:hidden'>
-              {/* <LargeSearchToggle className='flex-1 rounded-xl' /> */}
-            </div>
-          ),
-        },
-      }}
+    
       nav={{
         ...base.nav,
         mode: 'top',
         title: (
           <>
             {logo}
-            <span className='font-medium max-md:hidden'>Starter Kit</span>
+            <span className='font-medium max-md:hidden'>Template Starter Docs</span>
           </>
         ),
       }}
     >
       {children}
       {/* <DocsBackground /> */}
-      <AISearchTrigger />
+      {/* <AISearchTrigger /> */}
     </DocsLayout>
   )
 }
