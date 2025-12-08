@@ -4,6 +4,8 @@ title: 🤖 AI Code Editors
 
 | Tool | Type | Primary Focus | Major Models | Free Tier | Paid Plan | Best For | Unique Features |
 |------|------|---------------|-------------|-----------|-----------|-----------|-----------------|
+| **[Google Antigravity](https://antigravity.google/download)** | Agentic Platform | Multi-agent orchestration | Gemini 3 Pro, Claude Sonnet 4.5, GPT-OSS | Generous limits | Free (preview) | Complex workflows, enterprise | Agent Manager for parallel agents, browser automation, Artifacts (screenshots/walkthroughs), knowledge base learning, VS Code fork |
+| **[Claude Code](https://claude.com/product/claude-code)** | Terminal CLI | Agentic terminal coding | Claude Sonnet 4.5, Opus 4.5 | None | Pro $20/mo, Max $100-200/mo | Terminal-first devs, deep codebase | Terminal integration, works alongside any IDE, MCP servers, Git/GitHub integration, multi-file edits, agentic codebase search |
 | **[v0 by Vercel](https://v0.dev/)** | UI Generator | React/Tailwind UIs | Claude, GPT-4 | $5 credits/mo | $20+/mo | Frontend prototyping | Vercel+GitHub, visual designer, UI-first |
 | **[Lovable](https://lovable.dev/)** | App Builder | Full-stack web apps | Claude, GPT-4, Gemini | 5 credits/day | $25+/mo | MVPs, non-devs | Supabase, deploy, team collaboration |
 | **[Cursor](https://cursor.sh/)** | Code Editor | Productivity, multi-file | Claude, GPT-4, Gemini | 2K completions/mo | $20+/mo | Daily dev, large codebase | VS Code fork, privacy, context tracking |
