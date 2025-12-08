@@ -16,7 +16,7 @@ export const env = createEnv({
   //     z.url()
   //   ),
   // },
-  experimental__runtimeEnv: {
-    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
-  },
+  // experimental__runtimeEnv: {
+  //   NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+  // },
 })
