@@ -6,17 +6,18 @@ title: 💰 Investment Brokers
 
 | API Provider | Data Coverage | Rating | Label | Pricing (Indiv.) | Notes / Best For |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [Polygon.io](https://polygon.io) | Stocks, Options, Crypto, FX | 4.9 | Top Pick | Free Tier; Paid from \$29/mo | Best for Pros. Direct exchange connectivity. Ultra-low latency. 100% market coverage (SIP). |
 | [Alpaca Data](https://alpaca.markets/data) | US Stocks, Crypto, Options | 4.7 | Excellent | Free (IEX); \$99/mo (SIP) | Best for Traders. Seamless integration with trading. Paid plan offers unlimited SIP data. |
-| [Tiingo](https://www.tiingo.com) | Stocks, Crypto, FX, News | 4.8 | Best Value | Free; \$30/mo | Best for Hobbyists. Cleanest data (proprietary error-checking). Huge history (30+ years). |
 | [Finnhub](https://finnhub.io) | Stocks, FX, Crypto, Fundamentals | 4.5 | Great | Free; \$50/mo | Best for AI/Devs. Great free tier (60 calls/min). Unique data like social sentiment & ESG. |
+| [Tiingo](https://www.tiingo.com) | Stocks, Crypto, FX, News | 4.8 | Best Value | Free; \$30/mo | Best for Hobbyists. Cleanest data (proprietary error-checking). Huge history (30+ years). |
+| [Polygon.io](https://polygon.io) | Stocks, Options, Crypto, FX | 4.9 | Top Pick | Free Tier; Paid from \$29/mo | Best for Pros. Direct exchange connectivity. Ultra-low latency. 100% market coverage (SIP). |
+| [Alpha Vantage](https://www.alphavantage.co) | Stocks, FX, Crypto, Technicals | 4.0 | Good | Free; \$49.99/mo | Best for Indicators. Specialized in technical indicators (RSI, MACD) pre-calculated. |
 | [EODHD](https://eodhd.com) | Global Stocks, Fundamentals | 4.6 | Great | Free; €19.99/mo | Best for Global. Covers 60+ exchanges worldwide. Very affordable for global data. |
 | [Financial Modeling Prep](https://site.financialmodelingprep.com) | Fundamentals, Stocks, FX | 4.4 | Very Good | Free; \$19/mo | Best for Fundamentals. 30+ years of balance sheets, earnings, and cash flow statements. |
-| [Alpha Vantage](https://www.alphavantage.co) | Stocks, FX, Crypto, Technicals | 4.0 | Good | Free; \$49.99/mo | Best for Indicators. Specialized in technical indicators (RSI, MACD) pre-calculated. |
 | [Twelve Data](https://twelvedata.com) | Stocks, FX, Crypto, Indices | 4.3 | Good | Free; \$29/mo | Good Visuals. flexible API, great for building charting apps. Supports 800 req/day free. |
 | [Yahoo Finance (Unofficial)](https://pypi.org/project/yfinance/) | Everything (Stocks, Crypto, FX) | 3.8 | Average | Free (Open Source) | Best for Learning. No official support. Use via libraries like `yfinance` for non-commercial projects. |
 | [Intrinio](https://intrinio.com) | US Stocks, Options, Fundamentals | 4.2 | Pro | Starts ~\$\$ Hundreds | Enterprise Grade. Focused on institutional tools and Excel add-ins. High entry price. |
 | [MarketStack](https://marketstack.com) | Global Stocks, Intraday | 4.0 | Solid | Free; \$29/mo | Good Alternative. Scalable cloud data, decent global coverage. |
+| [SOV.AI](https://sov.ai) | Alternative Data, ML Tools | N/A | ML Focus | Paid subscription required | Best for Quants. 30,000+ tickers, 30+ years history. 80+ financial ratios, ML asset management tools. Python library. |
 
 
 ## Investment Brokers

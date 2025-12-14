@@ -1,9 +1,0 @@
-post-merge:
-  commands:
-    install-deps:
-      run: bun i
-
-commit-msg:
-  commands:
-    "lint commit message":
-      run: bun commitlint --edit {1}
