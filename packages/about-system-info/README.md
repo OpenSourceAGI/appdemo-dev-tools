@@ -27,6 +27,8 @@ npx about-system
 
 A cross-platform Node.js implementation of the system info script with enhanced features, caching, and full customization support.
 
+[NPM](https://www.npmjs.com/package/about-system-info)
+
 ## Examples
 
 ![systeminfo_greeting](https://i.imgur.com/BX6YsaK.png)
@@ -213,23 +215,3 @@ npm start
 # Run with custom settings
 npm start -- --set display.show_emojis false
 ```
-
-### License
-
-MIT License - see the original bash version for details.
-
-### Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test on multiple platforms
-5. Submit a pull request
-
-### Changelog
-
-- **v0.0.3**: Initial Node.js implementation with cross-platform support
-- Enhanced caching system
-- Settings management
-- Windows compatibility
-- Shell integration improvements

@@ -1,5 +1,7 @@
 # create-cloud-db
 
+[NPM](https://www.npmjs.com/package/create-cloud-db)
+
 `create-cloud-db` is a small CLI that creates a Turso database and manages the `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` values in your local `.env` file.
 
 It is designed for quick local setup so you can be ready to connect from Node, frameworks, or serverless environments with minimal manual configuration.
@@ -20,9 +22,14 @@ Then run:
 
 ```bash
 # will ask for name
+npm create cloud-db
+
+# or
 npx create-cloud-db
 
+# or
 npx create-cloud-db [myapp-db]
+
 ```
 
 Or install globally:

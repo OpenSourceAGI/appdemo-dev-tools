@@ -40,12 +40,12 @@
     "system-monitoring"
   ],
   "author": "vtempest",
-  "license": "MIT",
+  "license": "rights.institute/prosper",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vtempest/server-shell-setup.git"
+    "url": "https://github.com/OpenSourceAGI/StarterDOCS/tree/master/packages/about-system-info.git"
   },
-  "homepage": "https://github.com/vtempest/server-shell-setup#readme",
+  "homepage": "https://github.com/OpenSourceAGI/StarterDOCS/tree/master/packages/about-system-info",
   "files": [
     "src/about-system.js",
     "README.md",
