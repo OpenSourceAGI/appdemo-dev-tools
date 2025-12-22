@@ -1,0 +1,22 @@
+{
+  "name": "create-cloud-db",
+  "type": "module",
+  "version": "1.0.1",
+  "description": "CLI to create a Turso database and manage TURSO_* env vars",
+  "main": "create-cloud-db.js",
+  "bin": {
+    "create-cloud-db": "./create-cloud-db.js"
+  },
+  "scripts": {
+    "ship": "npx standard-version --release-as patch; npm publish",
+    "start": "node create-cloud-db.js"
+  },
+  "keywords": [
+    "turso",
+    "database",
+    "cli",
+    "env"
+  ],
+  "author": "",
+  "license": "MIT"
+}
