@@ -3,7 +3,7 @@
   "description": "CLI to create a Turso database and write TURSO_* env vars to .env file",
   "type": "module",
   "author": "vtempest",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "create-cloud-db.js",
   "bin": {
     "create-cloud-db": "./create-cloud-db.js"
@@ -12,6 +12,11 @@
     "ship": "npx standard-version --release-as patch; rm CHANGELOG.md; npm publish",
     "start": "node create-cloud-db.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenSourceAGI/StarterDOCS/tree/master/packages/create-cloud-db"
+  },
+  "homepage": "https://github.com/OpenSourceAGI/StarterDOCS/tree/master/packages/create-cloud-db",
   "keywords": [
     "turso",
     "database",
