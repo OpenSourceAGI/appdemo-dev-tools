@@ -1,8 +1,9 @@
 {
   "name": "create-cloud-db",
-  "type": "module",
-  "version": "1.0.1",
   "description": "CLI to create a Turso database and manage TURSO_* env vars",
+  "type": "module",
+  "author": "vtempest",
+  "version": "1.0.1",
   "main": "create-cloud-db.js",
   "bin": {
     "create-cloud-db": "./create-cloud-db.js"
@@ -17,6 +18,5 @@
     "cli",
     "env"
   ],
-  "author": "",
   "license": "MIT"
 }
