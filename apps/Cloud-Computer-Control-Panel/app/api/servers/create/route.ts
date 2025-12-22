@@ -1,0 +1,284 @@
+process.env.AWS_SDK_LOAD_CONFIG = "0"
+
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
+import { NextResponse } from "next/server"
+import { runInstance, allocateAddress, associateAddress, createOrGetDokploySecurityGroup } from "@/lib/aws-ec2-client"
+import { getUbuntuAMI } from "@/lib/aws-ami-ids"
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+
+    let accessKeyId: string
+    let secretAccessKey: string
+
+    if (body.accessKeyId === "env") {
+      accessKeyId = process.env.AWS_ACCESS_KEY_ID || ""
+      secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY || ""
+    } else {
+      accessKeyId = body.accessKeyId
+      secretAccessKey = body.secretAccessKey
+    }
+
+    if (!accessKeyId || !secretAccessKey) {
+      return NextResponse.json({ message: "Missing AWS credentials" }, { status: 400 })
+    }
+
+    const region = body.region || process.env.AWS_REGION || "us-east-1"
+    const { config } = body
+
+    let securityGroupId: string | undefined
+    if (config.setupDokploy) {
+      try {
+        const { groupId } = await createOrGetDokploySecurityGroup(accessKeyId, secretAccessKey, region)
+        securityGroupId = groupId
+        console.log("[v0] Using Dokploy security group:", groupId)
+      } catch (sgError) {
+        console.error("[v0] Failed to create security group:", sgError)
+      }
+    }
+
+    let dockerComposeContent = ""
+    if (config.dockerServices && config.dockerServices.length > 0) {
+      dockerComposeContent = "version: '3.8'\\n\\nservices:\\n"
+      config.dockerServices.forEach((service: any) => {
+        dockerComposeContent += `  ${service.name}:\\n`
+        dockerComposeContent += `    image: ${service.image}\\n`
+        dockerComposeContent += `    restart: always\\n`
+        if (service.ports && service.ports.length > 0) {
+          dockerComposeContent += `    ports:\\n`
+          service.ports.forEach((port: string) => {
+            dockerComposeContent += `      - "${port}"\\n`
+          })
+        }
+        dockerComposeContent += `\\n`
+      })
+    }
+
+    const userDataScript = `#!/bin/bash
+set -e
+
+# Update system
+apt-get update && apt-get upgrade -y
+
+${
+  config.setupDokploy
+    ? `
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+
+# Install Docker Compose
+curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+# Initialize Docker Swarm
+docker swarm init
+
+# Install Dokploy
+curl -sSL https://dokploy.com/install.sh | sh
+
+${
+  config.githubRepos && config.githubRepos.length > 0
+    ? `
+# Wait for Dokploy to be ready
+sleep 30
+
+# Clone GitHub repositories for Dokploy deployment
+mkdir -p /root/repos
+cd /root/repos
+
+${config.githubRepos
+  .map(
+    (repo: any, index: number) => `
+# Clone ${repo.name}
+git clone ${repo.url} repo-${index}
+echo "Repository ${repo.name} cloned and ready for Dokploy deployment" >> /var/log/dokploy-repos.log
+`,
+  )
+  .join("\n")}
+
+# Create deployment info file
+cat > /root/dokploy-repos.json << 'REPOS_EOF'
+${JSON.stringify(config.githubRepos, null, 2)}
+REPOS_EOF
+
+${
+  config.dokployApiKey && config.dokployApiKey.trim() !== ""
+    ? `
+# Automated Dokploy deployment via API
+echo "Starting automated Dokploy deployment..." >> /var/log/dokploy-repos.log
+
+# Wait for Dokploy to be fully ready
+sleep 60
+
+# Get the Dokploy server URL
+DOKPLOY_URL="http://localhost:3000"
+API_KEY="${config.dokployApiKey}"
+
+${config.githubRepos
+  .map(
+    (repo: any, index: number) => `
+# Deploy ${repo.name} to Dokploy
+curl -X POST "$DOKPLOY_URL/api/application.create" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "app-${index}",
+    "appName": "${repo.name.split("/")[1] || repo.name}",
+    "repositoryUrl": "${repo.url}",
+    "branch": "main",
+    "buildPath": "/",
+    "autoDeploy": true
+  }' >> /var/log/dokploy-api-deployment.log 2>&1
+
+echo "Deployed ${repo.name} to Dokploy via API" >> /var/log/dokploy-repos.log
+sleep 5
+`,
+  )
+  .join("\n")}
+
+echo "All repositories deployed to Dokploy automatically" >> /var/log/dokploy-repos.log
+`
+    : `
+echo "GitHub repositories cloned successfully. Deploy them manually via Dokploy UI at http://YOUR_IP:3000" >> /var/log/dokploy-repos.log
+`
+}
+`
+    : ""
+}
+`
+    : ""
+}
+
+${
+  config.setupDevEnvironment
+    ? `
+# Install development tools
+${config.devTools.includes("git") ? "apt-get install -y git" : ""}
+${config.devTools.includes("nodejs") ? "curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs" : ""}
+${config.devTools.includes("python3") ? "apt-get install -y python3 python3-pip" : ""}
+${config.devTools.includes("nginx") ? "apt-get install -y nginx" : ""}
+`
+    : ""
+}
+
+${
+  config.setupDevToolsShell
+    ? `
+echo "Installing comprehensive dev tools shell..." >> /var/log/setup.log
+wget -qO- https://dub.sh/dev.sh | bash -s -- all >> /var/log/dev-tools-install.log 2>&1
+echo "Dev tools shell installation completed" >> /var/log/setup.log
+`
+    : ""
+}
+
+${
+  dockerComposeContent
+    ? `
+# Create docker-compose.yml
+cat > /root/docker-compose.yml << 'DOCKER_COMPOSE_EOF'
+${dockerComposeContent}
+DOCKER_COMPOSE_EOF
+
+# Create systemd service to run docker-compose on boot
+cat > /etc/systemd/system/docker-compose-app.service << 'SYSTEMD_EOF'
+[Unit]
+Description=Docker Compose Application Service
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/root
+ExecStart=/usr/local/bin/docker-compose up -d
+ExecStop=/usr/local/bin/docker-compose down
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
+SYSTEMD_EOF
+
+# Enable and start the service
+systemctl daemon-reload
+systemctl enable docker-compose-app.service
+systemctl start docker-compose-app.service
+`
+    : ""
+}
+
+${
+  config.customScript && config.customScript.trim() !== ""
+    ? `
+# Custom user script
+${config.customScript}
+`
+    : ""
+}
+
+echo "Setup completed at $(date)" > /var/log/setup-complete.log
+`
+
+    const cleanKeyName = config.keyName && config.keyName.trim() !== "" ? config.keyName : undefined
+    console.log("[v0] Launching with keyName:", cleanKeyName || "none (will launch without key pair)")
+
+    const { instanceId: newInstanceId } = await runInstance(accessKeyId, secretAccessKey, region, {
+      imageId: getUbuntuAMI(region),
+      instanceType: config.instanceType || "t3.small",
+      keyName: cleanKeyName,
+      storageSize: config.storageSize || 40,
+      instanceName: config.instanceName,
+      userDataScript,
+      securityGroupId,
+      tags: config.setupDokploy
+        ? [
+            { Key: "Name", Value: config.instanceName },
+            { Key: "Dokploy", Value: "true" },
+          ]
+        : [{ Key: "Name", Value: config.instanceName }],
+    })
+
+    if (!newInstanceId) {
+      throw new Error("Failed to launch instance")
+    }
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+      const { allocationId, publicIp } = await allocateAddress(accessKeyId, secretAccessKey, region)
+
+      if (allocationId && publicIp) {
+        await associateAddress(accessKeyId, secretAccessKey, region, allocationId, newInstanceId)
+
+        return NextResponse.json({
+          message: "Instance launched successfully with Elastic IP",
+          instanceId: newInstanceId,
+          elasticIp: publicIp,
+          allocationId,
+        })
+      }
+    } catch (ipError) {
+      console.error("[v0] Failed to allocate Elastic IP:", ipError)
+      return NextResponse.json({
+        message: "Instance launched but Elastic IP allocation failed",
+        instanceId: newInstanceId,
+      })
+    }
+
+    return NextResponse.json({
+      message: "Instance launched successfully",
+      instanceId: newInstanceId,
+    })
+  } catch (error) {
+    console.error("[v0] Error creating server:", error)
+    return NextResponse.json(
+      {
+        message: "Failed to create server",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
+  }
+}

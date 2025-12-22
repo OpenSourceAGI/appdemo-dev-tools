@@ -1,0 +1,270 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CCCP Cloud Computer Control Panel API",
+    "description": "API for managing AWS EC2 instances with Dokploy integration, Docker Compose, and GitHub repository deployment",
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api",
+      "description": "Local API server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "awsCredentials": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-aws-access-key-id",
+        "description": "AWS Access Key ID (use 'server-env' to use server environment variables)"
+      }
+    },
+    "schemas": {
+      "Instance": {
+        "type": "object",
+        "properties": {
+          "instanceId": {
+            "type": "string",
+            "example": "i-1234567890abcdef0"
+          },
+          "instanceType": {
+            "type": "string",
+            "example": "t3.small"
+          },
+          "state": {
+            "type": "string",
+            "enum": ["pending", "running", "stopping", "stopped", "shutting-down", "terminated"]
+          },
+          "publicIp": {
+            "type": "string",
+            "example": "54.123.456.789"
+          },
+          "privateIp": {
+            "type": "string",
+            "example": "172.31.0.1"
+          },
+          "launchTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Key": { "type": "string" },
+                "Value": { "type": "string" }
+              }
+            }
+          },
+          "region": {
+            "type": "string",
+            "example": "us-east-1"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/check-credentials": {
+      "get": {
+        "summary": "Check AWS Credentials",
+        "description": "Verify if AWS credentials are available in environment variables",
+        "tags": ["Authentication"],
+        "responses": {
+          "200": {
+            "description": "Credential status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "hasCredentials": { "type": "boolean" },
+                    "region": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instances/all-regions": {
+      "get": {
+        "summary": "Scan All AWS Regions",
+        "description": "Scan all AWS regions for EC2 instances",
+        "tags": ["EC2 Instances"],
+        "security": [{ "awsCredentials": [] }],
+        "responses": {
+          "200": {
+            "description": "Instances from all regions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "instances": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Instance" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/servers/create": {
+      "post": {
+        "summary": "Create New EC2 Server",
+        "description": "Launch a new EC2 instance with optional Dokploy, Docker Compose, and GitHub deployments",
+        "tags": ["Servers"],
+        "security": [{ "awsCredentials": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["config"],
+                "properties": {
+                  "region": { "type": "string", "default": "us-east-1" },
+                  "config": {
+                    "type": "object",
+                    "required": ["instanceName"],
+                    "properties": {
+                      "instanceName": { "type": "string" },
+                      "instanceType": { "type": "string", "default": "t3.small" },
+                      "storageSize": { "type": "integer", "default": 40 },
+                      "keyName": { "type": "string" },
+                      "setupDokploy": { "type": "boolean" },
+                      "dokployApiKey": { "type": "string" },
+                      "dockerServices": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": { "type": "string" },
+                            "image": { "type": "string" },
+                            "ports": { "type": "array", "items": { "type": "string" } }
+                          }
+                        }
+                      },
+                      "githubRepos": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": { "type": "string" },
+                            "url": { "type": "string" }
+                          }
+                        }
+                      },
+                      "customScript": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Server created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "instanceId": { "type": "string" },
+                    "elasticIp": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instances": {
+      "post": {
+        "summary": "Manage EC2 Instance",
+        "description": "Start, stop, reboot, or terminate an existing EC2 instance",
+        "tags": ["EC2 Instances"],
+        "security": [{ "awsCredentials": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["action", "instanceId"],
+                "properties": {
+                  "region": { "type": "string", "default": "us-east-1" },
+                  "action": {
+                    "type": "string",
+                    "enum": ["start", "stop", "terminate", "reboot"]
+                  },
+                  "instanceId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Action completed"
+          }
+        }
+      }
+    },
+    "/docker-search": {
+      "get": {
+        "summary": "Search Docker Hub",
+        "description": "Search for Docker images on Docker Hub",
+        "tags": ["Docker"],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "nginx"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Docker Hub search results"
+          }
+        }
+      }
+    },
+    "/github-search": {
+      "get": {
+        "summary": "Search GitHub Repositories",
+        "description": "Search for GitHub repositories",
+        "tags": ["GitHub"],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "react"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "GitHub search results"
+          }
+        }
+      }
+    }
+  }
+}

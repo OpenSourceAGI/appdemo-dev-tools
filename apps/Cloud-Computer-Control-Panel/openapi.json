@@ -1,0 +1,762 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AWS Manager API",
+    "description": "API for managing AWS EC2 instances with Dokploy integration and Docker Compose support",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/api",
+      "description": "Local API server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "awsCredentials": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "accessKeyId",
+        "description": "AWS Access Key ID or 'env' to use environment variables"
+      }
+    },
+    "schemas": {
+      "Instance": {
+        "type": "object",
+        "properties": {
+          "instanceId": {
+            "type": "string",
+            "example": "i-1234567890abcdef0"
+          },
+          "instanceType": {
+            "type": "string",
+            "example": "t3.small"
+          },
+          "state": {
+            "type": "string",
+            "enum": ["pending", "running", "stopping", "stopped", "shutting-down", "terminated"]
+          },
+          "publicIp": {
+            "type": "string",
+            "example": "54.123.456.789"
+          },
+          "privateIp": {
+            "type": "string",
+            "example": "172.31.0.1"
+          },
+          "launchTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Key": { "type": "string" },
+                "Value": { "type": "string" }
+              }
+            }
+          },
+          "region": {
+            "type": "string",
+            "example": "us-east-1"
+          },
+          "availabilityZone": {
+            "type": "string",
+            "example": "us-east-1a"
+          }
+        }
+      },
+      "LaunchConfig": {
+        "type": "object",
+        "required": ["instanceName", "keyName"],
+        "properties": {
+          "instanceType": {
+            "type": "string",
+            "default": "t3.small",
+            "example": "t3.small"
+          },
+          "keyName": {
+            "type": "string",
+            "description": "EC2 key pair name"
+          },
+          "storageSize": {
+            "type": "integer",
+            "default": 40,
+            "description": "EBS volume size in GB"
+          },
+          "instanceName": {
+            "type": "string",
+            "description": "Name tag for the instance"
+          },
+          "setupDokploy": {
+            "type": "boolean",
+            "default": false,
+            "description": "Install Dokploy on the instance"
+          },
+          "setupDevEnvironment": {
+            "type": "boolean",
+            "default": false,
+            "description": "Install development tools"
+          },
+          "devTools": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["git", "nodejs", "python3", "nginx"]
+            }
+          },
+          "dockerServices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "image": { "type": "string" },
+                "ports": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          },
+          "githubRepos": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "url": { "type": "string" }
+              }
+            }
+          },
+          "dokployApiKey": {
+            "type": "string",
+            "description": "Dokploy API key for automated deployment"
+          },
+          "customScript": {
+            "type": "string",
+            "description": "Custom bash script to run"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/check-credentials": {
+      "get": {
+        "summary": "Check AWS Credentials",
+        "description": "Checks if AWS credentials are available in environment variables",
+        "tags": ["Authentication"],
+        "responses": {
+          "200": {
+            "description": "Credential status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "hasCredentials": {
+                      "type": "boolean"
+                    },
+                    "region": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instances": {
+      "get": {
+        "summary": "List EC2 Instances",
+        "description": "Fetches EC2 instances from a specific AWS region",
+        "tags": ["Instances"],
+        "parameters": [
+          {
+            "name": "accessKeyId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "AWS Access Key ID or 'env' to use environment variables"
+          },
+          {
+            "name": "secretAccessKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "AWS Secret Access Key or 'env' to use environment variables"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "us-east-1"
+            },
+            "description": "AWS region"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "instances": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Instance"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing credentials"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "post": {
+        "summary": "Manage EC2 Instance",
+        "description": "Launch, start, stop, terminate, or reboot an EC2 instance",
+        "tags": ["Instances"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["accessKeyId", "secretAccessKey", "action"],
+                "properties": {
+                  "accessKeyId": {
+                    "type": "string",
+                    "description": "AWS Access Key ID or 'env'"
+                  },
+                  "secretAccessKey": {
+                    "type": "string",
+                    "description": "AWS Secret Access Key or 'env'"
+                  },
+                  "region": {
+                    "type": "string",
+                    "default": "us-east-1"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": ["launch", "start", "stop", "terminate", "reboot"]
+                  },
+                  "instanceId": {
+                    "type": "string",
+                    "description": "Required for start/stop/terminate/reboot actions"
+                  },
+                  "config": {
+                    "$ref": "#/components/schemas/LaunchConfig",
+                    "description": "Required for launch action"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Action completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "instanceId": {
+                      "type": "string"
+                    },
+                    "elasticIp": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Instance not found"
+          },
+          "408": {
+            "description": "Timeout"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/instances/all-regions": {
+      "get": {
+        "summary": "Scan All Regions",
+        "description": "Scans all AWS regions for EC2 instances",
+        "tags": ["Instances"],
+        "parameters": [
+          {
+            "name": "accessKeyId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "secretAccessKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Instances from all regions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "instances": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Instance"
+                      }
+                    },
+                    "totalRegions": {
+                      "type": "integer"
+                    },
+                    "regionsScanned": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/managers": {
+      "post": {
+        "summary": "Create Managed Instance",
+        "description": "Creates a managed EC2 instance with Dokploy",
+        "tags": ["Managers"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["accessKeyId", "secretAccessKey", "config"],
+                "properties": {
+                  "accessKeyId": {
+                    "type": "string"
+                  },
+                  "secretAccessKey": {
+                    "type": "string"
+                  },
+                  "region": {
+                    "type": "string"
+                  },
+                  "config": {
+                    "$ref": "#/components/schemas/LaunchConfig"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Manager created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "instanceId": {
+                      "type": "string"
+                    },
+                    "publicIp": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get Manager Status",
+        "description": "Fetches status of a managed instance",
+        "tags": ["Managers"],
+        "parameters": [
+          {
+            "name": "accessKeyId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "secretAccessKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Instance status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "instanceId": {
+                      "type": "string"
+                    },
+                    "state": {
+                      "type": "string"
+                    },
+                    "publicIp": {
+                      "type": "string"
+                    },
+                    "privateIp": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/docker-search": {
+      "get": {
+        "summary": "Search Docker Hub",
+        "description": "Search for Docker images on Docker Hub",
+        "tags": ["Docker"],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search query for Docker images",
+            "example": "nginx"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results from Docker Hub",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "repo_name": {
+                            "type": "string",
+                            "example": "library/nginx"
+                          },
+                          "short_description": {
+                            "type": "string",
+                            "example": "Official build of Nginx."
+                          },
+                          "star_count": {
+                            "type": "integer",
+                            "example": 15000
+                          },
+                          "pull_count": {
+                            "type": "integer",
+                            "example": 1000000000
+                          },
+                          "is_official": {
+                            "type": "boolean",
+                            "example": true
+                          },
+                          "is_automated": {
+                            "type": "boolean",
+                            "example": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing query parameter"
+          },
+          "500": {
+            "description": "Docker Hub API error"
+          }
+        }
+      }
+    },
+    "/servers/create": {
+      "post": {
+        "summary": "Create New Server",
+        "description": "Launch a new EC2 instance with Dokploy, Docker Compose, and GitHub repositories",
+        "tags": ["Servers"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["accessKeyId", "secretAccessKey", "config"],
+                "properties": {
+                  "accessKeyId": {
+                    "type": "string",
+                    "description": "AWS Access Key ID or 'env'"
+                  },
+                  "secretAccessKey": {
+                    "type": "string",
+                    "description": "AWS Secret Access Key or 'env'"
+                  },
+                  "region": {
+                    "type": "string",
+                    "default": "us-east-1"
+                  },
+                  "config": {
+                    "type": "object",
+                    "required": ["instanceName"],
+                    "properties": {
+                      "instanceType": {
+                        "type": "string",
+                        "default": "t3.small"
+                      },
+                      "keyName": {
+                        "type": "string",
+                        "description": "Optional SSH key pair name"
+                      },
+                      "storageSize": {
+                        "type": "integer",
+                        "default": 40
+                      },
+                      "instanceName": {
+                        "type": "string"
+                      },
+                      "setupDokploy": {
+                        "type": "boolean",
+                        "default": false
+                      },
+                      "setupDevEnvironment": {
+                        "type": "boolean",
+                        "default": false
+                      },
+                      "devTools": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": ["git", "nodejs", "python3", "nginx"]
+                        }
+                      },
+                      "dockerServices": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": { "type": "string" },
+                            "image": { "type": "string" },
+                            "ports": {
+                              "type": "array",
+                              "items": { "type": "string" }
+                            }
+                          }
+                        }
+                      },
+                      "githubRepos": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": { "type": "string" },
+                            "url": { "type": "string" }
+                          }
+                        }
+                      },
+                      "dokployApiKey": {
+                        "type": "string",
+                        "description": "Dokploy API key for automated deployment"
+                      },
+                      "customScript": {
+                        "type": "string",
+                        "description": "Custom bash script to run"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Server created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "instanceId": { "type": "string" },
+                    "elasticIp": { "type": "string" },
+                    "allocationId": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/github-search": {
+      "get": {
+        "summary": "Search GitHub Repositories",
+        "description": "Search for GitHub repositories by name",
+        "tags": ["GitHub"],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search query for GitHub repositories",
+            "example": "react"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results from GitHub",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "integer" },
+                          "name": { "type": "string" },
+                          "full_name": { "type": "string" },
+                          "description": { "type": "string" },
+                          "html_url": { "type": "string" },
+                          "clone_url": { "type": "string" },
+                          "stargazers_count": { "type": "integer" },
+                          "language": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "AWS credential management"
+    },
+    {
+      "name": "Instances",
+      "description": "EC2 instance operations"
+    },
+    {
+      "name": "Managers",
+      "description": "Managed instance with Dokploy"
+    },
+    {
+      "name": "Docker",
+      "description": "Docker Hub integration and image search"
+    },
+    {
+      "name": "Servers",
+      "description": "Server creation and management"
+    },
+    {
+      "name": "GitHub",
+      "description": "GitHub repository integration"
+    }
+  ]
+}
