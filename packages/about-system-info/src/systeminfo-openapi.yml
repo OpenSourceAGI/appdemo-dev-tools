@@ -1,0 +1,367 @@
+openapi: 3.0.3
+info:
+  title: System Information API
+  description: |
+    A comprehensive system information API that provides detailed information about 
+    system hardware, software, network, and runtime statistics. The API returns 
+    clean, structured data suitable for monitoring, diagnostics, and system analysis.
+  version: 1.0.0
+  contact:
+    name: System Info Service
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+  - url: https://api.example.com/v1
+    description: Production server
+
+paths:
+  /system-info:
+    get:
+      summary: Get comprehensive system information
+      description: |
+        Returns detailed system information including hardware specifications,
+        software versions, network status, resource usage, and runtime statistics.
+        All returned values are clean strings without ANSI color codes or emojis.
+      operationId: getSystemInfo
+      parameters:
+        - name: format
+          in: query
+          description: Response format
+          required: false
+          schema:
+            type: string
+            enum: [json, text]
+            default: json
+        - name: include
+          in: query
+          description: Comma-separated list of specific fields to include
+          required: false
+          schema:
+            type: string
+            example: "cpu,ram_used,disk_used"
+        - name: exclude
+          in: query
+          description: Comma-separated list of fields to exclude
+          required: false
+          schema:
+            type: string
+            example: "ip,city,isp"
+      responses:
+        '200':
+          description: System information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemInfo'
+              examples:
+                linux_desktop:
+                  summary: Linux Desktop System
+                  value:
+                    timestamp: "2025-01-15T10:30:00.000Z"
+                    hostname: "workstation-linux"
+                    user: "admin"
+                    os: "Ubuntu 22.04.3 LTS"
+                    cpu: "Intel Core i7-12700K"
+                    gpu: "NVIDIA GeForce RTX 4070"
+                    device: "Custom Desktop"
+                    kernel: "6.2.0-37-generic"
+                    shell: "bash"
+                    disk_used: "45%"
+                    ram_used: "12/32GB"
+                    top_process: "8% firefox"
+                    uptime: "2d 14h 23m"
+                    temperature: "42°C"
+                    battery: ""
+                    load_average: "0.8 1.2 1.5"
+                    ip: "203.0.113.42"
+                    iplocal: "192.168.1.100"
+                    city: "San Francisco"
+                    domain: "http://example.com"
+                    isp: "Comcast Cable"
+                    pacman: "apt npm pip docker nvim"
+                    ports: "22ssh 80http 443https"
+                    containers: "web-server db-postgres"
+                    services_running: "145 services"
+                    memory_available: "18GB available"
+                    swap_used: "2% (512MB) swap"
+                    users_logged_in: "2 users"
+                    network_interfaces: "eth0 wlan0"
+                    mount_points: "/home(85%) /var(23%)"
+                    screen_resolution: "2560x1440"
+                    platform: "linux"
+                steamos:
+                  summary: Steam Deck System
+                  value:
+                    timestamp: "2025-01-15T10:30:00.000Z"
+                    hostname: "steamdeck"
+                    user: "deck"
+                    os: "SteamOS 3.5.7"
+                    cpu: "AMD Custom APU 0405"
+                    gpu: "AMD RDNA 2 Graphics"
+                    device: "Valve Steam Deck"
+                    kernel: "6.1.52-valve16-1-neptune-61"
+                    shell: "fish"
+                    disk_used: "67%"
+                    ram_used: "6/16GB"
+                    top_process: "12% steam"
+                    uptime: "5h 42m"
+                    temperature: "58°C"
+                    battery: "73%"
+                    load_average: "1.2 0.9 0.7"
+                    ip: "198.51.100.15"
+                    iplocal: "192.168.1.205"
+                    city: "Portland"
+                    domain: ""
+                    isp: "T-Mobile USA"
+                    pacman: "pacman yay flatpak"
+                    ports: "22ssh"
+                    containers: ""
+                    services_running: "89 services"
+                    memory_available: "9GB available"
+                    swap_used: "0% (0MB) swap"
+                    users_logged_in: "1 users"
+                    network_interfaces: "wlan0"
+                    mount_points: "/home(67%)"
+                    screen_resolution: "1280x800"
+                    platform: "linux"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    SystemInfo:
+      type: object
+      description: Complete system information object
+      required:
+        - timestamp
+        - platform
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the information was collected
+          example: "2025-01-15T10:30:00.000Z"
+        
+        # System Identity
+        hostname:
+          type: string
+          description: System hostname/computer name
+          example: "workstation-linux"
+          maxLength: 255
+        user:
+          type: string
+          description: Current logged-in username
+          example: "admin"
+          maxLength: 64
+        platform:
+          type: string
+          enum: [linux, windows, macos, unknown]
+          description: Operating system platform
+          example: "linux"
+        
+        # Operating System
+        os:
+          type: string
+          description: Operating system name and version
+          example: "Ubuntu 22.04.3 LTS"
+          maxLength: 128
+        kernel:
+          type: string
+          description: Kernel version
+          example: "6.2.0-37-generic"
+          maxLength: 64
+        shell:
+          type: string
+          description: Current shell being used
+          example: "bash"
+          maxLength: 32
+        
+        # Hardware
+        cpu:
+          type: string
+          description: CPU model and specifications (clean, no "with..." suffixes)
+          example: "Intel Core i7-12700K"
+          maxLength: 128
+        gpu:
+          type: string
+          description: Graphics card model
+          example: "NVIDIA GeForce RTX 4070"
+          maxLength: 128
+        device:
+          type: string
+          description: Device/computer model name
+          example: "Dell OptiPlex 7090"
+          maxLength: 128
+        
+        # Resource Usage
+        disk_used:
+          type: string
+          description: Root filesystem disk usage percentage
+          pattern: '^\d+%$'
+          example: "45%"
+        ram_used:
+          type: string
+          description: Memory usage in format "used/total GB"
+          pattern: '^\d+/\d+GB$'
+          example: "12/32GB"
+        top_process:
+          type: string
+          description: Highest CPU usage process with percentage
+          pattern: '^\d+% \w+$'
+          example: "8% firefox"
+        uptime:
+          type: string
+          description: System uptime in days, hours, minutes format
+          pattern: '^\d+d \d+h \d+m$'
+          example: "2d 14h 23m"
+        
+        # Hardware Status (Linux-specific)
+        temperature:
+          type: string
+          description: System temperature (empty if unavailable)
+          pattern: '^(\d+°C)?$'
+          example: "42°C"
+        battery:
+          type: string
+          description: Battery percentage and charging status (empty if no battery)
+          pattern: '^(\d+%[\+]?)?$'
+          example: "85%+"
+        load_average:
+          type: string
+          description: System load averages (1m, 5m, 15m) - Linux only
+          pattern: '^(\d+\.\d+ \d+\.\d+ \d+\.\d+)?$'
+          example: "0.8 1.2 1.5"
+        
+        # Network Information
+        ip:
+          type: string
+          description: Public IP address (empty if offline)
+          format: ipv4
+          example: "203.0.113.42"
+        iplocal:
+          type: string
+          description: Local/private IP address(es)
+          example: "192.168.1.100"
+          maxLength: 64
+        city:
+          type: string
+          description: Geographic city based on IP (empty if unavailable)
+          example: "San Francisco"
+          maxLength: 64
+        domain:
+          type: string
+          description: Reverse DNS hostname with http:// prefix (empty if unavailable)
+          format: uri
+          example: "http://example.com"
+        isp:
+          type: string
+          description: Internet Service Provider name (empty if unavailable)
+          example: "Comcast Cable"
+          maxLength: 64
+        
+        # Software and Tools
+        pacman:
+          type: string
+          description: Available package managers and development tools (space-separated)
+          example: "apt npm pip docker nvim yay"
+          maxLength: 256
+        ports:
+          type: string
+          description: Open TCP ports with service names (space-separated)
+          example: "22ssh 80http 443https 3000node"
+          maxLength: 512
+        containers:
+          type: string
+          description: Running Docker containers with ports (space-separated)
+          example: "web-server 80 db-postgres 5432"
+          maxLength: 256
+        services_running:
+          type: string
+          description: Number of active system services
+          pattern: '^\d+ services$'
+          example: "145 services"
+        
+        # Extended System Info (Linux-specific)
+        memory_available:
+          type: string
+          description: Available system memory (Linux only)
+          pattern: '^\d+GB available$'
+          example: "18GB available"
+        swap_used:
+          type: string
+          description: Swap usage percentage and size (Linux only)
+          pattern: '^\d+% \(\d+MB\) swap$'
+          example: "2% (512MB) swap"
+        users_logged_in:
+          type: string
+          description: Number of logged-in users (Linux only)
+          pattern: '^\d+ users$'
+          example: "2 users"
+        network_interfaces:
+          type: string
+          description: Active network interface names (Linux only)
+          example: "eth0 wlan0"
+          maxLength: 128
+        mount_points:
+          type: string
+          description: Non-root mount points with usage (Linux only)
+          example: "/home(85%) /var(23%) /opt(12%)"
+          maxLength: 256
+        screen_resolution:
+          type: string
+          description: Display resolution (Linux with X11 only)
+          pattern: '^\d+x\d+$'
+          example: "1920x1080"
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type
+          example: "SYSTEM_INFO_ERROR"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Failed to collect system information"
+        details:
+          type: string
+          description: Additional error details
+          example: "Unable to read /proc/meminfo"
+        timestamp:
+          type: string
+          format: date-time
+          description: When the error occurred
+          example: "2025-01-15T10:30:00.000Z"
+
+  parameters:
+    FormatParam:
+      name: format
+      in: query
+      description: Response format
+      required: false
+      schema:
+        type: string
+        enum: [json, text]
+        default: json
+
+tags:
+  - name: system
+    description: System information operations
+  - name: hardware
+    description: Hardware-related information
+  - name: network
+    description: Network and connectivity information
+  - name: resources
+    description: System resource usage

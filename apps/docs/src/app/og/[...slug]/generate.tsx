@@ -9,27 +9,27 @@ export interface GenerateProps {
   tag?: string
 }
 
-const font = readFile('./src/app/og/[...slug]/fonts/Inter-Regular.ttf').then(
-  (data) => ({
-    name: 'Inter',
-    data,
-    weight: 400,
-  })
-)
-const fontSemiBold = readFile(
-  './src/app/og/[...slug]/fonts/Inter-SemiBold.ttf'
-).then((data) => ({
-  name: 'Inter',
-  data,
-  weight: 500,
-}))
-const fontBold = readFile('./src/app/og/[...slug]/fonts/Inter-Bold.ttf').then(
-  (data) => ({
-    name: 'Inter',
-    data,
-    weight: 700,
-  })
-)
+// const font = readFile('./src/app/og/[...slug]/fonts/Inter-Regular.ttf').then(
+//   (data) => ({
+//     name: 'Inter',
+//     data,
+//     weight: 400,
+//   })
+// )
+// const fontSemiBold = readFile(
+//   './src/app/og/[...slug]/fonts/Inter-SemiBold.ttf'
+// ).then((data) => ({
+//   name: 'Inter',
+//   data,
+//   weight: 500,
+// }))
+// const fontBold = readFile('./src/app/og/[...slug]/fonts/Inter-Bold.ttf').then(
+//   (data) => ({
+//     name: 'Inter',
+//     data,
+//     weight: 700,
+//   })
+// )
 const logo = readFile('./public/logo.svg').then((data) => ({
   src: 'logo.svg',
   data,
@@ -41,7 +41,7 @@ export async function getImageResponseOptions(): Promise<ImageResponseOptions> {
     width: 1200,
     height: 630,
     persistentImages: [await logo],
-    fonts: await Promise.all([font, fontSemiBold, fontBold]),
+    // fonts: await Promise.all([font, fontSemiBold, fontBold]),
   }
 }
 

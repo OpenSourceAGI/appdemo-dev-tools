@@ -1,0 +1,67 @@
+{
+  "name": "about-system",
+  "version": "0.0.15",
+  "description": "A Node.js script to display key system information with emojis. Cross-platform support for Windows, macOS, and Linux with customizable output and caching.",
+  "main": "src/about-system.js",
+  "bin": {
+    "about-system": "./src/about-system.js",
+    "test-speed": "./src/test-speed-cloudflare.js"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/systeminfo-types.d.ts",
+      "import": "./src/about-system.js"
+    }
+  },
+  "scripts": {
+    "ship": "npx standard-version --release-as patch; npm publish",
+    "start": "node src/about-system.js",
+    "test-speed": "node src/test-speed-cloudflare.js",
+    "install-greeting": "node src/about-system.js --install",
+    "show-settings": "node src/about-system.js --settings-show",
+    "reset-settings": "node src/about-system.js --settings-reset",
+    "clear-cache": "node src/about-system.js --cache-clear",
+    "help": "node src/about-system.js --help"
+  },
+  "keywords": [
+    "src/about-system",
+    "system",
+    "information",
+    "cli",
+    "terminal",
+    "cross-platform",
+    "windows",
+    "linux",
+    "macos",
+    "shell",
+    "greeting",
+    "emoji",
+    "system-monitoring"
+  ],
+  "author": "vtempest",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vtempest/server-shell-setup.git"
+  },
+  "homepage": "https://github.com/vtempest/server-shell-setup#readme",
+  "files": [
+    "src/about-system.js",
+    "README.md",
+    "package.json"
+  ],
+  "os": [
+    "win32",
+    "darwin",
+    "linux",
+    "android"
+  ],
+  "preferGlobal": true,
+  "directories": {
+    "bin": "."
+  },
+  "dependencies": {
+    "ora": "^8.2.0"
+  }
+}
