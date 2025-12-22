@@ -39,7 +39,7 @@ A cross-platform Node.js implementation of the system info script with enhanced 
 
 ### Features
 
-- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **Cross-Platform**: Works on any Linux, Windows PowerShell (most features), macOS, Android Termux
 - **Smart Caching**: Configurable cache durations for different system info types
 - **Customizable Output**: Control which info blocks to show and their order
 - **Network Info**: Fetches IP, location, and ISP data from ipinfo.io

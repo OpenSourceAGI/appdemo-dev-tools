@@ -43,7 +43,7 @@
   "license": "rights.institute/prosper",
   "repository": {
     "type": "git",
-    "url": "https://github.com/OpenSourceAGI/StarterDOCS/tree/master/packages/about-system-info.git"
+    "url": "https://github.com/OpenSourceAGI/StarterDOCS/tree/master/packages/about-system-info"
   },
   "homepage": "https://github.com/OpenSourceAGI/StarterDOCS/tree/master/packages/about-system-info",
   "files": [
