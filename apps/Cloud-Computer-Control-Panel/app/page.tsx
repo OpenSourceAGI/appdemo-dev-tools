@@ -67,10 +67,39 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-5xl space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-3">
+    <div className="min-h-screen bg-background">
+      {/* Top Header Bar */}
+      <div className="w-full border-b border-border/50 bg-card/30 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="text-sm font-semibold text-foreground">CCCP</div>
+          <div className="flex items-center gap-4">
+            <a
+              href="https://docs.appdemo.site/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Docs
+            </a>
+            <a
+              href="https://docs.appdemo.site/docs/comparisons/_tool_rank"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Tool Rankings
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex items-center justify-center p-4 pt-12">
+        <div className="w-full max-w-5xl space-y-8">
+          {/* Header */}
+          <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-3 mb-4">
             <div className="p-3 bg-blue-500/10 rounded-xl">
               <Cloud className="h-10 w-10 text-rose-800" />
@@ -419,6 +448,7 @@ export default function HomePage() {
               <div className="text-sm text-muted-foreground text-center py-4">Search results will appear here</div>
             </CardContent>
           </Card>
+        </div>
         </div>
       </div>
     </div>
