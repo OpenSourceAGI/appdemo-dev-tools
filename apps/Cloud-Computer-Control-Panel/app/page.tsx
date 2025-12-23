@@ -72,7 +72,7 @@ export default function HomePage() {
       <div className="w-full border-b border-border/50 bg-card/30 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/apple-icon.png" alt="CCCP" className="h-6 w-6" />
+            <img src="/apple-touch-icon.png" alt="CCCP" className="h-6 w-6" />
             <span className="text-sm font-semibold text-foreground">CCCP</span>
           </div>
           <div className="flex items-center gap-6">
