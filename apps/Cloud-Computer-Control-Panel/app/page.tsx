@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Cloud, ExternalLink, AlertCircle, Cpu, HardDrive, CheckCircle } from "lucide-react"
+import { Cloud, ExternalLink, AlertCircle, Cpu, HardDrive, CheckCircle, BookOpen, BarChart3 } from "lucide-react"
 import { Select, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -71,24 +71,27 @@ export default function HomePage() {
       {/* Top Header Bar */}
       <div className="w-full border-b border-border/50 bg-card/30 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="text-sm font-semibold text-foreground">CCCP</div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <img src="/apple-icon.png" alt="CCCP" className="h-6 w-6" />
+            <span className="text-sm font-semibold text-foreground">CCCP</span>
+          </div>
+          <div className="flex items-center gap-6">
             <a
               href="https://docs.appdemo.site/docs"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent rounded-md transition-colors"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
+              <BookOpen className="h-4 w-4" />
               Docs
             </a>
             <a
               href="https://docs.appdemo.site/docs/comparisons/_tool_rank"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent rounded-md transition-colors"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
+              <BarChart3 className="h-4 w-4" />
               Tool Rankings
             </a>
           </div>
