@@ -14,17 +14,21 @@ export default function DocsPage(): ReactElement {
 
       <div className='mt-8 grid grid-cols-1 gap-4 text-left md:grid-cols-2'>
         <DocumentationItem
-          title='Documentation'
+          title='📚 Documentation'
           description='Get started with the Fumadocs framework.'
           icon={{ icon: BookIcon, id: '(index)' }}
           href='/docs'
+          colorClass='bg-blue-500/10 border-blue-500/30 hover:border-blue-500/50'
+          iconColorClass='bg-blue-500/20 border-blue-500/40 text-blue-600 dark:text-blue-400'
         />
 
         <DocumentationItem
-          title='Tool Rank'
+          title='🔧 Tool Rank'
           description="Get started with Fumadocs's API reference feature."
           icon={{ icon: WebhookIcon, id: 'api-reference' }}
           href='/docs/comparisons/_tool_rank'
+          colorClass='bg-purple-500/10 border-purple-500/30 hover:border-purple-500/50'
+          iconColorClass='bg-purple-500/20 border-purple-500/40 text-purple-600 dark:text-purple-400'
         />
       </div>
     </main>
@@ -36,6 +40,8 @@ function DocumentationItem({
   description,
   icon: { icon: ItemIcon, id },
   href,
+  colorClass,
+  iconColorClass,
 }: {
   title: string
   description: string
@@ -44,10 +50,12 @@ function DocumentationItem({
     id: string
   }
   href: string
+  colorClass?: string
+  iconColorClass?: string
 }): ReactElement {
   return (
-    <Item href={href}>
-      <Icon className={id}>
+    <Item href={href} colorClass={colorClass}>
+      <Icon className={id} iconColorClass={iconColorClass}>
         <ItemIcon className='size-full' />
       </Icon>
       <h2 className='mb-2 font-semibold text-lg'>{title}</h2>
@@ -59,15 +67,17 @@ function DocumentationItem({
 function Icon({
   className,
   children,
+  iconColorClass,
 }: {
   className?: string
   children: ReactNode
+  iconColorClass?: string
 }): ReactElement {
   return (
     <div
       className={cn(
         'mb-2 size-9 rounded-lg border p-1.5 shadow-fd-primary/30',
-        className
+        iconColorClass || className
       )}
       style={{
         boxShadow: 'inset 0px 8px 8px 0px var(--tw-shadow-color)',
@@ -79,14 +89,15 @@ function Icon({
 }
 
 function Item(
-  props: LinkProps & { className?: string; children: ReactNode }
+  props: LinkProps & { className?: string; children: ReactNode; colorClass?: string }
 ): ReactElement {
-  const { className, children, ...rest } = props
+  const { className, children, colorClass, ...rest } = props
   return (
     <Link
       {...rest}
       className={cn(
         'rounded-2xl border border-border bg-fd-accent/30 p-6 shadow-lg backdrop-blur-lg transition-all hover:bg-fd-accent',
+        colorClass,
         className
       )}
     >
