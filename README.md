@@ -15,8 +15,9 @@
 </p>
 <h3 align="center">
     <a href="https://starterdocs.vtempest.workers.dev">🎮 Demo</a>
-    <a href="https://starterdocs.js.org">📑 Docs (starterdocs.js.org)</a>
-    <a href="https://starterdocs.js.org/docs/guides/starter-docs#%EF%B8%8F-installation">⬇️ Installation</a>
+    <a href="https://starterdocs.js.org">📑 Docs</a>
+    <a href="https://starterdocs.js.org/docs/guides/starter-docs#%EF%B8%8F-installation">⬇️ Install </a>
+    <a href="https://v0.app/templates/dashboard-landing-auth-billing-teams-docs-themes-ExDfusFzX6P"> 🎨 Template </a>
     
 </h3>
 
