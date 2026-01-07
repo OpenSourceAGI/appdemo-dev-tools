@@ -189,7 +189,16 @@ export function ManagerList({ credentials }: ManagerListProps) {
     setSoftwareModalOpen(true)
   }
 
-  const handleCardClick = async (instance: EC2Instance) => {
+  const handleCardClick = async (instance: EC2Instance, event?: React.MouseEvent) => {
+    // Don't handle card clicks if the click came from a button or interactive element
+    if (event) {
+      const target = event.target as HTMLElement
+      // Check if click came from a button, or any element inside a button
+      if (target.closest('button')) {
+        return
+      }
+    }
+
     // Check if Dokploy is already installed
     if (hasDokploy(instance)) {
       toast({
@@ -599,7 +608,7 @@ export function ManagerList({ credentials }: ManagerListProps) {
               <Card
                 key={instance.instanceId}
                 className="overflow-hidden cursor-pointer hover:border-primary/50 transition-colors"
-                onClick={() => handleCardClick(instance)}
+                onClick={(e) => handleCardClick(instance, e)}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
@@ -771,7 +780,7 @@ export function ManagerList({ credentials }: ManagerListProps) {
                       className="w-full bg-green-600 hover:bg-green-700"
                       onClick={(e) => {
                         e.stopPropagation()
-                        handleCardClick(instance)
+                        handleCardClick(instance, e)
                       }}
                       disabled={isLoading || !!installationState}
                     >
