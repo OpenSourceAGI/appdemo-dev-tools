@@ -182,6 +182,109 @@ export function ManagerList({ credentials }: ManagerListProps) {
     setSoftwareModalOpen(true)
   }
 
+  const handleCardClick = async (instance: EC2Instance) => {
+    // Check if Dokploy is already installed
+    if (hasDokploy(instance)) {
+      toast({
+        title: "Dokploy Already Installed",
+        description: "Dokploy is already installed on this instance. Use the Admin Dashboard button to access it.",
+      })
+      return
+    }
+
+    // Check if instance is running
+    if (instance.state !== "running") {
+      toast({
+        title: "Instance Not Running",
+        description: "The instance must be running to install Dokploy. Please start the instance first.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Check if there's an active installation
+    if (installations.has(instance.instanceId)) {
+      toast({
+        title: "Installation In Progress",
+        description: "An installation is already in progress for this instance.",
+      })
+      return
+    }
+
+    // Confirm installation
+    if (!confirm(`Install Dokploy on ${getInstanceName(instance)}?\n\nThis will install Dokploy and make it available at http://${instance.publicIp}:3000`)) {
+      return
+    }
+
+    // Start installation
+    setActionLoading({ instanceId: instance.instanceId, action: "install-dokploy" })
+
+    try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      }
+
+      if (credentials.accessKeyId !== "server-env" && credentials.secretAccessKey !== "server-env") {
+        headers["x-aws-access-key-id"] = credentials.accessKeyId
+        headers["x-aws-secret-access-key"] = credentials.secretAccessKey
+      }
+      headers["x-aws-region"] = instance.region
+
+      const response = await fetch("/api/instances/install-software", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          instanceId: instance.instanceId,
+          region: instance.region,
+          installDokploy: true,
+          dokployApiKey: "",
+          installDevToolsShell: false,
+          dockerServices: [],
+          githubRepos: [],
+          customScript: "",
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        if (data.error === "SSM_NOT_AVAILABLE") {
+          toast({
+            title: "SSM Not Available",
+            description: data.message,
+            variant: "destructive",
+          })
+          return
+        }
+        throw new Error(data.error || "Failed to install Dokploy")
+      }
+
+      if (data.success && data.commandId) {
+        toast({
+          title: "Dokploy Installation Started",
+          description: `Installing Dokploy via SSM. Watch the progress on the instance card.`,
+        })
+
+        startInstallationTracking(instance.instanceId, data.commandId, "Dokploy", instance.region)
+      } else {
+        toast({
+          title: "Manual Installation Required",
+          description: data.message || "Please run the installation script manually via SSH.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("[v0] Dokploy install error:", error)
+      toast({
+        title: "Installation Failed",
+        description: error instanceof Error ? error.message : "Failed to install Dokploy",
+        variant: "destructive",
+      })
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
   const handleInstanceAction = async (instance: EC2Instance, action: string) => {
     setActionLoading({ instanceId: instance.instanceId, action })
 
@@ -293,15 +396,47 @@ export function ManagerList({ credentials }: ManagerListProps) {
 
       // If completed, show toast and remove from tracking
       if (data.status === "Success") {
-        toast({
-          title: "Installation Complete",
-          description: `${installation.installing} installed successfully on ${installation.instanceId}`,
-        })
+        // Find the instance to get its public IP
+        const instance = ec2Instances.find((i) => i.instanceId === installation.instanceId)
+        const isDokploy = installation.installing.toLowerCase().includes("dokploy")
+
+        if (isDokploy && instance?.publicIp) {
+          const dokployUrl = `http://${instance.publicIp}:3000`
+          toast({
+            title: "Dokploy Installation Complete",
+            description: (
+              <div className="space-y-2">
+                <p>Dokploy installed successfully on {installation.instanceId}</p>
+                <a
+                  href={dokployUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block text-primary hover:underline font-medium"
+                >
+                  Open Dokploy Dashboard →
+                </a>
+              </div>
+            ),
+          })
+        } else {
+          toast({
+            title: "Installation Complete",
+            description: `${installation.installing} installed successfully on ${installation.instanceId}`,
+          })
+        }
+
         setInstallations((prev) => {
           const newMap = new Map(prev)
           newMap.delete(installation.instanceId)
           return newMap
         })
+
+        // Refresh instances to update tags (especially Dokploy tag)
+        if (isDokploy) {
+          setTimeout(() => {
+            loadAllRegionsInstances()
+          }, 2000)
+        }
       } else if (data.status === "Failed" || data.status === "Cancelled" || data.status === "TimedOut") {
         toast({
           title: "Installation Failed",
@@ -375,7 +510,11 @@ export function ManagerList({ credentials }: ManagerListProps) {
             const installationState = installations.get(instance.instanceId)
 
             return (
-              <Card key={instance.instanceId} className="overflow-hidden">
+              <Card
+                key={instance.instanceId}
+                className="overflow-hidden cursor-pointer hover:border-primary/50 transition-colors"
+                onClick={() => handleCardClick(instance)}
+              >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="space-y-1 flex-1">
@@ -394,7 +533,12 @@ export function ManagerList({ credentials }: ManagerListProps) {
                         {instance.publicIp && (
                           <Badge
                             variant="outline"
-                            className="bg-blue-500/10 text-blue-500 border-blue-500/20 font-mono"
+                            className="bg-blue-500/10 text-blue-500 border-blue-500/20 font-mono cursor-pointer hover:bg-blue-500/20 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              window.open(`http://${instance.publicIp}`, "_blank")
+                            }}
+                            title="Click to open in browser"
                           >
                             {instance.publicIp}
                           </Badge>
@@ -430,7 +574,10 @@ export function ManagerList({ credentials }: ManagerListProps) {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleInstanceAction(instance, "reboot")}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleInstanceAction(instance, "reboot")
+                            }}
                             disabled={isLoading}
                             title="Restart"
                           >
@@ -443,7 +590,10 @@ export function ManagerList({ credentials }: ManagerListProps) {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleInstanceAction(instance, "stop")}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleInstanceAction(instance, "stop")
+                            }}
                             disabled={isLoading}
                             title="Stop"
                           >
@@ -459,7 +609,10 @@ export function ManagerList({ credentials }: ManagerListProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleInstanceAction(instance, "start")}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleInstanceAction(instance, "start")
+                          }}
                           disabled={isLoading}
                           title="Start"
                         >
@@ -474,7 +627,10 @@ export function ManagerList({ credentials }: ManagerListProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleTerminate(instance)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleTerminate(instance)
+                          }}
                           disabled={isLoading}
                           title="Terminate"
                           className="text-destructive hover:text-destructive"
@@ -489,7 +645,10 @@ export function ManagerList({ credentials }: ManagerListProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleAddSoftware(instance)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleAddSoftware(instance)
+                        }}
                         disabled={instance.state !== "running" || isLoading || !!installationState}
                         title="Add Software"
                       >
@@ -509,7 +668,10 @@ export function ManagerList({ credentials }: ManagerListProps) {
                       variant="default"
                       size="sm"
                       className="w-full"
-                      onClick={() => window.open(`http://${instance.publicIp}:3000`, "_blank")}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        window.open(`http://${instance.publicIp}:3000`, "_blank")
+                      }}
                     >
                       <ExternalLink className="h-4 w-4 mr-2" />
                       Admin Dashboard
