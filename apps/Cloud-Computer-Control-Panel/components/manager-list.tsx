@@ -764,6 +764,31 @@ export function ManagerList({ credentials }: ManagerListProps) {
                     </Button>
                   )}
 
+                  {!dokploy && instance.state === "running" && instance.publicIp && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleCardClick(instance)
+                      }}
+                      disabled={isLoading || !!installationState}
+                    >
+                      {isLoading && actionLoading?.action === "install-dokploy" ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Installing...
+                        </>
+                      ) : (
+                        <>
+                          <PackagePlus className="h-4 w-4 mr-2" />
+                          Install Dokploy
+                        </>
+                      )}
+                    </Button>
+                  )}
+
                   {/* Manager Info */}
                   {manager && (
                     <div className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg">
