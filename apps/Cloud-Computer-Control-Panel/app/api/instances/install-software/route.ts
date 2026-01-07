@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createEC2Client } from "@/lib/aws-ec2-client"
+import { createSSMClient } from "@/lib/aws-ssm-client"
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,6 +25,15 @@ export async function POST(req: NextRequest) {
     }
 
     const ec2 = createEC2Client(accessKeyId, secretAccessKey, region)
+    const ssm = createSSMClient(accessKeyId, secretAccessKey, region)
+
+    // Build installation description for display
+    const installing: string[] = []
+    if (installDokploy) installing.push("Dokploy")
+    if (installDevToolsShell) installing.push("Dev Tools Shell")
+    if (dockerServices?.length > 0) installing.push(`${dockerServices.length} Docker service(s)`)
+    if (githubRepos?.length > 0) installing.push(`${githubRepos.length} GitHub repo(s)`)
+    if (customScript?.trim()) installing.push("Custom script")
 
     // Build the installation script
     let installScript = "#!/bin/bash\n\n"
@@ -98,20 +108,45 @@ export async function POST(req: NextRequest) {
 
     installScript += "echo 'Software installation completed!'\n"
 
-    // Use AWS Systems Manager Run Command to execute the script
-    // Note: This requires the instance to have the SSM agent and appropriate IAM role
-    // For simplicity, we'll use user data attribute update (requires instance stop/start)
-
     console.log("[v0] Generated installation script for instance:", instanceId)
-    console.log("[v0] Script:", installScript)
+    console.log("[v0] Installing:", installing.join(", "))
 
-    // In a production environment, you would use SSM Run Command:
-    // aws ssm send-command --instance-ids ${instanceId} --document-name "AWS-RunShellScript" --parameters commands="${installScript}"
+    try {
+      // Execute the script via SSM Run Command
+      const { commandId } = await ssm.sendCommand([instanceId], [installScript])
 
-    return NextResponse.json({
-      message: "Installation script prepared. Note: Requires SSM agent or manual execution.",
-      script: installScript,
-    })
+      console.log("[v0] SSM Command initiated:", commandId)
+
+      return NextResponse.json({
+        success: true,
+        commandId,
+        installing: installing.join(", "),
+        message: "Installation started successfully via SSM",
+      })
+    } catch (ssmError: any) {
+      console.error("[v0] SSM execution failed:", ssmError)
+
+      // If SSM fails, return the script for manual execution
+      if (
+        ssmError.message?.includes("InvalidInstanceId") ||
+        ssmError.message?.includes("InstanceNotConnected") ||
+        ssmError.message?.includes("UnsupportedPlatformType")
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "SSM_NOT_AVAILABLE",
+            message:
+              "Instance doesn't have SSM agent installed or lacks required IAM role. Install SSM agent and add AmazonSSMManagedInstanceCore policy to the instance role.",
+            script: installScript,
+            installing: installing.join(", "),
+          },
+          { status: 400 },
+        )
+      }
+
+      throw ssmError
+    }
   } catch (error: any) {
     console.error("[v0] Error installing software:", error)
     return NextResponse.json({ error: error.message || "Failed to install software" }, { status: 500 })
