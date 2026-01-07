@@ -218,31 +218,65 @@ export function ManagerList({ credentials }: ManagerListProps) {
       return
     }
 
+    // Check for public IP
+    if (!instance.publicIp) {
+      toast({
+        title: "No Public IP",
+        description: "Instance doesn't have a public IP address yet",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Get SSH key name from manager or instance
+    const manager = getManagerForInstance(instance.instanceId)
+    const keyName = manager?.config?.keyName || instance.keyName
+
+    if (!keyName) {
+      toast({
+        title: "No SSH Key",
+        description: "Instance doesn't have an SSH key associated. Please add software through the + button instead.",
+        variant: "destructive",
+      })
+      return
+    }
+
     // Confirm installation
     if (!confirm(`Install Dokploy on ${getInstanceName(instance)}?\n\nThis will install Dokploy and make it available at http://${instance.publicIp}:3000`)) {
+      return
+    }
+
+    // Import SSH key utils dynamically (client-side only)
+    const { getSSHKey } = await import("@/lib/ssh-key-utils")
+
+    // Get SSH key from localStorage
+    const sshKey = getSSHKey(keyName)
+    if (!sshKey) {
+      toast({
+        title: "SSH Key Not Found",
+        description: "SSH key not found in localStorage. Cannot connect to instance.",
+        variant: "destructive",
+      })
       return
     }
 
     // Start installation
     setActionLoading({ instanceId: instance.instanceId, action: "install-dokploy" })
 
+    // Track installation as in progress
+    startInstallationTracking(instance.instanceId, "", "Dokploy", instance.region)
+
     try {
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      }
-
-      if (credentials.accessKeyId !== "server-env" && credentials.secretAccessKey !== "server-env") {
-        headers["x-aws-access-key-id"] = credentials.accessKeyId
-        headers["x-aws-secret-access-key"] = credentials.secretAccessKey
-      }
-      headers["x-aws-region"] = instance.region
-
-      const response = await fetch("/api/instances/install-software", {
+      const response = await fetch("/api/instances/install-software-ssh", {
         method: "POST",
-        headers,
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           instanceId: instance.instanceId,
-          region: instance.region,
+          publicIp: instance.publicIp,
+          keyName: keyName,
+          privateKey: sshKey.privateKey,
           installDokploy: true,
           dokployApiKey: "",
           installDevToolsShell: false,
@@ -255,37 +289,77 @@ export function ManagerList({ credentials }: ManagerListProps) {
       const data = await response.json()
 
       if (!response.ok) {
-        if (data.error === "SSM_NOT_AVAILABLE") {
+        if (data.error === "SSH_CONNECTION_FAILED") {
           toast({
-            title: "SSM Not Available",
+            title: "SSH Connection Failed",
             description: data.message,
             variant: "destructive",
+          })
+          // Remove from installation tracking
+          setInstallations((prev) => {
+            const newMap = new Map(prev)
+            newMap.delete(instance.instanceId)
+            return newMap
           })
           return
         }
         throw new Error(data.error || "Failed to install Dokploy")
       }
 
-      if (data.success && data.commandId) {
+      if (data.success) {
         toast({
-          title: "Dokploy Installation Started",
-          description: `Installing Dokploy via SSM. Watch the progress on the instance card.`,
+          title: "Dokploy Installation Complete",
+          description: (
+            <div className="space-y-2">
+              <p>Dokploy installed successfully via SSH</p>
+              <a
+                href={`http://${instance.publicIp}:3000`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block text-primary hover:underline font-medium"
+              >
+                Open Dokploy Dashboard →
+              </a>
+            </div>
+          ),
         })
 
-        startInstallationTracking(instance.instanceId, data.commandId, "Dokploy", instance.region)
+        // Remove from installation tracking
+        setInstallations((prev) => {
+          const newMap = new Map(prev)
+          newMap.delete(instance.instanceId)
+          return newMap
+        })
+
+        // Refresh instances to update tags
+        setTimeout(() => {
+          loadAllRegionsInstances()
+        }, 2000)
       } else {
         toast({
-          title: "Manual Installation Required",
-          description: data.message || "Please run the installation script manually via SSH.",
+          title: "Installation Failed",
+          description: data.message || "Failed to install Dokploy on the instance.",
           variant: "destructive",
+        })
+        // Remove from installation tracking
+        setInstallations((prev) => {
+          const newMap = new Map(prev)
+          newMap.delete(instance.instanceId)
+          return newMap
         })
       }
     } catch (error) {
-      console.error("[v0] Dokploy install error:", error)
+      console.error("[SSH] Dokploy install error:", error)
       toast({
         title: "Installation Failed",
         description: error instanceof Error ? error.message : "Failed to install Dokploy",
         variant: "destructive",
+      })
+      // Remove from installation tracking
+      setInstallations((prev) => {
+        const newMap = new Map(prev)
+        newMap.delete(instance.instanceId)
+        return newMap
       })
     } finally {
       setActionLoading(null)
@@ -363,6 +437,11 @@ export function ManagerList({ credentials }: ManagerListProps) {
   }
 
   const checkInstallationStatus = async (installation: InstallationState) => {
+    // Skip SSM polling for SSH installations (no commandId)
+    if (!installation.commandId) {
+      return
+    }
+
     try {
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
@@ -457,7 +536,7 @@ export function ManagerList({ credentials }: ManagerListProps) {
         })
       }
     } catch (error) {
-      console.error("[v0] Error checking installation status:", error)
+      console.error("[SSM] Error checking installation status:", error)
     }
   }
 
