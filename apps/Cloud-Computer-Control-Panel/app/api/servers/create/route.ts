@@ -4,8 +4,9 @@ export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 import { NextResponse } from "next/server"
-import { runInstance, allocateAddress, associateAddress, createOrGetDokploySecurityGroup } from "@/lib/aws-ec2-client"
+import { runInstance, allocateAddress, associateAddress, createOrGetDokploySecurityGroup, importKeyPair } from "@/lib/aws-ec2-client"
 import { getUbuntuAMI } from "@/lib/aws-ami-ids"
+import { generateSSHKeyPair } from "@/lib/ssh-key-utils"
 
 export async function POST(request: Request) {
   try {
@@ -222,23 +223,26 @@ ${config.customScript}
 echo "Setup completed at $(date)" > /var/log/setup-complete.log
 `
 
-    const cleanKeyName = config.keyName && config.keyName.trim() !== "" ? config.keyName : undefined
-    console.log("[v0] Launching with keyName:", cleanKeyName || "none (will launch without key pair)")
+    // Generate SSH key pair and import to AWS
+    console.log("[v0] Generating SSH key pair...")
+    const sshKeyPair = generateSSHKeyPair(2048)
+
+    // Create a unique key name based on instance name and timestamp
+    const keyName = `${config.instanceName.replace(/[^a-zA-Z0-9-]/g, '-')}-${Date.now()}`
+
+    console.log("[v0] Importing SSH public key to AWS as:", keyName)
+    await importKeyPair(accessKeyId, secretAccessKey, region, keyName, sshKeyPair.publicKey)
+
+    console.log("[v0] Launching instance with SSH key:", keyName)
 
     const { instanceId: newInstanceId } = await runInstance(accessKeyId, secretAccessKey, region, {
       imageId: getUbuntuAMI(region),
       instanceType: config.instanceType || "t3.small",
-      keyName: cleanKeyName,
+      keyName: keyName,
       storageSize: config.storageSize || 40,
       instanceName: config.instanceName,
       userDataScript,
       securityGroupId,
-      tags: config.setupDokploy
-        ? [
-            { Key: "Name", Value: config.instanceName },
-            { Key: "Dokploy", Value: "true" },
-          ]
-        : [{ Key: "Name", Value: config.instanceName }],
     })
 
     if (!newInstanceId) {
@@ -257,6 +261,12 @@ echo "Setup completed at $(date)" > /var/log/setup-complete.log
           instanceId: newInstanceId,
           elasticIp: publicIp,
           allocationId,
+          sshKey: {
+            keyName: keyName,
+            privateKey: sshKeyPair.privateKey,
+            publicKey: sshKeyPair.publicKey,
+            fingerprint: sshKeyPair.fingerprint,
+          },
         })
       }
     } catch (ipError) {
@@ -264,12 +274,24 @@ echo "Setup completed at $(date)" > /var/log/setup-complete.log
       return NextResponse.json({
         message: "Instance launched but Elastic IP allocation failed",
         instanceId: newInstanceId,
+        sshKey: {
+          keyName: keyName,
+          privateKey: sshKeyPair.privateKey,
+          publicKey: sshKeyPair.publicKey,
+          fingerprint: sshKeyPair.fingerprint,
+        },
       })
     }
 
     return NextResponse.json({
       message: "Instance launched successfully",
       instanceId: newInstanceId,
+      sshKey: {
+        keyName: keyName,
+        privateKey: sshKeyPair.privateKey,
+        publicKey: sshKeyPair.publicKey,
+        fingerprint: sshKeyPair.fingerprint,
+      },
     })
   } catch (error) {
     console.error("[v0] Error creating server:", error)

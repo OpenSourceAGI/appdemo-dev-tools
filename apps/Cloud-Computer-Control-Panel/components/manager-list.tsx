@@ -40,6 +40,7 @@ interface EC2Instance {
   launchTime?: string
   tags?: Array<{ Key: string; Value: string }>
   region: string
+  keyName?: string
 }
 
 interface InstallationState {
@@ -178,7 +179,13 @@ export function ManagerList({ credentials }: ManagerListProps) {
   }
 
   const handleAddSoftware = (instance: EC2Instance) => {
-    setSelectedInstanceForSoftware(instance)
+    // Get the manager for this instance to retrieve the keyName
+    const manager = getManagerForInstance(instance.instanceId)
+    const instanceWithKey = {
+      ...instance,
+      keyName: manager?.config?.keyName || instance.keyName,
+    }
+    setSelectedInstanceForSoftware(instanceWithKey)
     setSoftwareModalOpen(true)
   }
 
