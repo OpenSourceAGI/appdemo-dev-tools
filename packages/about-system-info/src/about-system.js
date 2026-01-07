@@ -974,7 +974,7 @@ const infoFunctions = {
       const loads = loadavg.split(' ').slice(0, 3);
       const color = colors[settings.colors.load_average] || colors.red;
       const emoji = settings.display.show_emojis ? '⚖️ ' : '';
-      return `${color}${emoji}${loads.join(' ')}`;
+      return `${color}${emoji} ${loads.join(' ')}`;
     } catch { }
     return '';
   },
@@ -1058,7 +1058,7 @@ const infoFunctions = {
       if (mountPoints.length > 0) {
         const color = colors[settings.colors.mount_points] || colors.gray;
         const emoji = settings.display.show_emojis ? '📂 ' : '';
-        const result = `${color}${emoji}${mountPoints.slice(0, 3).join(' ')}`;
+        const result = `${color}${emoji} ${mountPoints.slice(0, 3).join(' ')}`;
         setCachedValue(this.cache, 'mount_points', result);
         return result;
       }
@@ -1093,7 +1093,7 @@ const infoFunctions = {
       if (serviceCount > 0) {
         const color = colors[settings.colors.services_running] || colors.green;
         const emoji = settings.display.show_emojis ? '⚙️ ' : '';
-        const result = `${color}${emoji}${serviceCount} services`;
+        const result = `${color}${emoji} ${serviceCount} services`;
         setCachedValue(this.cache, 'services_running', result);
         return result;
       }
@@ -1128,7 +1128,7 @@ const infoFunctions = {
           if (tempC > 0 && tempC < 150) { // Reasonable temperature range
             const color = tempC > 70 ? colors.red : tempC > 50 ? colors.yellow : colors.green;
             const emoji = settings.display.show_emojis ? '🌡️ ' : '';
-            const result = `${color}${emoji}${tempC}°C`;
+            const result = `${color}${emoji} ${tempC}°C`;
             setCachedValue(this.cache, 'temperature', result);
             return result;
           }

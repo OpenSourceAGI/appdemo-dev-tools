@@ -4,8 +4,7 @@
   "description": "A Node.js script to display key system information with emojis. Cross-platform support for Windows, macOS, and Linux with customizable output and caching.",
   "main": "src/about-system.js",
   "bin": {
-    "about-system": "./src/about-system.js",
-    "test-speed": "./src/test-speed-cloudflare.js"
+    "about-system": "./src/about-system.js"
   },
   "type": "module",
   "exports": {
@@ -15,7 +14,7 @@
     }
   },
   "scripts": {
-    "ship": "npx standard-version --release-as patch; npm publish",
+    "ship": "npx standard-version --release-as patch; rm CHANGELOG.md; npm publish",
     "start": "node src/about-system.js",
     "test-speed": "node src/test-speed-cloudflare.js",
     "install-greeting": "node src/about-system.js --install",
