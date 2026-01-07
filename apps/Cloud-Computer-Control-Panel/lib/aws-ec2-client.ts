@@ -220,6 +220,45 @@ export async function describeKeyPairs(
   }
 }
 
+/**
+ * Import a public SSH key to AWS EC2
+ */
+export async function importKeyPair(
+  accessKeyId: string,
+  secretAccessKey: string,
+  region: string,
+  keyName: string,
+  publicKeyMaterial: string,
+): Promise<{ keyPairId: string | null; keyFingerprint: string | null }> {
+  // AWS expects the public key to be base64 encoded
+  const publicKeyBase64 = Buffer.from(publicKeyMaterial).toString("base64")
+
+  const params: Record<string, string> = {
+    KeyName: keyName,
+    PublicKeyMaterial: publicKeyBase64,
+  }
+
+  try {
+    const xml = await ec2Query(accessKeyId, secretAccessKey, region, "ImportKeyPair", params)
+
+    const keyPairId = xml.match(/<keyPairId>(.*?)<\/keyPairId>/)?.[1] || null
+    const keyFingerprint = xml.match(/<keyFingerprint>(.*?)<\/keyFingerprint>/)?.[1] || null
+
+    return { keyPairId, keyFingerprint }
+  } catch (error) {
+    // If key already exists, we can still use it
+    if (error instanceof Error && error.message.includes("InvalidKeyPair.Duplicate")) {
+      console.warn(`[EC2] Key pair '${keyName}' already exists in region ${region}`)
+      // Try to get the existing key info
+      const existingKeys = await describeKeyPairs(accessKeyId, secretAccessKey, region, keyName)
+      if (existingKeys.length > 0) {
+        return { keyPairId: existingKeys[0].keyPairId || null, keyFingerprint: null }
+      }
+    }
+    throw error
+  }
+}
+
 export async function runInstance(
   accessKeyId: string,
   secretAccessKey: string,
@@ -543,6 +582,8 @@ export function createEC2Client(accessKeyId: string, secretAccessKey: string, re
   return {
     describeInstances: () => describeInstances(accessKeyId, secretAccessKey, region),
     describeKeyPairs: (keyName?: string) => describeKeyPairs(accessKeyId, secretAccessKey, region, keyName),
+    importKeyPair: (keyName: string, publicKeyMaterial: string) =>
+      importKeyPair(accessKeyId, secretAccessKey, region, keyName, publicKeyMaterial),
     runInstance: (config: Parameters<typeof runInstance>[3]) =>
       runInstance(accessKeyId, secretAccessKey, region, config),
     allocateAddress: () => allocateAddress(accessKeyId, secretAccessKey, region),

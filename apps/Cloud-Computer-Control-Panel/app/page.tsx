@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Cloud, ExternalLink, AlertCircle, Cpu, HardDrive, CheckCircle } from "lucide-react"
+import { Cloud, ExternalLink, AlertCircle, Cpu, HardDrive, CheckCircle, BookOpen, BarChart3 } from "lucide-react"
 import { Select, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -67,10 +67,42 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-5xl space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-3">
+    <div className="min-h-screen bg-background">
+      {/* Top Header Bar */}
+      <div className="w-full border-b border-border/50 bg-card/30 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <img src="/apple-touch-icon.png" alt="CCCP" className="h-6 w-6" />
+            <span className="text-sm font-semibold text-foreground">CCCP</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <a
+              href="https://docs.appdemo.site/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent rounded-md transition-colors"
+            >
+              <BookOpen className="h-4 w-4" />
+              Docs
+            </a>
+            <a
+              href="https://docs.appdemo.site/docs/comparisons/_tool_rank"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent rounded-md transition-colors"
+            >
+              <BarChart3 className="h-4 w-4" />
+              Tool Rankings
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex items-center justify-center p-4 pt-12">
+        <div className="w-full max-w-5xl space-y-8">
+          {/* Header */}
+          <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-3 mb-4">
             <div className="p-3 bg-blue-500/10 rounded-xl">
               <Cloud className="h-10 w-10 text-rose-800" />
@@ -419,6 +451,7 @@ export default function HomePage() {
               <div className="text-sm text-muted-foreground text-center py-4">Search results will appear here</div>
             </CardContent>
           </Card>
+        </div>
         </div>
       </div>
     </div>
