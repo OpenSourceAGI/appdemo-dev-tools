@@ -6,7 +6,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  serverExternalPackages: ['@aws-sdk/client-ec2', '@aws-sdk/credential-providers'],
+  serverExternalPackages: ['@aws-sdk/client-ec2', '@aws-sdk/credential-providers', 'ssh2', 'node-forge'],
   turbopack: {},
 }
 

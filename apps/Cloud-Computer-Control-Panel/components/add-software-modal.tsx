@@ -14,6 +14,7 @@ import { GitHubRepoSearch } from "./github-repo-search"
 import { useToast } from "@/hooks/use-toast"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
+import { getSSHKey } from "@/lib/ssh-key-utils"
 
 interface AddSoftwareModalProps {
   open: boolean
@@ -22,6 +23,7 @@ interface AddSoftwareModalProps {
     instanceId: string
     publicIp?: string
     region: string
+    keyName?: string
   }
   credentials: {
     accessKeyId: string
@@ -63,20 +65,49 @@ export function AddSoftwareModal({
       return
     }
 
+    // Check if we have the necessary information for SSH
+    if (!instance.publicIp) {
+      toast({
+        title: "No Public IP",
+        description: "Instance doesn't have a public IP address yet",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!instance.keyName) {
+      toast({
+        title: "No SSH Key",
+        description: "Instance doesn't have an SSH key associated",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Get SSH key from localStorage
+    const sshKey = getSSHKey(instance.keyName)
+    if (!sshKey) {
+      toast({
+        title: "SSH Key Not Found",
+        description: "SSH key not found in localStorage. Cannot connect to instance.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setInstalling(true)
 
     try {
-      const response = await fetch("/api/instances/install-software", {
+      const response = await fetch("/api/instances/install-software-ssh", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-aws-access-key-id": credentials.accessKeyId !== "server-env" ? credentials.accessKeyId : "",
-          "x-aws-secret-access-key": credentials.secretAccessKey !== "server-env" ? credentials.secretAccessKey : "",
-          "x-aws-region": instance.region,
         },
         body: JSON.stringify({
           instanceId: instance.instanceId,
-          region: instance.region,
+          publicIp: instance.publicIp,
+          keyName: instance.keyName,
+          privateKey: sshKey.privateKey,
           installDokploy,
           dokployApiKey,
           installDevToolsShell,
@@ -89,10 +120,10 @@ export function AddSoftwareModal({
       const data = await response.json()
 
       if (!response.ok) {
-        // Handle SSM not available
-        if (data.error === "SSM_NOT_AVAILABLE") {
+        // Handle SSH connection failure
+        if (data.error === "SSH_CONNECTION_FAILED") {
           toast({
-            title: "SSM Not Available",
+            title: "SSH Connection Failed",
             description: data.message,
             variant: "destructive",
           })
@@ -101,17 +132,12 @@ export function AddSoftwareModal({
         throw new Error(data.error || "Failed to install software")
       }
 
-      // If installation started successfully via SSM
-      if (data.success && data.commandId) {
+      // If installation completed successfully via SSH
+      if (data.success) {
         toast({
-          title: "Software Installation Started",
-          description: `Installing ${data.installing} via SSM. Check the instance card for progress.`,
+          title: "Software Installation Completed",
+          description: `Successfully installed ${data.installing} via SSH.`,
         })
-
-        // Trigger installation tracking
-        if (onInstallationStart) {
-          onInstallationStart(instance.instanceId, data.commandId, data.installing, instance.region)
-        }
 
         onOpenChange(false)
         // Reset form
@@ -122,18 +148,18 @@ export function AddSoftwareModal({
         setGithubRepos([])
         setCustomScript("")
       } else {
-        // Fallback: SSM not available, show script
+        // Installation failed
         toast({
-          title: "Manual Installation Required",
-          description: data.message || "Please run the installation script manually via SSH.",
+          title: "Installation Failed",
+          description: data.message || "Failed to install software on the instance.",
           variant: "destructive",
         })
       }
     } catch (error) {
-      console.error("[v0] Install error:", error)
+      console.error("[SSH] Install error:", error)
       toast({
         title: "Installation Failed",
-        description: "Failed to install software on the instance",
+        description: error instanceof Error ? error.message : "Failed to install software on the instance",
         variant: "destructive",
       })
     } finally {

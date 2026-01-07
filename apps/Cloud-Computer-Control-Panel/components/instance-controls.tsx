@@ -23,6 +23,7 @@ import {
   Camera,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { storeSSHKey } from "@/lib/ssh-key-utils"
 
 interface InstanceControlsProps {
   manager: any
@@ -100,9 +101,22 @@ export function InstanceControls({ manager, apiUrl, credentials, onUpdate }: Ins
       const result = await response.json()
       console.log("[v0] Launch result:", result)
 
+      // Store SSH key in localStorage if provided
+      if (result.sshKey) {
+        storeSSHKey(result.sshKey.keyName, {
+          privateKey: result.sshKey.privateKey,
+          publicKey: result.sshKey.publicKey,
+          fingerprint: result.sshKey.fingerprint,
+        })
+        console.log("[v0] SSH key stored in localStorage:", result.sshKey.keyName)
+      }
+
       onUpdate({
         ...manager,
-        config: sanitizedConfig,
+        config: {
+          ...sanitizedConfig,
+          keyName: result.sshKey?.keyName || sanitizedConfig.keyName,
+        },
         status: {
           state: "pending",
           instanceId: result.instanceId,
