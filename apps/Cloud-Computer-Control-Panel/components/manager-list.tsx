@@ -42,6 +42,14 @@ interface EC2Instance {
   region: string
 }
 
+interface InstallationState {
+  commandId: string
+  status: "InProgress" | "Success" | "Failed" | "Cancelled" | "TimedOut"
+  installing: string
+  instanceId: string
+  region: string
+}
+
 interface ManagerListProps {
   credentials: {
     accessKeyId: string
@@ -60,6 +68,7 @@ export function ManagerList({ credentials }: ManagerListProps) {
   const [selectedInstanceForSoftware, setSelectedInstanceForSoftware] = useState<EC2Instance | null>(null)
   const { toast } = useToast()
   const [actionLoading, setActionLoading] = useState<{ instanceId: string; action: string } | null>(null)
+  const [installations, setInstallations] = useState<Map<string, InstallationState>>(new Map())
 
   useEffect(() => {
     loadManagers()
@@ -117,7 +126,7 @@ export function ManagerList({ credentials }: ManagerListProps) {
       console.log("[v0] Loaded instances:", data.instances?.length || 0)
       setEc2Instances(data.instances || [])
 
-      const allInstanceIds = new Set(data.instances?.map((i: EC2Instance) => i.instanceId) || [])
+      const allInstanceIds = new Set<string>(data.instances?.map((i: EC2Instance) => i.instanceId) || [])
       setExpandedInstances(allInstanceIds)
     } catch (err) {
       console.error("Error loading instances:", err)
@@ -231,6 +240,100 @@ export function ManagerList({ credentials }: ManagerListProps) {
     }
   }
 
+  const startInstallationTracking = (instanceId: string, commandId: string, installing: string, region: string) => {
+    const newInstallation: InstallationState = {
+      commandId,
+      status: "InProgress",
+      installing,
+      instanceId,
+      region,
+    }
+
+    setInstallations((prev) => new Map(prev).set(instanceId, newInstallation))
+  }
+
+  const checkInstallationStatus = async (installation: InstallationState) => {
+    try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      }
+
+      if (credentials.accessKeyId !== "server-env" && credentials.secretAccessKey !== "server-env") {
+        headers["x-aws-access-key-id"] = credentials.accessKeyId
+        headers["x-aws-secret-access-key"] = credentials.secretAccessKey
+      }
+      headers["x-aws-region"] = installation.region
+
+      const response = await fetch("/api/instances/installation-status", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          commandId: installation.commandId,
+          instanceId: installation.instanceId,
+          region: installation.region,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to check installation status")
+      }
+
+      const data = await response.json()
+
+      // Update installation state
+      setInstallations((prev) => {
+        const newMap = new Map(prev)
+        const current = newMap.get(installation.instanceId)
+        if (current) {
+          current.status = data.status
+          newMap.set(installation.instanceId, current)
+        }
+        return newMap
+      })
+
+      // If completed, show toast and remove from tracking
+      if (data.status === "Success") {
+        toast({
+          title: "Installation Complete",
+          description: `${installation.installing} installed successfully on ${installation.instanceId}`,
+        })
+        setInstallations((prev) => {
+          const newMap = new Map(prev)
+          newMap.delete(installation.instanceId)
+          return newMap
+        })
+      } else if (data.status === "Failed" || data.status === "Cancelled" || data.status === "TimedOut") {
+        toast({
+          title: "Installation Failed",
+          description: `Failed to install ${installation.installing}: ${data.statusDetails || data.status}`,
+          variant: "destructive",
+        })
+        setInstallations((prev) => {
+          const newMap = new Map(prev)
+          newMap.delete(installation.instanceId)
+          return newMap
+        })
+      }
+    } catch (error) {
+      console.error("[v0] Error checking installation status:", error)
+    }
+  }
+
+  // Poll for installation status
+  useEffect(() => {
+    if (installations.size === 0) return
+
+    const interval = setInterval(() => {
+      installations.forEach((installation) => {
+        if (installation.status === "InProgress") {
+          checkInstallationStatus(installation)
+        }
+      })
+    }, 5000) // Poll every 5 seconds
+
+    return () => clearInterval(interval)
+  }, [installations])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -269,6 +372,7 @@ export function ManagerList({ credentials }: ManagerListProps) {
             const instanceName = getInstanceName(instance)
             const dokploy = hasDokploy(instance)
             const isLoading = actionLoading?.instanceId === instance.instanceId
+            const installationState = installations.get(instance.instanceId)
 
             return (
               <Card key={instance.instanceId} className="overflow-hidden">
@@ -307,6 +411,15 @@ export function ManagerList({ credentials }: ManagerListProps) {
                         {dokploy && (
                           <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
                             Dokploy
+                          </Badge>
+                        )}
+                        {installationState && (
+                          <Badge
+                            variant="outline"
+                            className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 animate-pulse"
+                          >
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                            Installing: {installationState.installing}
                           </Badge>
                         )}
                       </div>
@@ -377,10 +490,14 @@ export function ManagerList({ credentials }: ManagerListProps) {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleAddSoftware(instance)}
-                        disabled={instance.state !== "running" || isLoading}
+                        disabled={instance.state !== "running" || isLoading || !!installationState}
                         title="Add Software"
                       >
-                        <PackagePlus className="h-4 w-4" />
+                        {installationState ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <PackagePlus className="h-4 w-4" />
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -403,7 +520,12 @@ export function ManagerList({ credentials }: ManagerListProps) {
                   {manager && (
                     <div className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg">
                       <div className="text-sm font-medium mb-2">Associated Manager: {manager.name}</div>
-                      <InstanceControls manager={manager} onUpdate={loadAllRegionsInstances} />
+                      <InstanceControls
+                        manager={manager}
+                        apiUrl="/api/instances"
+                        credentials={credentials}
+                        onUpdate={loadAllRegionsInstances}
+                      />
                     </div>
                   )}
                 </CardContent>
@@ -426,7 +548,12 @@ export function ManagerList({ credentials }: ManagerListProps) {
                   <CardDescription>Ready to launch</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <InstanceControls manager={manager} onUpdate={loadAllRegionsInstances} />
+                  <InstanceControls
+                    manager={manager}
+                    apiUrl="/api/instances"
+                    credentials={credentials}
+                    onUpdate={loadAllRegionsInstances}
+                  />
                 </CardContent>
               </Card>
             ))}
@@ -440,6 +567,7 @@ export function ManagerList({ credentials }: ManagerListProps) {
           onOpenChange={setSoftwareModalOpen}
           instance={selectedInstanceForSoftware}
           credentials={credentials}
+          onInstallationStart={startInstallationTracking}
         />
       )}
     </div>

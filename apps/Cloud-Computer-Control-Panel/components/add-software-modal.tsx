@@ -28,9 +28,16 @@ interface AddSoftwareModalProps {
     secretAccessKey: string
     region: string
   }
+  onInstallationStart?: (instanceId: string, commandId: string, installing: string, region: string) => void
 }
 
-export function AddSoftwareModal({ open, onOpenChange, instance, credentials }: AddSoftwareModalProps) {
+export function AddSoftwareModal({
+  open,
+  onOpenChange,
+  instance,
+  credentials,
+  onInstallationStart,
+}: AddSoftwareModalProps) {
   const [installDokploy, setInstallDokploy] = useState(false)
   const [dokployApiKey, setDokployApiKey] = useState("")
   const [installDevToolsShell, setInstallDevToolsShell] = useState(false)
@@ -79,23 +86,49 @@ export function AddSoftwareModal({ open, onOpenChange, instance, credentials }: 
         }),
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        throw new Error("Failed to install software")
+        // Handle SSM not available
+        if (data.error === "SSM_NOT_AVAILABLE") {
+          toast({
+            title: "SSM Not Available",
+            description: data.message,
+            variant: "destructive",
+          })
+          return
+        }
+        throw new Error(data.error || "Failed to install software")
       }
 
-      toast({
-        title: "Software Installation Started",
-        description: "Software is being installed on the instance. This may take a few minutes.",
-      })
+      // If installation started successfully via SSM
+      if (data.success && data.commandId) {
+        toast({
+          title: "Software Installation Started",
+          description: `Installing ${data.installing} via SSM. Check the instance card for progress.`,
+        })
 
-      onOpenChange(false)
-      // Reset form
-      setInstallDokploy(false)
-      setDokployApiKey("")
-      setInstallDevToolsShell(false)
-      setDockerServices([])
-      setGithubRepos([])
-      setCustomScript("")
+        // Trigger installation tracking
+        if (onInstallationStart) {
+          onInstallationStart(instance.instanceId, data.commandId, data.installing, instance.region)
+        }
+
+        onOpenChange(false)
+        // Reset form
+        setInstallDokploy(false)
+        setDokployApiKey("")
+        setInstallDevToolsShell(false)
+        setDockerServices([])
+        setGithubRepos([])
+        setCustomScript("")
+      } else {
+        // Fallback: SSM not available, show script
+        toast({
+          title: "Manual Installation Required",
+          description: data.message || "Please run the installation script manually via SSH.",
+          variant: "destructive",
+        })
+      }
     } catch (error) {
       console.error("[v0] Install error:", error)
       toast({
