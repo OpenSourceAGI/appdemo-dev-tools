@@ -137,16 +137,6 @@ export function AddSoftwareModal({
       console.log("[AddSoftwareModal] API response:", { ok: response.ok, status: response.status, data })
 
       if (!response.ok) {
-        // Handle SSH connection failure
-        if (data.error === "SSH_CONNECTION_FAILED") {
-          console.error("[AddSoftwareModal] SSH connection failed:", data.message)
-          toast({
-            title: "SSH Connection Failed",
-            description: data.message,
-            variant: "destructive",
-          })
-          return
-        }
         throw new Error(data.error || "Failed to install software")
       }
 
