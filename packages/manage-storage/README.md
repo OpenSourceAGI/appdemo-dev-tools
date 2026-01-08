@@ -13,7 +13,7 @@ Universal cloud storage manager supporting AWS S3, Cloudflare R2, and Backblaze 
 - **Lightweight**: Built on aws-lite (not the bloated AWS SDK) for faster cold starts
 - **Simple API**: Single function interface for all storage operations
 - **No File System**: Returns data directly - perfect for serverless/edge environments
-- **TypeScript Ready**: Full type support (coming soon)
+- **TypeScript Ready**: Full type support with comprehensive type definitions
 
 ## Installation
 

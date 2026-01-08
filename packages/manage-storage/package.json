@@ -2,7 +2,9 @@
   "name": "manage-storage",
   "version": "0.0.2",
   "description": "Storage manager supporting AWS S3, Cloudflare R2, and Backblaze B2 with automatic provider detection",
-  "main": "manage-storage.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "type": "module",
   "keywords": [
     "s3",
@@ -29,14 +31,28 @@
   "homepage": "https://github.com/vtempest/Starter-DOCS#readme",
   "dependencies": {
     "@aws-lite/client": "^0.23.2",
-    "@aws-lite/s3": "^0.4.5",
+    "@aws-lite/s3": "^0.2.6",
     "dotenv": "^17.2.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@aws-lite/s3-types": "^0.2.6",
+    "@types/node": "^22.19.3",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7",
+    "vite-plugin-dts": "^4.3.0"
+  },
   "scripts": {
+    "build": "vite build",
+    "prepublishOnly": "npm run build",
     "ship": "npx standard-version --release-as patch; rm CHANGELOG.md; npm publish"
   },
   "exports": {
-    ".": "./storage-manager.js"
-  }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ]
 }
