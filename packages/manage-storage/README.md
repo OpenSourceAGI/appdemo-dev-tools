@@ -13,7 +13,6 @@ Universal cloud storage manager supporting AWS S3, Cloudflare R2, and Backblaze 
 - **Lightweight**: Built on aws-lite (not the bloated AWS SDK) for faster cold starts
 - **Simple API**: Single function interface for all storage operations
 - **No File System**: Returns data directly - perfect for serverless/edge environments
-- **TypeScript Ready**: Full type support with comprehensive type definitions
 
 ## Installation
 
@@ -43,6 +42,18 @@ const data = await manageStorage("download", {
 
 // List all files
 const files = await manageStorage("list");
+
+// Copy a file
+await manageStorage("copy", {
+  key: "documents/report.pdf",
+  destinationKey: "documents/report-backup.pdf",
+});
+
+// Rename a file (copy + delete)
+await manageStorage("rename", {
+  key: "documents/old-name.pdf",
+  destinationKey: "documents/new-name.pdf",
+});
 
 // Delete a file
 await manageStorage("delete", {
@@ -90,16 +101,17 @@ Performs storage operations on your configured cloud provider.
 
 #### Parameters
 
-- **action** `string` - The operation to perform: `'upload'`, `'download'`, `'delete'`, `'list'`, or `'deleteAll'`
+- **action** `string` - The operation to perform: `'upload'`, `'download'`, `'delete'`, `'list'`, `'deleteAll'`, `'copy'`, or `'rename'`
 - **options** `object` - Operation-specific options
 
 #### Options
 
-| Option     | Type                     | Required                            | Description                                          |
-| ---------- | ------------------------ | ----------------------------------- | ---------------------------------------------------- |
-| `key`      | `string`                 | Yes (except for `list`/`deleteAll`) | The object key/path                                  |
-| `body`     | `string\|Buffer\|Stream` | Yes (for `upload`)                  | The file content to upload                           |
-| `provider` | `'s3'\|'r2'\|'b2'`       | No                                  | Force a specific provider (auto-detected if omitted) |
+| Option           | Type                     | Required                            | Description                                          |
+| ---------------- | ------------------------ | ----------------------------------- | ---------------------------------------------------- |
+| `key`            | `string`                 | Yes (except for `list`/`deleteAll`) | The object key/path                                  |
+| `destinationKey` | `string`                 | Yes (for `copy`/`rename`)           | The destination key/path for copy/rename operations  |
+| `body`           | `string\|Buffer\|Stream` | Yes (for `upload`)                  | The file content to upload                           |
+| `provider`       | `'s3'\|'r2'\|'b2'`       | No                                  | Force a specific provider (auto-detected if omitted) |
 
 ## Usage Examples
 
@@ -156,7 +168,39 @@ const notes = files.filter((key) => key.startsWith("notes/"));
 console.log(notes); // ['notes/memo.txt']
 ```
 
-### 4. Delete Files
+### 4. Copy Files
+
+```javascript
+// Copy a file to a new location
+await manageStorage("copy", {
+  key: "documents/report.pdf",
+  destinationKey: "documents/backup/report-2024.pdf",
+});
+
+// Create a backup
+await manageStorage("copy", {
+  key: "config/settings.json",
+  destinationKey: "config/settings.backup.json",
+});
+```
+
+### 5. Rename Files
+
+```javascript
+// Rename a file (performs copy + delete)
+await manageStorage("rename", {
+  key: "old-filename.txt",
+  destinationKey: "new-filename.txt",
+});
+
+// Move to a different folder
+await manageStorage("rename", {
+  key: "temp/draft.md",
+  destinationKey: "published/article.md",
+});
+```
+
+### 6. Delete Files
 
 ```javascript
 // Delete a single file
@@ -169,7 +213,7 @@ const result = await manageStorage("deleteAll");
 console.log(`Deleted ${result.count} files`);
 ```
 
-### 5. Force a Specific Provider
+### 7. Force a Specific Provider
 
 ```javascript
 // Use R2 even if other providers are configured
@@ -187,7 +231,7 @@ await manageStorage("upload", {
 });
 ```
 
-### 6. Runtime Configuration (Override Environment Variables)
+### 8. Runtime Configuration (Override Environment Variables)
 
 ```javascript
 // Pass credentials at runtime instead of using env vars
@@ -242,7 +286,7 @@ export async function GET(req) {
 
 ```javascript
 import express from "express";
-import { manageStorage } from "@opensourceagi/cloud-storage";
+import { manageStorage } from "manage-storage";
 
 const app = express();
 app.use(express.json());
@@ -290,7 +334,7 @@ app.listen(3000, () => console.log("Server running on port 3000"));
 ### Cloudflare Workers
 
 ```javascript
-import { manageStorage } from "@opensourceagi/cloud-storage";
+import { manageStorage } from "manage-storage";
 
 export default {
   async fetch(request, env) {
@@ -383,6 +427,26 @@ const contents = await Promise.all(
 }
 ```
 
+### Copy
+
+```javascript
+{
+  success: true,
+  sourceKey: 'documents/report.pdf',
+  destinationKey: 'documents/backup/report-2024.pdf'
+}
+```
+
+### Rename
+
+```javascript
+{
+  success: true,
+  oldKey: 'old-filename.txt',
+  newKey: 'new-filename.txt'
+}
+```
+
 ## Why aws-lite?
 
 This library uses [@aws-lite](https://aws-lite.org/) instead of the official AWS SDK because:
@@ -393,11 +457,7 @@ This library uses [@aws-lite](https://aws-lite.org/) instead of the official AWS
 - **Modern API**: Clean, promise-based interface
 - **No dependencies overhead**: Minimal dependency tree
 
-# Cloud Object Storage Comparison: GCS, Backblaze B2, Cloudflare R2, and AWS S3
-
-Google Cloud Storage (GCS) joins Backblaze B2, Cloudflare R2, and AWS S3 as a hyperscaler option with [strong multi-region support](https://cloud.google.com/storage/pricing), multiple storage classes, and [deep integration with Google Cloud services](https://cloud.google.com/storage/pricing). These providers all [offer S3-compatible object storage](https://www.backblaze.com/cloud-storage/pricing) but differ significantly in [pricing models](https://www.backblaze.com/cloud-storage/pricing), especially storage costs, egress fees, and ecosystem fit.
-
-## Updated pricing snapshot ("hot"/Standard storage)
+# Cloud Object Storage Comparison
 
 | Service                                                         | Storage price (/TB-month)      | Egress to internet                                                                        | API ops (Class A/B per 1K, approx)                                                 | Minimum duration                                            | Notes                                                              |
 | --------------------------------------------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------ |

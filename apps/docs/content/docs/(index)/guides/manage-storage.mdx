@@ -18,7 +18,6 @@ Universal cloud storage manager supporting AWS S3, Cloudflare R2, and Backblaze 
 - **Lightweight**: Built on aws-lite (not the bloated AWS SDK) for faster cold starts
 - **Simple API**: Single function interface for all storage operations
 - **No File System**: Returns data directly - perfect for serverless/edge environments
-- **TypeScript Ready**: Full type support (coming soon)
 
 ## Installation
 
@@ -247,7 +246,7 @@ export async function GET(req) {
 
 ```javascript
 import express from "express";
-import { manageStorage } from "@opensourceagi/cloud-storage";
+import { manageStorage } from "manage-storage";
 
 const app = express();
 app.use(express.json());
@@ -295,7 +294,7 @@ app.listen(3000, () => console.log("Server running on port 3000"));
 ### Cloudflare Workers
 
 ```javascript
-import { manageStorage } from "@opensourceagi/cloud-storage";
+import { manageStorage } from "manage-storage";
 
 export default {
   async fetch(request, env) {
@@ -398,11 +397,7 @@ This library uses [@aws-lite](https://aws-lite.org/) instead of the official AWS
 - **Modern API**: Clean, promise-based interface
 - **No dependencies overhead**: Minimal dependency tree
 
-# Cloud Object Storage Comparison: GCS, Backblaze B2, Cloudflare R2, and AWS S3
-
-Google Cloud Storage (GCS) joins Backblaze B2, Cloudflare R2, and AWS S3 as a hyperscaler option with [strong multi-region support](https://cloud.google.com/storage/pricing), multiple storage classes, and [deep integration with Google Cloud services](https://cloud.google.com/storage/pricing). These providers all [offer S3-compatible object storage](https://www.backblaze.com/cloud-storage/pricing) but differ significantly in [pricing models](https://www.backblaze.com/cloud-storage/pricing), especially storage costs, egress fees, and ecosystem fit.
-
-## Updated pricing snapshot ("hot"/Standard storage)
+# Cloud Object Storage Comparison
 
 | Service                                                         | Storage price (/TB-month)      | Egress to internet                                                                        | API ops (Class A/B per 1K, approx)                                                 | Minimum duration                                            | Notes                                                              |
 | --------------------------------------------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------ |

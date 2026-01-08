@@ -11,7 +11,14 @@ export type Provider = "s3" | "r2" | "b2";
 /**
  * Storage operation action type
  */
-export type Action = "upload" | "download" | "delete" | "list" | "deleteAll";
+export type Action =
+  | "upload"
+  | "download"
+  | "delete"
+  | "list"
+  | "deleteAll"
+  | "copy"
+  | "rename";
 
 /**
  * Options for storage operations
@@ -19,6 +26,8 @@ export type Action = "upload" | "download" | "delete" | "list" | "deleteAll";
 export interface StorageOptions {
   /** The object key/path (required for upload, download, delete) */
   key?: string;
+  /** The destination key/path (required for copy, rename) */
+  destinationKey?: string;
   /** The file content to upload (required for upload) */
   body?: string | Buffer | ReadableStream;
   /** Force a specific cloud provider (auto-detected if omitted) */
@@ -65,6 +74,32 @@ export interface DeleteAllResult {
   success: boolean;
   /** Number of objects deleted */
   count: number;
+  [key: string]: any;
+}
+
+/**
+ * Result from copy operation
+ */
+export interface CopyResult {
+  /** Whether the copy was successful */
+  success: boolean;
+  /** The source object key */
+  sourceKey: string;
+  /** The destination object key */
+  destinationKey: string;
+  [key: string]: any;
+}
+
+/**
+ * Result from rename operation
+ */
+export interface RenameResult {
+  /** Whether the rename was successful */
+  success: boolean;
+  /** The old object key */
+  oldKey: string;
+  /** The new object key */
+  newKey: string;
   [key: string]: any;
 }
 
@@ -117,6 +152,20 @@ interface ProviderConfig {
  * });
  *
  * @example
+ * // Copy a file
+ * await manageStorage('copy', {
+ *   key: 'documents/report.pdf',
+ *   destinationKey: 'documents/report-copy.pdf'
+ * });
+ *
+ * @example
+ * // Rename a file (copy + delete)
+ * await manageStorage('rename', {
+ *   key: 'documents/old-name.pdf',
+ *   destinationKey: 'documents/new-name.pdf'
+ * });
+ *
+ * @example
  * // Force a specific provider with runtime credentials
  * await manageStorage('upload', {
  *   key: 'test.txt',
@@ -152,10 +201,26 @@ export async function manageStorage(
   options?: StorageOptions
 ): Promise<DeleteAllResult>;
 export async function manageStorage(
+  action: "copy",
+  options: StorageOptions & { key: string; destinationKey: string }
+): Promise<CopyResult>;
+export async function manageStorage(
+  action: "rename",
+  options: StorageOptions & { key: string; destinationKey: string }
+): Promise<RenameResult>;
+export async function manageStorage(
   action: Action,
   options: StorageOptions = {}
-): Promise<UploadResult | string | DeleteResult | string[] | DeleteAllResult> {
-  const { key, body, provider: optProvider, ...rest } = options;
+): Promise<
+  | UploadResult
+  | string
+  | DeleteResult
+  | string[]
+  | DeleteAllResult
+  | CopyResult
+  | RenameResult
+> {
+  const { key, body, destinationKey, provider: optProvider, ...rest } = options;
   const provider = optProvider || detectDefaultProvider();
   const providerOptions = Object.fromEntries(
     Object.entries(rest).map(([k, v]) => [`${provider.toUpperCase()}_${k}`, v])
@@ -181,28 +246,24 @@ export async function manageStorage(
           Key: key!,
           Body: body,
         });
-        console.log(`Uploaded ${key} to ${provider}`);
         return { success: true, key: key!, ...uploadResult };
       case "download":
         const downloadResult = await client.s3.GetObject({
           Bucket: config.bucket,
           Key: key!,
         });
-        console.log(`Downloaded ${key} from ${provider}`);
         return downloadResult.Body as string;
       case "delete":
         const deleteResult = await client.s3.DeleteObject({
           Bucket: config.bucket,
           Key: key!,
         });
-        console.log(`Deleted ${key} from ${provider}`);
         return { success: true, key: key!, ...deleteResult };
       case "list":
         const listResult = await client.s3.ListObjectsV2({
           Bucket: config.bucket,
         });
         const keys = listResult.Contents?.map((obj: any) => obj.Key) || [];
-        console.log(keys.join("\n"));
         return keys as string[];
       case "deleteAll":
         const allObjects = await client.s3.ListObjectsV2({
@@ -212,24 +273,55 @@ export async function manageStorage(
           const deleteAllResult = await client.s3.DeleteObjects({
             Bucket: config.bucket,
             Delete: {
-              Objects: allObjects.Contents.map((obj: any) => ({ Key: obj.Key })),
+              Objects: allObjects.Contents.map((obj: any) => ({
+                Key: obj.Key,
+              })),
             },
           });
-          console.log(
-            `Deleted all ${allObjects.Contents.length} files from ${provider}`
-          );
           return {
             success: true,
             count: allObjects.Contents.length,
             ...deleteAllResult,
           };
         } else {
-          console.log(`${provider} bucket empty`);
           return { success: true, count: 0 };
         }
+      case "copy":
+        if (!destinationKey) {
+          throw new Error("destinationKey is required for copy operation");
+        }
+        const copyResult = await (client.s3 as any).CopyObject({
+          Bucket: config.bucket,
+          CopySource: `${config.bucket}/${key!}`,
+          Key: destinationKey,
+        });
+        return {
+          success: true,
+          sourceKey: key!,
+          destinationKey,
+          ...copyResult,
+        };
+      case "rename":
+        if (!destinationKey) {
+          throw new Error("destinationKey is required for rename operation");
+        }
+        await (client.s3 as any).CopyObject({
+          Bucket: config.bucket,
+          CopySource: `${config.bucket}/${key!}`,
+          Key: destinationKey,
+        });
+        await client.s3.DeleteObject({
+          Bucket: config.bucket,
+          Key: key!,
+        });
+        return {
+          success: true,
+          oldKey: key!,
+          newKey: destinationKey,
+        };
       default:
         throw new Error(
-          "Invalid action: upload, download, delete, list, deleteAll"
+          "Invalid action: upload, download, delete, list, deleteAll, copy, rename"
         );
     }
   } catch (error) {

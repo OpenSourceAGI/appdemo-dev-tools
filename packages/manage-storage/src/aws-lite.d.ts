@@ -8,6 +8,7 @@ declare module "@aws-lite/client" {
   }
 
   export interface S3Methods {
+    CopyObject(params: any): Promise<any>;
     PutObject(params: any): Promise<any>;
     GetObject(params: any): Promise<any>;
     DeleteObject(params: any): Promise<any>;
@@ -20,7 +21,9 @@ declare module "@aws-lite/client" {
     [key: string]: any;
   }
 
-  export default function AwsLite(config: AwsLiteConfig): Promise<AwsLiteClient>;
+  export default function AwsLite(
+    config: AwsLiteConfig
+  ): Promise<AwsLiteClient>;
 }
 
 declare module "@aws-lite/s3" {

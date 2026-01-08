@@ -1,4 +1,6 @@
-export { manageStorage } from "./manage-storage";
+import { manageStorage } from "./manage-storage";
+export default manageStorage;
+export * from "./manage-storage";
 export type {
   Provider,
   Action,
@@ -6,4 +8,6 @@ export type {
   UploadResult,
   DeleteResult,
   DeleteAllResult,
+  CopyResult,
+  RenameResult,
 } from "./manage-storage";
