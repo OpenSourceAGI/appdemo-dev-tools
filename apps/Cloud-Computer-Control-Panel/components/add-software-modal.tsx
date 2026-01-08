@@ -50,6 +50,15 @@ export function AddSoftwareModal({
   const { toast } = useToast()
 
   const handleInstall = async () => {
+    console.log("[AddSoftwareModal] Install button clicked")
+    console.log("[AddSoftwareModal] Install options:", {
+      installDokploy,
+      installDevToolsShell,
+      dockerServicesCount: dockerServices.length,
+      githubReposCount: githubRepos.length,
+      hasCustomScript: !!customScript.trim(),
+    })
+
     if (
       !installDokploy &&
       !installDevToolsShell &&
@@ -57,9 +66,10 @@ export function AddSoftwareModal({
       githubRepos.length === 0 &&
       !customScript.trim()
     ) {
+      console.log("[AddSoftwareModal] Validation failed: Nothing to install")
       toast({
         title: "Nothing to Install",
-        description: "Please select at least one software option",
+        description: "Please select at least one software option from the tabs above",
         variant: "destructive",
       })
       return
@@ -67,6 +77,7 @@ export function AddSoftwareModal({
 
     // Check if we have the necessary information for SSH
     if (!instance.publicIp) {
+      console.log("[AddSoftwareModal] Validation failed: No public IP")
       toast({
         title: "No Public IP",
         description: "Instance doesn't have a public IP address yet",
@@ -76,6 +87,7 @@ export function AddSoftwareModal({
     }
 
     if (!instance.keyName) {
+      console.log("[AddSoftwareModal] Validation failed: No SSH key name")
       toast({
         title: "No SSH Key",
         description: "Instance doesn't have an SSH key associated",
@@ -85,8 +97,10 @@ export function AddSoftwareModal({
     }
 
     // Get SSH key from localStorage
+    console.log("[AddSoftwareModal] Retrieving SSH key:", instance.keyName)
     const sshKey = getSSHKey(instance.keyName)
     if (!sshKey) {
+      console.log("[AddSoftwareModal] Validation failed: SSH key not found in localStorage")
       toast({
         title: "SSH Key Not Found",
         description: "SSH key not found in localStorage. Cannot connect to instance.",
@@ -95,9 +109,11 @@ export function AddSoftwareModal({
       return
     }
 
+    console.log("[AddSoftwareModal] Starting SSH installation...")
     setInstalling(true)
 
     try {
+      console.log("[AddSoftwareModal] Sending request to /api/instances/install-software-ssh")
       const response = await fetch("/api/instances/install-software-ssh", {
         method: "POST",
         headers: {
@@ -118,10 +134,12 @@ export function AddSoftwareModal({
       })
 
       const data = await response.json()
+      console.log("[AddSoftwareModal] API response:", { ok: response.ok, status: response.status, data })
 
       if (!response.ok) {
         // Handle SSH connection failure
         if (data.error === "SSH_CONNECTION_FAILED") {
+          console.error("[AddSoftwareModal] SSH connection failed:", data.message)
           toast({
             title: "SSH Connection Failed",
             description: data.message,
@@ -134,6 +152,7 @@ export function AddSoftwareModal({
 
       // If installation completed successfully via SSH
       if (data.success) {
+        console.log("[AddSoftwareModal] Installation successful via SSH")
         toast({
           title: "Software Installation Completed",
           description: `Successfully installed ${data.installing} via SSH.`,
@@ -149,6 +168,7 @@ export function AddSoftwareModal({
         setCustomScript("")
       } else {
         // Installation failed
+        console.error("[AddSoftwareModal] Installation failed:", data.message)
         toast({
           title: "Installation Failed",
           description: data.message || "Failed to install software on the instance.",
@@ -156,7 +176,7 @@ export function AddSoftwareModal({
         })
       }
     } catch (error) {
-      console.error("[SSH] Install error:", error)
+      console.error("[AddSoftwareModal] Install error:", error)
       toast({
         title: "Installation Failed",
         description: error instanceof Error ? error.message : "Failed to install software on the instance",
