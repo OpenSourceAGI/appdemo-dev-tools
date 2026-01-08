@@ -1,18 +1,18 @@
 ---
-title: ☁️ Cloud Hosting
+title: ☁️ Cloud Compute
 ---
 
 ## 🌐 Cloud Compute Providers
 
-| Provider | Monthly Cost Range | Strengths | Best For |
-|----------|-------------------|-----------|----------|
-| AWS | $3,750-6,250 | Comprehensive features, global scale | Enterprise applications |
-| GCP | $8,000-50,000 | Analytics integration, automatic optimization | Data-heavy applications |
-| Azure | $21,500-45,000 | Enterprise integration, hybrid benefits | Microsoft ecosystems |
-| Hetzner | $325-850 | Lowest cost per performance | CPU-intensive workloads |
-| Cloudflare | $100-500 | Zero egress, global edge network | Content delivery, JAMstack |
-| Vercel | $200-2,000+ | Developer experience, automatic optimization | Frontend-focused applications |
-| DigitalOcean | $500-2,000 | Predictable pricing, managed services | Balanced development teams |
+| Provider     | Monthly Cost Range | Strengths                                     | Best For                      |
+| ------------ | ------------------ | --------------------------------------------- | ----------------------------- |
+| AWS          | $3,750-6,250       | Comprehensive features, global scale          | Enterprise applications       |
+| GCP          | $8,000-50,000      | Analytics integration, automatic optimization | Data-heavy applications       |
+| Azure        | $21,500-45,000     | Enterprise integration, hybrid benefits       | Microsoft ecosystems          |
+| Hetzner      | $325-850           | Lowest cost per performance                   | CPU-intensive workloads       |
+| Cloudflare   | $100-500           | Zero egress, global edge network              | Content delivery, JAMstack    |
+| Vercel       | $200-2,000+        | Developer experience, automatic optimization  | Frontend-focused applications |
+| DigitalOcean | $500-2,000         | Predictable pricing, managed services         | Balanced development teams    |
 
 ### 🟠 Amazon Web Services: Enterprise scale leader
 
@@ -70,7 +70,6 @@ DigitalOcean provides **predictable pricing** with comprehensive managed service
 
 Expect **$500-2,000 monthly** for 100,000 user applications, with excellent documentation and developer-friendly tools justifying the moderate premium over pure VPS providers.
 
-
 ## Optimization strategies comparison
 
 **Reserved instances and commitments** provide the largest savings opportunities. AWS offers up to 72% discounts with 3-year reserved instances, GCP provides 70% committed use discounts, and Azure delivers 72% reserved instance savings. **Combining Azure Hybrid Benefit with reserved instances achieves 85% total savings**.
@@ -88,7 +87,6 @@ Expect **$500-2,000 monthly** for 100,000 user applications, with excellent docu
 **Cross-zone and cross-region charges** accumulate quickly. AWS charges $0.01/GB for cross-AZ traffic, while GCP and Azure have similar inter-zone fees. **Careful architectural planning** minimizes these charges through regional deployment strategies.
 
 ## Recommendations by use case
-
 
 Supporting 100,000 users requires sophisticated cloud infrastructure with careful cost optimization. After analyzing current 2024-2025 pricing across major providers, this report delivers actionable insights for budget planning and architectural decisions.
 
