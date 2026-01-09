@@ -4,25 +4,26 @@ A TypeScript/Node.js library to display comprehensive system information with cu
 
 ## Features
 
-- 🚀 **Fast**: Intelligent caching system for quick repeated access
+- 📊 **Comprehensive**: 30+ system metrics including CPU, GPU, network, containers, and more
+- 🌍 **Cross-platform**: Works on Linux, macOS, and Windows, and Android
 - 🎨 **Customizable**: Configure colors, emojis, and display order
 - 🔌 **Two Modes**: Use as CLI tool or import as API
-- 🌍 **Cross-platform**: Works on Linux, macOS, and Windows
-- 📊 **Comprehensive**: 30+ system metrics including CPU, GPU, network, containers, and more
+- 🚀 **Cached**: Intelligent caching system for quick repeated access
 - 💾 **TypeScript**: Full type definitions included
 
 ## Installation
-
-```bash
-npm install about-system
-```
 
 ```bash
 npx about-system
 ```
 
 ```bash
-bunx about-system
+npm install -g about-system
+about-system
+```
+
+```bash
+bun x about-system
 ```
 
 ## Examples
@@ -70,6 +71,8 @@ about-system --settings-reset
 # Set specific configuration values
 about-system --set display.show_emojis false
 about-system --set colors.user blue
+about-system --set emojis.cpu "🚀 "
+about-system --set labels.cpu "Processor"
 
 # Clear cache
 about-system --refresh
@@ -80,17 +83,17 @@ about-system --refresh
 ### Basic Example
 
 ```typescript
-import { getSystemInfo } from 'about-system';
+import { getSystemInfo } from "about-system";
 
 // Get all system information as JSON
 const info = await getSystemInfo();
 
-console.log(info.user);        // Current username
-console.log(info.hostname);    // Computer hostname
-console.log(info.os);          // Operating system
-console.log(info.cpu);         // CPU model
-console.log(info.ram_used);    // RAM usage (e.g., "8/16GB")
-console.log(info.disk_used);   // Disk usage (e.g., "45%")
+console.log(info.user); // Current username
+console.log(info.hostname); // Computer hostname
+console.log(info.os); // Operating system
+console.log(info.cpu); // CPU model
+console.log(info.ram_used); // RAM usage (e.g., "8/16GB")
+console.log(info.disk_used); // Disk usage (e.g., "45%")
 ```
 
 ### Using Individual Info Functions
@@ -98,7 +101,7 @@ console.log(info.disk_used);   // Disk usage (e.g., "45%")
 You can import and use individual system info functions:
 
 ```typescript
-import { infoFunctions } from 'about-system/api';
+import { infoFunctions } from "about-system/api";
 
 // Create a context with cache
 const cache = {};
@@ -123,16 +126,16 @@ async function getBasicInfo() {
 
 ```typescript
 // Default import (complete API)
-import { getSystemInfo } from 'about-system';
+import { getSystemInfo } from "about-system";
 
 // Direct API import with individual functions
-import { getSystemInfo, infoFunctions } from 'about-system/api';
+import { getSystemInfo, infoFunctions } from "about-system/api";
 
 // CLI functions
-import { displaySystemInfo } from 'about-system/cli';
+import { displaySystemInfo } from "about-system/cli";
 
 // Types only
-import type { SystemInfo, Platform } from 'about-system/types';
+import type { SystemInfo, Platform } from "about-system/types";
 ```
 
 ### All Available Fields
@@ -142,38 +145,38 @@ See the [systeminfo-types.d.ts](src/systeminfo-types.d.ts) file for complete Typ
 ```typescript
 interface SystemInfo {
   // System Identity
-  timestamp: string;          // ISO 8601 timestamp
-  hostname: string;           // Computer hostname
-  user: string;              // Current username
-  platform: 'linux' | 'windows' | 'macos' | 'unknown';
+  timestamp: string; // ISO 8601 timestamp
+  hostname: string; // Computer hostname
+  user: string; // Current username
+  platform: "linux" | "windows" | "macos" | "unknown";
 
   // Operating System
-  os: string;                // OS name and version
-  kernel: string;            // Kernel version
-  shell: string;             // Shell program (Linux/Unix)
+  os: string; // OS name and version
+  kernel: string; // Kernel version
+  shell: string; // Shell program (Linux/Unix)
 
   // Hardware
-  cpu: string;               // CPU model
-  gpu: string;               // GPU model
-  device: string;            // Device/computer model
+  cpu: string; // CPU model
+  gpu: string; // GPU model
+  device: string; // Device/computer model
 
   // Real-time Resources
-  disk_used: string;         // Disk usage percentage
-  ram_used: string;          // RAM usage (used/total GB)
-  top_process: string;       // Top CPU-consuming process
-  uptime: string;            // System uptime (Xd Yh Zm)
+  disk_used: string; // Disk usage percentage
+  ram_used: string; // RAM usage (used/total GB)
+  top_process: string; // Top CPU-consuming process
+  uptime: string; // System uptime (Xd Yh Zm)
 
   // Network
-  ip: string;                // Public IP address
-  iplocal: string;           // Local IP address(es)
-  city: string;              // Geographic location
-  isp: string;               // Internet service provider
+  ip: string; // Public IP address
+  iplocal: string; // Local IP address(es)
+  city: string; // Geographic location
+  isp: string; // Internet service provider
 
   // Linux-specific
-  temperature: string;       // System temperature
-  battery: string;           // Battery percentage
-  load_average: string;      // System load
-  services_running: string;  // Active services count
+  temperature: string; // System temperature
+  battery: string; // Battery percentage
+  load_average: string; // System load
+  services_running: string; // Active services count
 
   // And 20+ more fields...
 }
@@ -184,7 +187,7 @@ interface SystemInfo {
 See [examples/api-usage.js](examples/api-usage.js) for more examples.
 
 ```typescript
-import { getSystemInfo } from 'about-system';
+import { getSystemInfo } from "about-system";
 
 // Example: Monitor system resources
 async function monitorResources() {
@@ -195,12 +198,12 @@ async function monitorResources() {
     ram: info.ram_used,
     disk: info.disk_used,
     temperature: info.temperature,
-    topProcess: info.top_process
+    topProcess: info.top_process,
   };
 }
 
 // Example: Create custom dashboard
-import { infoFunctions } from 'about-system/api';
+import { infoFunctions } from "about-system/api";
 
 async function getDashboardData(context) {
   return {
@@ -217,7 +220,7 @@ async function getDashboardData(context) {
     network: {
       localIP: infoFunctions.iplocal(),
       publicIP: await infoFunctions.ip(context),
-    }
+    },
   };
 }
 ```
@@ -266,6 +269,8 @@ about-system --settings-reset
 # Set individual values
 about-system --set display.show_emojis false
 about-system --set colors.user blue
+about-system --set emojis.cpu "🚀 "
+about-system --set labels.hostname "Computer"
 about-system --set cache.enabled true
 
 # Clear cache
@@ -278,15 +283,17 @@ about-system --cache-clear
 {
   "version": "1.0.0",
   "display_order": [
-    "user",
-    "hostname",
-    "disk_used",
-    "ram_used",
-    "uptime",
-    "ip",
-    "os",
-    "cpu",
-    "shell"
+    ["user", "hostname", "os", "device", "kernel", "cpu", "gpu"],
+    [
+      "disk_used",
+      "ram_used",
+      "top_process",
+      "uptime",
+      "temperature",
+      "battery"
+    ],
+    ["ip", "iplocal", "city", "domain", "isp"],
+    ["shell", "pacman", "services_running", "containers"]
   ],
   "colors": {
     "user": "red",
@@ -299,25 +306,77 @@ about-system --cache-clear
     "cpu": "orange",
     "shell": "orange"
   },
+  "emojis": {
+    "user": "👤 ",
+    "hostname": "🏠 ",
+    "cpu": "📈 ",
+    "gpu": "🎮 ",
+    "disk_used": "📁 ",
+    "ram_used": "💾 ",
+    "ip": "🌎 ",
+    "shell": "🐚 "
+  },
+  "labels": {
+    "user": "User",
+    "hostname": "Host",
+    "cpu": "CPU",
+    "gpu": "GPU",
+    "disk_used": "Disk",
+    "ram_used": "RAM",
+    "ip": "IP",
+    "shell": "Shell"
+  },
   "display": {
     "show_emojis": true,
-    "separator": " ",
-    "max_width": 120
-  },
-  "cache": {
-    "enabled": true
+    "single_line": false,
+    "line_wrap_length": 100
   },
   "network": {
-    "timeout": 5000,
     "show_offline_message": true
+  },
+  "advanced": {
+    "debug": false
   }
 }
 ```
 
-### Available Colors
+### Customization Options
+
+#### Colors
+
+Available color options for each info block:
 
 - `red`, `orange`, `yellow`, `green`, `blue`, `cyan`, `purple`, `magenta`, `gray`, `lightblue`
 - Use `multicolor` for ports to get a rainbow effect
+
+```bash
+about-system --set colors.user blue
+about-system --set colors.hostname green
+```
+
+#### Emojis
+
+Customize the emoji displayed for each info block. Emojis can be toggled on/off globally with `display.show_emojis` or individually customized:
+
+```bash
+# Toggle emojis on/off
+about-system --set display.show_emojis false
+
+# Customize individual emojis
+about-system --set emojis.cpu "🚀 "
+about-system --set emojis.hostname "🖥️ "
+about-system --set emojis.battery "🔋 "
+```
+
+#### Labels
+
+Customize the text labels for each info block:
+
+```bash
+about-system --set labels.cpu "Processor"
+about-system --set labels.hostname "Computer"
+about-system --set labels.ram_used "Memory"
+```
 
 ### Platform-Specific Features
 
@@ -365,7 +424,7 @@ The `--install` flag automatically configures the script as a shell greeting:
 All API functions include comprehensive JSDoc documentation:
 
 ```typescript
-import { infoFunctions } from 'about-system/api';
+import { infoFunctions } from "about-system/api";
 
 // Hover over any function in your IDE to see:
 // - Function description
@@ -374,10 +433,11 @@ import { infoFunctions } from 'about-system/api';
 // - Usage examples
 // - Platform-specific notes
 
-infoFunctions.cpu(context);  // IDE shows full documentation
+infoFunctions.cpu(context); // IDE shows full documentation
 ```
 
 **Features:**
+
 - ✅ Every function documented with JSDoc
 - ✅ Parameter and return type descriptions
 - ✅ Real-world usage examples
@@ -387,6 +447,7 @@ infoFunctions.cpu(context);  // IDE shows full documentation
 ### TypeScript Support
 
 Full TypeScript definitions with:
+
 - Complete `SystemInfo` interface
 - All 30+ field types documented
 - Platform-specific type unions
@@ -394,11 +455,11 @@ Full TypeScript definitions with:
 
 ```typescript
 import type {
-  SystemInfo,           // Main info object
-  Platform,             // Platform type
-  SystemInfoOptions,    // Config options
-  InfoContext,          // Context for functions
-} from 'about-system/types';
+  SystemInfo, // Main info object
+  Platform, // Platform type
+  SystemInfoOptions, // Config options
+  InfoContext, // Context for functions
+} from "about-system/types";
 ```
 
 ## Project Structure
