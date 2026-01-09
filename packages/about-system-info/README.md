@@ -1,33 +1,29 @@
-<p align="center">
-    <img src="https://i.imgur.com/1kwKBTR.png">
-</p>
-<p align="center">
-    <img alt="GitHub Stars" src="https://img.shields.io/github/stars/vtempest/server-shell-setup">
-    <a href="https://github.com/vtempest/server-shell-setup/discussions">
-    <img alt="GitHub Discussions"
-        src="https://img.shields.io/github/discussions/vtempest/server-shell-setup">
-    </a>
-     <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request">
-            <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
-    </a>
-    <a href="https://codespaces.new/vtempest/server-shell-setup">
-    <img src="https://github.com/codespaces/badge.svg" width="150" height="20">
-    </a>
-</p>
+# About System Info
 
-## Node.js Shell System Info Metadata
+A TypeScript/Node.js library to display comprehensive system information with customizable output. Cross-platform support for Windows, macOS, and Linux with caching for optimal performance.
+
+## Features
+
+- 🚀 **Fast**: Intelligent caching system for quick repeated access
+- 🎨 **Customizable**: Configure colors, emojis, and display order
+- 🔌 **Two Modes**: Use as CLI tool or import as API
+- 🌍 **Cross-platform**: Works on Linux, macOS, and Windows
+- 📊 **Comprehensive**: 30+ system metrics including CPU, GPU, network, containers, and more
+- 💾 **TypeScript**: Full type definitions included
+
+## Installation
 
 ```bash
-bunx about-system
+npm install about-system
 ```
+
 ```bash
 npx about-system
 ```
 
-
-A cross-platform Node.js implementation of the system info script with enhanced features, caching, and full customization support.
-
-[NPM](https://www.npmjs.com/package/about-system-info)
+```bash
+bunx about-system
+```
 
 ## Examples
 
@@ -35,73 +31,226 @@ A cross-platform Node.js implementation of the system info script with enhanced 
 
 `👤 deck 🏠 steamdeck 📁 90% 💾 2/14GB 🔝 6% cursor ⏱️  1d 7h 18m 🌎 174.194.193.230 📍 San Jose 🔗 http://230.sub-174-194-193.myvzw.com 👮 Verizon Business ⚡ SteamOS 📈 AMD Custom APU 0405 💻 Jupiter 🔧 6.11.11-valve12-1-neptune-611-g517a46b477e1 🐚 fish 🚀 npm pip docker nvim bun 📦 docker-node`
 
- `👤 u0_a365 🏠 localhost 📁 54% 💾 1/5GB 🔝 1% fish ⏱️ 4d 9h 19m 🌎 174.194.193.230 🌐 192.168.42.229 📍 San Jose 🔗 http://230.sub-174-194-193.myvzw.com 👮 Verizon Business ⚡ Android 13 📈 Kryo-4XX-Silver 💻 SM-G781U 🔧 4.19.113-27223811 🐚 nu 🚀 apt npm pip hx nvim`
+`👤 u0_a365 🏠 localhost 📁 54% 💾 1/5GB 🔝 1% fish ⏱️ 4d 9h 19m 🌎 174.194.193.230 🌐 192.168.42.229 📍 San Jose 🔗 http://230.sub-174-194-193.myvzw.com 👮 Verizon Business ⚡ Android 13 📈 Kryo-4XX-Silver 💻 SM-G781U 🔧 4.19.113-27223811 🐚 nu 🚀 apt npm pip hx nvim`
 
-### Features
+## CLI Usage
 
-- **Cross-Platform**: Works on any Linux, Windows PowerShell (most features), macOS, Android Termux
-- **Smart Caching**: Configurable cache durations for different system info types
-- **Customizable Output**: Control which info blocks to show and their order
-- **Network Info**: Fetches IP, location, and ISP data from ipinfo.io
-- **Emoji Support**: Beautiful emoji-enhanced output (can be disabled)
-- **Settings Management**: Persistent configuration with JSON settings file
-- **Shell Integration**: Easy installation as shell greeting
-- **Performance Optimized**: Caches expensive operations like network requests
+### Basic Usage
 
-### Installation
-
-#### Global Installation (Recommended)
 ```bash
-npx about-system
+# Show all system information
+about-system
+
+# Show specific fields
+about-system cpu,ram_used,disk_used
+
+# Output as JSON
+about-system --json
+
+# Get help
+about-system --help
 ```
 
-### Quick Start
+### Installation as Shell Greeting
 
-1. **Run the script**:
-   ```bash
-   about-system
-   ```
+```bash
+# Install as shell greeting (runs on terminal startup)
+about-system --install
+```
 
-2. **Install as shell greeting**:
-   ```bash
-   about-system --install
-   ```
+### Configuration
 
-3. **Customize settings**:
-   ```bash
-   about-system --set display.show_emojis false
-   about-system --set colors.user blue
-   about-system --set display_order '["user","hostname","uptime"]'
-   ```
+```bash
+# View current settings
+about-system --settings-show
+
+# Reset settings to defaults
+about-system --settings-reset
+
+# Set specific configuration values
+about-system --set display.show_emojis false
+about-system --set colors.user blue
+
+# Clear cache
+about-system --refresh
+```
+
+## API Usage
+
+### Basic Example
+
+```typescript
+import { getSystemInfo } from 'about-system';
+
+// Get all system information as JSON
+const info = await getSystemInfo();
+
+console.log(info.user);        // Current username
+console.log(info.hostname);    // Computer hostname
+console.log(info.os);          // Operating system
+console.log(info.cpu);         // CPU model
+console.log(info.ram_used);    // RAM usage (e.g., "8/16GB")
+console.log(info.disk_used);   // Disk usage (e.g., "45%")
+```
+
+### Using Individual Info Functions
+
+You can import and use individual system info functions:
+
+```typescript
+import { infoFunctions } from 'about-system/api';
+
+// Create a context with cache
+const cache = {};
+const context = { cache };
+
+// Use individual functions
+const cpu = infoFunctions.cpu(context);
+const ram = infoFunctions.ram_used(context);
+const uptime = infoFunctions.uptime();
+
+// Build custom monitoring tools
+async function getBasicInfo() {
+  return {
+    user: infoFunctions.user(),
+    hostname: infoFunctions.hostname(),
+    uptime: infoFunctions.uptime(),
+  };
+}
+```
+
+### Multiple Import Styles
+
+```typescript
+// Default import (complete API)
+import { getSystemInfo } from 'about-system';
+
+// Direct API import with individual functions
+import { getSystemInfo, infoFunctions } from 'about-system/api';
+
+// CLI functions
+import { displaySystemInfo } from 'about-system/cli';
+
+// Types only
+import type { SystemInfo, Platform } from 'about-system/types';
+```
+
+### All Available Fields
+
+See the [systeminfo-types.d.ts](src/systeminfo-types.d.ts) file for complete TypeScript definitions with detailed JSDoc comments.
+
+```typescript
+interface SystemInfo {
+  // System Identity
+  timestamp: string;          // ISO 8601 timestamp
+  hostname: string;           // Computer hostname
+  user: string;              // Current username
+  platform: 'linux' | 'windows' | 'macos' | 'unknown';
+
+  // Operating System
+  os: string;                // OS name and version
+  kernel: string;            // Kernel version
+  shell: string;             // Shell program (Linux/Unix)
+
+  // Hardware
+  cpu: string;               // CPU model
+  gpu: string;               // GPU model
+  device: string;            // Device/computer model
+
+  // Real-time Resources
+  disk_used: string;         // Disk usage percentage
+  ram_used: string;          // RAM usage (used/total GB)
+  top_process: string;       // Top CPU-consuming process
+  uptime: string;            // System uptime (Xd Yh Zm)
+
+  // Network
+  ip: string;                // Public IP address
+  iplocal: string;           // Local IP address(es)
+  city: string;              // Geographic location
+  isp: string;               // Internet service provider
+
+  // Linux-specific
+  temperature: string;       // System temperature
+  battery: string;           // Battery percentage
+  load_average: string;      // System load
+  services_running: string;  // Active services count
+
+  // And 20+ more fields...
+}
+```
+
+### Advanced Examples
+
+See [examples/api-usage.js](examples/api-usage.js) for more examples.
+
+```typescript
+import { getSystemInfo } from 'about-system';
+
+// Example: Monitor system resources
+async function monitorResources() {
+  const info = await getSystemInfo();
+
+  return {
+    cpu: info.cpu,
+    ram: info.ram_used,
+    disk: info.disk_used,
+    temperature: info.temperature,
+    topProcess: info.top_process
+  };
+}
+
+// Example: Create custom dashboard
+import { infoFunctions } from 'about-system/api';
+
+async function getDashboardData(context) {
+  return {
+    hardware: {
+      cpu: infoFunctions.cpu(context),
+      gpu: infoFunctions.gpu(context),
+      device: infoFunctions.device(context),
+    },
+    resources: {
+      ram: infoFunctions.ram_used(context),
+      disk: infoFunctions.disk_used(context),
+      uptime: infoFunctions.uptime(),
+    },
+    network: {
+      localIP: infoFunctions.iplocal(),
+      publicIP: await infoFunctions.ip(context),
+    }
+  };
+}
+```
 
 ### Available Info Blocks
 
-| Block | Description | Example Output |
-|-------|-------------|----------------|
-| `user` | Current username | `👤 username` |
-| `hostname` | System hostname | `🏠 hostname` |
-| `ip` | Public IP address | `🌎 192.168.1.1` |
-| `iplocal` | Local IP addresses | `🌐 192.168.1.100` |
-| `city` | Location based on IP | `📍 San Francisco` |
-| `domain` | Reverse DNS hostname | `🔗 http://example.com` |
-| `isp` | Internet service provider | `👮 Verizon Business` |
-| `os` | Operating system | `⚡ Ubuntu 22.04` |
-| `cpu` | CPU information | `📈 Intel Core i7-8700K` |
-| `gpu` | Graphics card | `🎮 NVIDIA GeForce RTX 3080` |
-| `disk_used` | Disk usage percentage | `📁 75%` |
-| `ram_used` | Memory usage | `💾 8/16GB` |
-| `top_process` | Highest CPU process | `🔝 15% chrome` |
-| `uptime` | System uptime | `⏱️ 2d 5h 30m` |
-| `device` | Device model | `💻 MacBook Pro` |
-| `kernel` | Kernel version | `🔧 5.15.0-56-generic` |
-| `shell` | Current shell | `🐚 fish` |
-| `pacman` | Available package managers | `🚀 apt npm pip docker` |
-| `ports` | Open network ports | `🔌 80http 443https 22ssh` |
-| `containers` | Running Docker containers | `📦 nginx redis postgres` |
+| Block         | Description                | Example Output               |
+| ------------- | -------------------------- | ---------------------------- |
+| `user`        | Current username           | `👤 username`                |
+| `hostname`    | System hostname            | `🏠 hostname`                |
+| `ip`          | Public IP address          | `🌎 192.168.1.1`             |
+| `iplocal`     | Local IP addresses         | `🌐 192.168.1.100`           |
+| `city`        | Location based on IP       | `📍 San Francisco`           |
+| `domain`      | Reverse DNS hostname       | `🔗 http://example.com`      |
+| `isp`         | Internet service provider  | `👮 Verizon Business`        |
+| `os`          | Operating system           | `⚡ Ubuntu 22.04`            |
+| `cpu`         | CPU information            | `📈 Intel Core i7-8700K`     |
+| `gpu`         | Graphics card              | `🎮 NVIDIA GeForce RTX 3080` |
+| `disk_used`   | Disk usage percentage      | `📁 75%`                     |
+| `ram_used`    | Memory usage               | `💾 8/16GB`                  |
+| `top_process` | Highest CPU process        | `🔝 15% chrome`              |
+| `uptime`      | System uptime              | `⏱️ 2d 5h 30m`               |
+| `device`      | Device model               | `💻 MacBook Pro`             |
+| `kernel`      | Kernel version             | `🔧 5.15.0-56-generic`       |
+| `shell`       | Current shell              | `🐚 fish`                    |
+| `pacman`      | Available package managers | `🚀 apt npm pip docker`      |
+| `ports`       | Open network ports         | `🔌 80http 443https 22ssh`   |
+| `containers`  | Running Docker containers  | `📦 nginx redis postgres`    |
 
 ### Configuration
 
 The script uses a JSON settings file located at:
+
 - **Linux/macOS**: `~/.config/systeminfo-settings.json`
 - **Windows**: `%APPDATA%\systeminfo-settings.json`
 
@@ -129,8 +278,15 @@ about-system --cache-clear
 {
   "version": "1.0.0",
   "display_order": [
-    "user", "hostname", "disk_used", "ram_used", "uptime",
-    "ip", "os", "cpu", "shell"
+    "user",
+    "hostname",
+    "disk_used",
+    "ram_used",
+    "uptime",
+    "ip",
+    "os",
+    "cpu",
+    "shell"
   ],
   "colors": {
     "user": "red",
@@ -166,16 +322,19 @@ about-system --cache-clear
 ### Platform-Specific Features
 
 #### Windows
+
 - Detects Windows-specific package managers (choco, winget, scoop)
 - Uses `wmic` for system information
 - Supports PowerShell and Command Prompt integration
 
 #### Linux
+
 - Detects Linux package managers (apt, yum, pacman, etc.)
 - Reads from `/proc` and `/sys` filesystems
 - Supports various shells (bash, zsh, fish, nushell)
 
 #### macOS
+
 - Detects macOS-specific tools
 - Uses `system_profiler` for hardware info
 - Supports zsh and bash integration
@@ -199,19 +358,100 @@ The `--install` flag automatically configures the script as a shell greeting:
 - **NuShell**: Adds to `~/.config/nushell/config.nu`
 - **PowerShell**: Provides instructions for profile setup
 
-### Development
+## Documentation
+
+### JSDoc Comments
+
+All API functions include comprehensive JSDoc documentation:
+
+```typescript
+import { infoFunctions } from 'about-system/api';
+
+// Hover over any function in your IDE to see:
+// - Function description
+// - Parameter details
+// - Return type information
+// - Usage examples
+// - Platform-specific notes
+
+infoFunctions.cpu(context);  // IDE shows full documentation
+```
+
+**Features:**
+- ✅ Every function documented with JSDoc
+- ✅ Parameter and return type descriptions
+- ✅ Real-world usage examples
+- ✅ Platform compatibility notes
+- ✅ IDE autocomplete support
+
+### TypeScript Support
+
+Full TypeScript definitions with:
+- Complete `SystemInfo` interface
+- All 30+ field types documented
+- Platform-specific type unions
+- Exported helper types
+
+```typescript
+import type {
+  SystemInfo,           // Main info object
+  Platform,             // Platform type
+  SystemInfoOptions,    // Config options
+  InfoContext,          // Context for functions
+} from 'about-system/types';
+```
+
+## Project Structure
+
+```
+about-system-info/
+├── src/
+│   ├── system-info-api.ts      # Core API with JSDoc (exported infoFunctions)
+│   ├── about-system-cli.ts     # CLI interface
+│   ├── index.ts                # Main entry point
+│   └── systeminfo-types.d.ts   # TypeScript type definitions
+├── dist/                       # Compiled JavaScript output (Vite build)
+│   ├── index.js                # Main entry (0.19 KB)
+│   ├── system-info-api.js      # Core API (21 KB)
+│   ├── about-system-cli.js     # CLI (10 KB)
+│   └── *.d.ts                  # Type definitions
+├── examples/
+│   └── api-usage.js           # Example API usage
+├── vite.config.ts             # Vite build configuration
+├── tsconfig.json              # TypeScript configuration
+├── package.json
+└── README.md
+```
+
+## Development
 
 ```bash
 # Clone the repository
-git clone https://github.com/vtempest/server-shell-setup.git
-cd server-shell-setup
+git clone https://github.com/OpenSourceAGI/StarterDOCS.git
+cd StarterDOCS/packages/about-system-info
 
 # Install dependencies
 npm install
 
-# Run the script
+# Build TypeScript
+npm run build
+
+# Run CLI
 npm start
 
-# Run with custom settings
-npm start -- --set display.show_emojis false
+# Watch mode for development
+npm run dev
 ```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+rights.institute/prosper
+
+## Links
+
+- [Repository](https://github.com/OpenSourceAGI/StarterDOCS/tree/master/packages/about-system-info)
+- [Issues](https://github.com/OpenSourceAGI/StarterDOCS/issues)

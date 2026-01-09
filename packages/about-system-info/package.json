@@ -2,26 +2,40 @@
   "name": "about-system",
   "version": "0.0.17",
   "description": "A Node.js script to display key system information with emojis. Cross-platform support for Windows, macOS, and Linux with customizable output and caching.",
-  "main": "src/about-system.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
-    "about-system": "./src/about-system.js"
+    "about-system": "./dist/about-system-cli.js"
   },
   "type": "module",
   "exports": {
     ".": {
-      "types": "./src/systeminfo-types.d.ts",
-      "import": "./src/about-system.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./api": {
+      "types": "./dist/system-info-api.d.ts",
+      "import": "./dist/system-info-api.js"
+    },
+    "./cli": {
+      "types": "./dist/about-system-cli.d.ts",
+      "import": "./dist/about-system-cli.js"
+    },
+    "./types": {
+      "types": "./src/systeminfo-types.d.ts"
     }
   },
   "scripts": {
-    "ship": "npx standard-version --release-as patch; rm CHANGELOG.md; npm publish",
-    "start": "node src/about-system.js",
-    "test-speed": "node src/test-speed-cloudflare.js",
-    "install-greeting": "node src/about-system.js --install",
-    "show-settings": "node src/about-system.js --settings-show",
-    "reset-settings": "node src/about-system.js --settings-reset",
-    "clear-cache": "node src/about-system.js --cache-clear",
-    "help": "node src/about-system.js --help"
+    "build": "vite build",
+    "build:tsc": "tsc",
+    "dev": "vite build --watch",
+    "ship": "npm run build && npx standard-version --release-as patch; rm CHANGELOG.md; npm publish",
+    "start": "npm run build && node dist/about-system-cli.js",
+    "install-greeting": "npm run build && node dist/about-system-cli.js --install",
+    "show-settings": "npm run build && node dist/about-system-cli.js --settings-show",
+    "reset-settings": "npm run build && node dist/about-system-cli.js --settings-reset",
+    "clear-cache": "npm run build && node dist/about-system-cli.js --refresh",
+    "help": "npm run build && node dist/about-system-cli.js --help"
   },
   "keywords": [
     "src/about-system",
@@ -46,7 +60,8 @@
   },
   "homepage": "https://github.com/OpenSourceAGI/StarterDOCS/tree/master/packages/about-system-info",
   "files": [
-    "src/about-system.js",
+    "dist/**/*",
+    "src/**/*.ts",
     "README.md",
     "package.json"
   ],
@@ -62,5 +77,11 @@
   },
   "dependencies": {
     "ora": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4"
   }
 }

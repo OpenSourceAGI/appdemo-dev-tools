@@ -1,7 +1,7 @@
 {
   "name": "manage-storage",
   "version": "0.0.5",
-  "description": "Storage manager supporting AWS S3, Cloudflare R2, and Backblaze B2 with automatic provider detection",
+  "description": "Storage manager supporting AWS S3, Backblaze B2, and Cloudflare R2 with automatic provider detection",
   "main": "./dist/manage-storage.js",
   "module": "./dist/manage-storage.js",
   "types": "./dist/manage-storage.d.ts",
@@ -9,13 +9,15 @@
   "keywords": [
     "s3",
     "r2",
+    "b2",
     "cloudflare",
     "backblaze",
-    "b2",
+    "aws",
+    "amazon",
     "storage",
     "cloud",
-    "aws",
-    "object-storage",
+    "cloud-storage",
+    "file-storage",
     "multi-cloud"
   ],
   "author": "vtempest",

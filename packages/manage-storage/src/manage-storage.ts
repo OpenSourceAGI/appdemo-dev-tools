@@ -1,12 +1,19 @@
-import AwsLite from "@aws-lite/client";
-import s3 from "@aws-lite/s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+  DeleteObjectsCommand,
+  ListObjectsV2Command,
+  CopyObjectCommand,
+} from "@aws-sdk/client-s3";
 import { config } from "dotenv";
 config();
 
 /**
  * Cloud storage provider type
  */
-export type Provider = "s3" | "r2" | "b2";
+export type Provider = "amazon" | "backblaze" | "cloudflare";
 
 /**
  * Storage operation action type
@@ -115,7 +122,7 @@ interface ProviderConfig {
 }
 
 /**
- * Universal cloud storage manager supporting AWS S3, Cloudflare R2, and Backblaze B2.
+ * Universal cloud storage manager supporting Amazon S3, Backblaze B2, and Cloudflare R2.
  * Automatically detects the configured provider from environment variables.
  *
  * @param action - The storage operation to perform
@@ -170,7 +177,7 @@ interface ProviderConfig {
  * await manageStorage('upload', {
  *   key: 'test.txt',
  *   body: 'Hello!',
- *   provider: 'r2',
+ *   provider: 'cloudflare',
  *   BUCKET_NAME: 'my-bucket',
  *   ACCESS_KEY_ID: 'key-id',
  *   SECRET_ACCESS_KEY: 'secret',
@@ -230,54 +237,68 @@ export async function manageStorage(
     throw new Error(`Missing credentials for ${provider}`);
   }
 
-  const client = await AwsLite({
+  const client = new S3Client({
     region: config.region,
     endpoint: config.endpoint,
-    accessKeyId: config.accessKeyId,
-    secretAccessKey: config.secretAccessKey,
-    plugins: [s3],
+    credentials: {
+      accessKeyId: config.accessKeyId,
+      secretAccessKey: config.secretAccessKey,
+    },
   });
 
   try {
     switch (action) {
       case "upload":
-        const uploadResult = await client.s3.PutObject({
-          Bucket: config.bucket,
-          Key: key!,
-          Body: body,
-        });
+        const uploadResult = await client.send(
+          new PutObjectCommand({
+            Bucket: config.bucket,
+            Key: key!,
+            Body: body,
+          })
+        );
         return { success: true, key: key!, ...uploadResult };
       case "download":
-        const downloadResult = await client.s3.GetObject({
-          Bucket: config.bucket,
-          Key: key!,
-        });
-        return downloadResult.Body as string;
+        const downloadResult = await client.send(
+          new GetObjectCommand({
+            Bucket: config.bucket,
+            Key: key!,
+          })
+        );
+        const bodyString = await downloadResult.Body?.transformToString();
+        return bodyString as string;
       case "delete":
-        const deleteResult = await client.s3.DeleteObject({
-          Bucket: config.bucket,
-          Key: key!,
-        });
+        const deleteResult = await client.send(
+          new DeleteObjectCommand({
+            Bucket: config.bucket,
+            Key: key!,
+          })
+        );
         return { success: true, key: key!, ...deleteResult };
       case "list":
-        const listResult = await client.s3.ListObjectsV2({
-          Bucket: config.bucket,
-        });
+        const listResult = await client.send(
+          new ListObjectsV2Command({
+            Bucket: config.bucket,
+          })
+        );
         const keys = listResult.Contents?.map((obj: any) => obj.Key) || [];
         return keys as string[];
       case "deleteAll":
-        const allObjects = await client.s3.ListObjectsV2({
-          Bucket: config.bucket,
-        });
-        if (allObjects.Contents?.length) {
-          const deleteAllResult = await client.s3.DeleteObjects({
+        const allObjects = await client.send(
+          new ListObjectsV2Command({
             Bucket: config.bucket,
-            Delete: {
-              Objects: allObjects.Contents.map((obj: any) => ({
-                Key: obj.Key,
-              })),
-            },
-          });
+          })
+        );
+        if (allObjects.Contents?.length) {
+          const deleteAllResult = await client.send(
+            new DeleteObjectsCommand({
+              Bucket: config.bucket,
+              Delete: {
+                Objects: allObjects.Contents.map((obj: any) => ({
+                  Key: obj.Key,
+                })),
+              },
+            })
+          );
           return {
             success: true,
             count: allObjects.Contents.length,
@@ -290,11 +311,13 @@ export async function manageStorage(
         if (!destinationKey) {
           throw new Error("destinationKey is required for copy operation");
         }
-        const copyResult = await (client.s3 as any).CopyObject({
-          Bucket: config.bucket,
-          CopySource: `${config.bucket}/${key!}`,
-          Key: destinationKey,
-        });
+        const copyResult = await client.send(
+          new CopyObjectCommand({
+            Bucket: config.bucket,
+            CopySource: `${config.bucket}/${key!}`,
+            Key: destinationKey,
+          })
+        );
         return {
           success: true,
           sourceKey: key!,
@@ -305,15 +328,19 @@ export async function manageStorage(
         if (!destinationKey) {
           throw new Error("destinationKey is required for rename operation");
         }
-        await (client.s3 as any).CopyObject({
-          Bucket: config.bucket,
-          CopySource: `${config.bucket}/${key!}`,
-          Key: destinationKey,
-        });
-        await client.s3.DeleteObject({
-          Bucket: config.bucket,
-          Key: key!,
-        });
+        await client.send(
+          new CopyObjectCommand({
+            Bucket: config.bucket,
+            CopySource: `${config.bucket}/${key!}`,
+            Key: destinationKey,
+          })
+        );
+        await client.send(
+          new DeleteObjectCommand({
+            Bucket: config.bucket,
+            Key: key!,
+          })
+        );
         return {
           success: true,
           oldKey: key!,
@@ -332,34 +359,34 @@ export async function manageStorage(
 
 /**
  * Detects which cloud storage provider is configured based on environment variables.
- * Checks for complete sets of credentials for each provider in priority order: R2, B2, S3.
+ * Checks for complete sets of credentials for each provider in priority order: Cloudflare, Backblaze, Amazon.
  *
  * @private
- * @returns The detected provider ('r2', 'b2', or 's3'). Defaults to 'r2' if none configured.
+ * @returns The detected provider ('cloudflare', 'backblaze', or 'amazon'). Defaults to 'cloudflare' if none configured.
  *
  * @example
- * // With R2 env vars set
- * const provider = detectDefaultProvider(); // Returns 'r2'
+ * // With Cloudflare env vars set
+ * const provider = detectDefaultProvider(); // Returns 'cloudflare'
  */
 function detectDefaultProvider(): Provider {
   const checks: Record<Provider, string[]> = {
-    r2: [
-      "R2_BUCKET_NAME",
-      "R2_ACCESS_KEY_ID",
-      "R2_SECRET_ACCESS_KEY",
-      "R2_BUCKET_URL",
+    cloudflare: [
+      "CLOUDFLARE_BUCKET_NAME",
+      "CLOUDFLARE_ACCESS_KEY_ID",
+      "CLOUDFLARE_SECRET_ACCESS_KEY",
+      "CLOUDFLARE_BUCKET_URL",
     ],
-    b2: [
-      "B2_BUCKET_NAME",
-      "B2_ACCESS_KEY_ID",
-      "B2_SECRET_ACCESS_KEY",
-      "B2_BUCKET_URL",
+    backblaze: [
+      "BACKBLAZE_BUCKET_NAME",
+      "BACKBLAZE_ACCESS_KEY_ID",
+      "BACKBLAZE_SECRET_ACCESS_KEY",
+      "BACKBLAZE_BUCKET_URL",
     ],
-    s3: [
-      "S3_BUCKET_NAME",
-      "S3_ACCESS_KEY_ID",
-      "S3_SECRET_ACCESS_KEY",
-      "S3_BUCKET_URL",
+    amazon: [
+      "AMAZON_BUCKET_NAME",
+      "AMAZON_ACCESS_KEY_ID",
+      "AMAZON_SECRET_ACCESS_KEY",
+      "AMAZON_BUCKET_URL",
     ],
   };
   for (const [provider, keys] of Object.entries(checks) as [
@@ -370,7 +397,7 @@ function detectDefaultProvider(): Provider {
       return provider;
     }
   }
-  return "r2"; // Default
+  return "cloudflare"; // Default
 }
 
 /**
@@ -383,9 +410,9 @@ function detectDefaultProvider(): Provider {
  * @returns Configuration object with bucket, credentials, and endpoint
  *
  * @example
- * const config = getConfig('r2', {
- *   R2_BUCKET_NAME: 'my-bucket',
- *   R2_ACCESS_KEY_ID: 'key123'
+ * const config = getConfig('cloudflare', {
+ *   CLOUDFLARE_BUCKET_NAME: 'my-bucket',
+ *   CLOUDFLARE_ACCESS_KEY_ID: 'key123'
  * });
  */
 function getConfig(
@@ -395,8 +422,8 @@ function getConfig(
   const varPrefix = provider.toUpperCase() + "_";
   return {
     region:
-      provider === "s3"
-        ? options.awsRegion || process.env.S3_REGION || "us-east-1"
+      provider === "amazon"
+        ? options.awsRegion || process.env.AMAZON_REGION || "us-east-1"
         : "auto",
     endpoint:
       options[`${varPrefix}BUCKET_URL`] ||
@@ -420,3 +447,6 @@ function getConfig(
       "",
   };
 }
+
+
+export default manageStorage;

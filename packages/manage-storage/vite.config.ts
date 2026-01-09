@@ -5,13 +5,23 @@ import dts from "vite-plugin-dts";
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, "src/index.ts"),
+      entry: resolve(__dirname, "src/manage-storage.ts"),
       name: "ManageStorage",
-      fileName: "index",
+      fileName: "manage-storage",
       formats: ["es"],
     },
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: false,
+        drop_debugger: true,
+      },
+      format: {
+        comments: false,
+      },
+    },
     rollupOptions: {
-      external: ["@aws-lite/client", "@aws-lite/s3", "dotenv"],
+      external: ["dotenv"],
       output: {
         preserveModules: false,
       },

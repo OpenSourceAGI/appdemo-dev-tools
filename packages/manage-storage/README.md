@@ -4,15 +4,16 @@
 
 # Cloud Storage Manager
 
-Universal cloud storage manager supporting AWS S3, Cloudflare R2, and Backblaze B2 with automatic provider detection. Built on the lightweight [@aws-lite](https://aws-lite.org/) SDK for optimal performance in serverless environments.
+Universal cloud storage manager supporting Amazon S3, Cloudflare R2, and Backblaze B2 with automatic provider detection. Built on the official AWS SDK v3 with optimized configuration for multi-cloud compatibility.
 
 ## Features
 
-- **Multi-Cloud Support**: Works seamlessly with AWS S3, Cloudflare R2, and Backblaze B2
+- **Multi-Cloud Support**: Works seamlessly with Amazon S3, Cloudflare R2, and Backblaze B2
 - **Auto-Detection**: Automatically detects the configured provider from environment variables
-- **Lightweight**: Built on aws-lite (not the bloated AWS SDK) for faster cold starts
+- **Modern SDK**: Built on AWS SDK v3 with command pattern for optimal performance
 - **Simple API**: Single function interface for all storage operations
 - **No File System**: Returns data directly - perfect for serverless/edge environments
+- **Minified**: Terser minification for smaller bundle sizes
 
 ## Installation
 
@@ -68,29 +69,29 @@ Set environment variables for your preferred provider. The library will automati
 ### Cloudflare R2
 
 ```env
-R2_BUCKET_NAME=my-bucket
-R2_ACCESS_KEY_ID=your-access-key-id
-R2_SECRET_ACCESS_KEY=your-secret-access-key
-R2_BUCKET_URL=https://your-account-id.r2.cloudflarestorage.com
+CLOUDFLARE_BUCKET_NAME=my-bucket
+CLOUDFLARE_ACCESS_KEY_ID=your-access-key-id
+CLOUDFLARE_SECRET_ACCESS_KEY=your-secret-access-key
+CLOUDFLARE_BUCKET_URL=https://your-account-id.r2.cloudflarestorage.com
 ```
 
 ### Backblaze B2
 
 ```env
-B2_BUCKET_NAME=my-bucket
-B2_ACCESS_KEY_ID=your-key-id
-B2_SECRET_ACCESS_KEY=your-application-key
-B2_BUCKET_URL=https://s3.us-west-004.backblazeb2.com
+BACKBLAZE_BUCKET_NAME=my-bucket
+BACKBLAZE_ACCESS_KEY_ID=your-key-id
+BACKBLAZE_SECRET_ACCESS_KEY=your-application-key
+BACKBLAZE_BUCKET_URL=https://s3.us-west-004.backblazeb2.com
 ```
 
-### AWS S3
+### Amazon S3
 
 ```env
-S3_BUCKET_NAME=my-bucket
-S3_ACCESS_KEY_ID=your-access-key-id
-S3_SECRET_ACCESS_KEY=your-secret-access-key
-S3_BUCKET_URL=https://s3.amazonaws.com
-S3_REGION=us-east-1
+AMAZON_BUCKET_NAME=my-bucket
+AMAZON_ACCESS_KEY_ID=your-access-key-id
+AMAZON_SECRET_ACCESS_KEY=your-secret-access-key
+AMAZON_BUCKET_URL=https://s3.amazonaws.com
+AMAZON_REGION=us-east-1
 ```
 
 ## API Reference
@@ -106,12 +107,12 @@ Performs storage operations on your configured cloud provider.
 
 #### Options
 
-| Option           | Type                     | Required                            | Description                                          |
-| ---------------- | ------------------------ | ----------------------------------- | ---------------------------------------------------- |
-| `key`            | `string`                 | Yes (except for `list`/`deleteAll`) | The object key/path                                  |
-| `destinationKey` | `string`                 | Yes (for `copy`/`rename`)           | The destination key/path for copy/rename operations  |
-| `body`           | `string\|Buffer\|Stream` | Yes (for `upload`)                  | The file content to upload                           |
-| `provider`       | `'s3'\|'r2'\|'b2'`       | No                                  | Force a specific provider (auto-detected if omitted) |
+| Option           | Type                                | Required                            | Description                                          |
+| ---------------- | ----------------------------------- | ----------------------------------- | ---------------------------------------------------- |
+| `key`            | `string`                            | Yes (except for `list`/`deleteAll`) | The object key/path                                  |
+| `destinationKey` | `string`                            | Yes (for `copy`/`rename`)           | The destination key/path for copy/rename operations  |
+| `body`           | `string\|Buffer\|Stream`            | Yes (for `upload`)                  | The file content to upload                           |
+| `provider`       | `'amazon'\|'cloudflare'\|'backblaze'` | No                                  | Force a specific provider (auto-detected if omitted) |
 
 ## Usage Examples
 
@@ -216,18 +217,18 @@ console.log(`Deleted ${result.count} files`);
 ### 7. Force a Specific Provider
 
 ```javascript
-// Use R2 even if other providers are configured
+// Use Cloudflare R2 even if other providers are configured
 await manageStorage("upload", {
   key: "test.txt",
-  body: "Hello R2!",
-  provider: "r2",
+  body: "Hello Cloudflare!",
+  provider: "cloudflare",
 });
 
-// Use B2 specifically
+// Use Backblaze B2 specifically
 await manageStorage("upload", {
   key: "test.txt",
-  body: "Hello B2!",
-  provider: "b2",
+  body: "Hello Backblaze!",
+  provider: "backblaze",
 });
 ```
 
@@ -238,7 +239,7 @@ await manageStorage("upload", {
 await manageStorage("upload", {
   key: "secure/data.json",
   body: JSON.stringify({ secret: "value" }),
-  provider: "r2",
+  provider: "cloudflare",
   BUCKET_NAME: "my-custom-bucket",
   ACCESS_KEY_ID: "runtime-key-id",
   SECRET_ACCESS_KEY: "runtime-secret",
@@ -346,11 +347,11 @@ export default {
       const result = await manageStorage("upload", {
         key,
         body: content,
-        provider: "r2",
-        BUCKET_NAME: env.R2_BUCKET_NAME,
-        ACCESS_KEY_ID: env.R2_ACCESS_KEY_ID,
-        SECRET_ACCESS_KEY: env.R2_SECRET_ACCESS_KEY,
-        BUCKET_URL: env.R2_BUCKET_URL,
+        provider: "cloudflare",
+        BUCKET_NAME: env.CLOUDFLARE_BUCKET_NAME,
+        ACCESS_KEY_ID: env.CLOUDFLARE_ACCESS_KEY_ID,
+        SECRET_ACCESS_KEY: env.CLOUDFLARE_SECRET_ACCESS_KEY,
+        BUCKET_URL: env.CLOUDFLARE_BUCKET_URL,
       });
 
       return Response.json(result);
@@ -447,15 +448,16 @@ const contents = await Promise.all(
 }
 ```
 
-## Why aws-lite?
+## Why AWS SDK v3?
 
-This library uses [@aws-lite](https://aws-lite.org/) instead of the official AWS SDK because:
+This library uses the official [@aws-sdk/client-s3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/) because:
 
-- **10-100x smaller**: Significantly reduced bundle size
-- **Faster cold starts**: Critical for serverless/edge functions
-- **S3-compatible**: Works with S3, R2, B2, and any S3-compatible service
-- **Modern API**: Clean, promise-based interface
-- **No dependencies overhead**: Minimal dependency tree
+- **Modern Architecture**: Modular SDK with tree-shakable imports
+- **Command Pattern**: Clean, consistent API design
+- **S3-Compatible**: Works with S3, R2, B2, and any S3-compatible service
+- **Official Support**: Direct support from AWS with regular updates
+- **Production Ready**: Battle-tested in enterprise environments
+- **Minified Output**: Terser minification reduces bundle size
 
 # Cloud Object Storage Comparison
 
