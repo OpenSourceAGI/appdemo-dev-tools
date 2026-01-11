@@ -88,7 +88,7 @@ export function InstanceControls({ manager, apiUrl, credentials, onUpdate }: Ins
         body: JSON.stringify({
           accessKeyId: credentials.accessKeyId,
           secretAccessKey: credentials.secretAccessKey,
-          region: credentials.region,
+          region: sanitizedConfig.region || credentials.region,
           config: sanitizedConfig,
         }),
       })
