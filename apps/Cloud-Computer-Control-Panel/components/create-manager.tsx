@@ -25,12 +25,37 @@ const INSTANCE_TYPES = [
   { value: "t3.xlarge", label: "t3.xlarge", vcpu: 4, ram: 16, cost: 121.47 },
 ]
 
+const AWS_REGIONS = [
+  { value: "us-east-1", label: "US East (N. Virginia)" },
+  { value: "us-east-2", label: "US East (Ohio)" },
+  { value: "us-west-1", label: "US West (N. California)" },
+  { value: "us-west-2", label: "US West (Oregon)" },
+  { value: "ca-central-1", label: "Canada (Central)" },
+  { value: "eu-central-1", label: "Europe (Frankfurt)" },
+  { value: "eu-west-1", label: "Europe (Ireland)" },
+  { value: "eu-west-2", label: "Europe (London)" },
+  { value: "eu-west-3", label: "Europe (Paris)" },
+  { value: "eu-north-1", label: "Europe (Stockholm)" },
+  { value: "eu-south-1", label: "Europe (Milan)" },
+  { value: "ap-east-1", label: "Asia Pacific (Hong Kong)" },
+  { value: "ap-south-1", label: "Asia Pacific (Mumbai)" },
+  { value: "ap-northeast-1", label: "Asia Pacific (Tokyo)" },
+  { value: "ap-northeast-2", label: "Asia Pacific (Seoul)" },
+  { value: "ap-northeast-3", label: "Asia Pacific (Osaka)" },
+  { value: "ap-southeast-1", label: "Asia Pacific (Singapore)" },
+  { value: "ap-southeast-2", label: "Asia Pacific (Sydney)" },
+  { value: "sa-east-1", label: "South America (São Paulo)" },
+  { value: "me-south-1", label: "Middle East (Bahrain)" },
+  { value: "af-south-1", label: "Africa (Cape Town)" },
+]
+
 const DEV_TOOLS = ["git", "docker", "nodejs", "python3", "nginx"]
 
 export function CreateManager({ credentials, onSuccess }: { credentials: any; onSuccess: () => void }) {
   const { toast } = useToast()
   const [formData, setFormData] = useState({
     instanceName: "",
+    region: credentials.region || "us-east-1",
     instanceType: "t3.small",
     storageSize: 40,
     keyName: "",
@@ -55,7 +80,6 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
       config: {
         ...formData,
         keyName: sanitizedKeyName,
-        region: credentials.region,
         createdAt: new Date().toISOString(),
       },
       status: {
@@ -182,6 +206,28 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="region">Region</Label>
+              <Select value={formData.region} onValueChange={(value) => setFormData({ ...formData, region: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {AWS_REGIONS.map((region) => (
+                    <SelectItem key={region.value} value={region.value}>
+                      {region.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="flex items-center gap-1 pt-1">
+                <Badge variant="outline" className="text-xs">
+                  <MapPin className="h-3 w-3 mr-1" />
+                  {formData.region}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="instanceType">Instance Type</Label>
               <Select
                 value={formData.instanceType}
@@ -229,18 +275,12 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="keyName">SSH Key Pair Name (Optional)</Label>
-              <Input
-                id="keyName"
-                value={formData.keyName}
-                onChange={(e) => setFormData({ ...formData, keyName: e.target.value })}
-                placeholder="Leave empty if you don't have a key pair"
-              />
-              <p className="text-xs text-muted-foreground">
-                You can connect via AWS Systems Manager Session Manager without a key pair
-              </p>
-            </div>
+            <Alert>
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription className="text-xs">
+                SSH key pairs will be automatically generated and saved securely when you launch the instance
+              </AlertDescription>
+            </Alert>
           </CardContent>
         </Card>
 
@@ -450,7 +490,7 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
               <div className="flex items-center">
                 <Badge variant="outline" className="h-fit">
                   <MapPin className="h-3 w-3 mr-1" />
-                  {credentials.region}
+                  {formData.region}
                 </Badge>
               </div>
             </div>
