@@ -1,182 +1,58 @@
-import crypto from "crypto"
+import {
+  EC2Client,
+  DescribeInstancesCommand,
+  DescribeKeyPairsCommand,
+  ImportKeyPairCommand,
+  RunInstancesCommand,
+  AllocateAddressCommand,
+  AssociateAddressCommand,
+  StartInstancesCommand,
+  StopInstancesCommand,
+  TerminateInstancesCommand,
+  ReleaseAddressCommand,
+  DescribeAddressesCommand,
+  DescribeInstanceStatusCommand,
+  CreateSecurityGroupCommand,
+  AuthorizeSecurityGroupIngressCommand,
+  DescribeSecurityGroupsCommand,
+  DescribeVpcsCommand,
+  type Instance,
+  type Tag,
+} from "@aws-sdk/client-ec2"
 
-function hmac(key: string | Buffer, data: string): Buffer {
-  return crypto.createHmac("sha256", key as any).update(data, "utf8").digest()
-}
-
-function sha256Hex(data: string): string {
-  return crypto.createHash("sha256").update(data, "utf8").digest("hex")
-}
-
-function getSignatureKey(secretKey: string, dateStamp: string, region: string, service: string): Buffer {
-  const kDate = hmac("AWS4" + secretKey, dateStamp)
-  const kRegion = hmac(kDate, region)
-  const kService = hmac(kRegion, service)
-  const kSigning = hmac(kService, "aws4_request")
-  return kSigning
-}
-
-async function ec2Query(
-  accessKeyId: string,
-  secretAccessKey: string,
-  region: string,
-  action: string,
-  params: Record<string, string> = {},
-): Promise<string> {
-  const host = `ec2.${region}.amazonaws.com`
-  const endpoint = `https://${host}/`
-  const method = "POST"
-  const service = "ec2"
-
-  const now = new Date()
-  const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "")
-  const dateStamp = amzDate.slice(0, 8)
-
-  const queryParams: Record<string, string> = {
-    Action: action,
-    Version: "2016-11-15",
-    ...params,
-  }
-
-  const body = new URLSearchParams(queryParams).toString()
-
-  const canonicalUri = "/"
-  const canonicalQueryString = ""
-  const canonicalHeaders = [
-    ["content-type", "application/x-www-form-urlencoded; charset=utf-8"],
-    ["host", host],
-    ["x-amz-date", amzDate],
-  ]
-    .map(([k, v]) => `${k}:${v}\n`)
-    .join("")
-
-  const signedHeaders = "content-type;host;x-amz-date"
-  const payloadHash = sha256Hex(body)
-
-  const canonicalRequest = [
-    method,
-    canonicalUri,
-    canonicalQueryString,
-    canonicalHeaders,
-    signedHeaders,
-    payloadHash,
-  ].join("\n")
-
-  const algorithm = "AWS4-HMAC-SHA256"
-  const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`
-  const stringToSign = [algorithm, amzDate, credentialScope, sha256Hex(canonicalRequest)].join("\n")
-
-  const signingKey = getSignatureKey(secretAccessKey, dateStamp, region, service)
-  const signature = crypto.createHmac("sha256", signingKey as any).update(stringToSign, "utf8").digest("hex")
-
-  const authorizationHeader = `${algorithm} Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`
-
-  const headers = {
-    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-    "X-Amz-Date": amzDate,
-    Authorization: authorizationHeader,
-  }
-
-  const res = await fetch(endpoint, {
-    method,
-    headers,
-    body,
+function createClient(accessKeyId: string, secretAccessKey: string, region: string): EC2Client {
+  return new EC2Client({
+    region,
+    credentials: {
+      accessKeyId,
+      secretAccessKey,
+    },
   })
-
-  const text = await res.text()
-  if (!res.ok) {
-    throw new Error(`EC2 error ${res.status}: ${text}`)
-  }
-  return text
 }
 
-function parseXmlInstances(xml: string): any[] {
-  const instances: any[] = []
+interface ParsedInstance {
+  instanceId?: string
+  instanceType?: string
+  state?: string
+  publicIp?: string
+  privateIp?: string
+  launchTime?: string
+  tags: Array<{ Key?: string; Value?: string }>
+}
 
-  console.log("[v0] Starting XML parse for instances")
-
-  // Parse all reservations
-  const reservationSetMatch = xml.match(/<reservationSet>([\s\S]*?)<\/reservationSet>/)
-  if (!reservationSetMatch) {
-    console.log("[v0] No reservationSet found")
-    return instances
+function parseInstance(instance: Instance): ParsedInstance {
+  return {
+    instanceId: instance.InstanceId,
+    instanceType: instance.InstanceType,
+    state: instance.State?.Name,
+    publicIp: instance.PublicIpAddress,
+    privateIp: instance.PrivateIpAddress,
+    launchTime: instance.LaunchTime?.toISOString(),
+    tags: (instance.Tags as Tag[] | undefined)?.map((tag) => ({
+      Key: tag.Key,
+      Value: tag.Value,
+    })) || [],
   }
-
-  const reservationSetXml = reservationSetMatch[1]
-
-  // Split by reservation item boundaries more explicitly
-  const reservationBlocks = reservationSetXml.split(/<\/item>/).filter((block) => block.includes("<instancesSet>"))
-
-  console.log(`[v0] Found ${reservationBlocks.length} reservation blocks`)
-
-  for (const reservationBlock of reservationBlocks) {
-    // Find instancesSet within this reservation
-    const instancesSetMatch = reservationBlock.match(/<instancesSet>([\s\S]*?)(<\/instancesSet>|$)/)
-
-    if (instancesSetMatch) {
-      const instancesSetXml = instancesSetMatch[1]
-      console.log("[v0] Found instancesSet block")
-
-      // Split by </item> to get individual instances
-      const instanceBlocks = instancesSetXml
-        .split("</item>")
-        .filter((block) => block.trim() && block.includes("<instanceId>"))
-
-      console.log(`[v0] Found ${instanceBlocks.length} instance blocks in this set`)
-
-      for (let i = 0; i < instanceBlocks.length; i++) {
-        const itemXml = instanceBlocks[i]
-
-        // Extract core instance data
-        const instanceId = itemXml.match(/<instanceId>(.*?)<\/instanceId>/)?.[1]
-
-        if (!instanceId) {
-          console.log(`[v0] Skipping instance block ${i + 1}: no instanceId found`)
-          continue
-        }
-
-        console.log(`[v0] Parsing instance ${i + 1}: ${instanceId}`)
-
-        const instanceType = itemXml.match(/<instanceType>(.*?)<\/instanceType>/)?.[1]
-        const stateMatch = itemXml.match(/<instanceState>([\s\S]*?)<\/instanceState>/)
-        const state = stateMatch ? stateMatch[1].match(/<name>(.*?)<\/name>/)?.[1] : undefined
-        const publicIp = itemXml.match(/<ipAddress>(.*?)<\/ipAddress>/)?.[1]
-        const privateIp = itemXml.match(/<privateIpAddress>(.*?)<\/privateIpAddress>/)?.[1]
-        const launchTime = itemXml.match(/<launchTime>(.*?)<\/launchTime>/)?.[1]
-
-        // Parse tags
-        const tags: Array<{ Key?: string; Value?: string }> = []
-        const tagSetMatch = itemXml.match(/<tagSet>([\s\S]*?)<\/tagSet>/)
-
-        if (tagSetMatch) {
-          const tagSetXml = tagSetMatch[1]
-          const tagBlocks = tagSetXml.split("</item>").filter((block) => block.trim() && block.includes("<key>"))
-
-          for (const tagBlock of tagBlocks) {
-            const key = tagBlock.match(/<key>(.*?)<\/key>/)?.[1]
-            const value = tagBlock.match(/<value>(.*?)<\/value>/)?.[1]
-
-            if (key !== undefined) {
-              tags.push({ Key: key, Value: value })
-            }
-          }
-        }
-
-        instances.push({
-          instanceId,
-          instanceType,
-          state,
-          publicIp,
-          privateIp,
-          launchTime,
-          tags,
-        })
-      }
-    }
-  }
-
-  console.log(`[v0] Total instances parsed: ${instances.length}`)
-  return instances
 }
 
 /**
@@ -188,32 +64,22 @@ export async function describeKeyPairs(
   region: string,
   keyName?: string,
 ): Promise<any[]> {
-  const params: Record<string, string> = {}
-
-  if (keyName) {
-    params["KeyName.1"] = keyName
-  }
+  const client = createClient(accessKeyId, secretAccessKey, region)
 
   try {
-    const xml = await ec2Query(accessKeyId, secretAccessKey, region, "DescribeKeyPairs", params)
+    const command = new DescribeKeyPairsCommand({
+      KeyNames: keyName ? [keyName] : undefined,
+    })
 
-    const keyPairs: any[] = []
-    const keyMatches = xml.matchAll(/<item>([\s\S]*?)<\/item>/g)
+    const response = await client.send(command)
 
-    for (const match of keyMatches) {
-      const itemXml = match[1]
-      const name = itemXml.match(/<keyName>(.*?)<\/keyName>/)?.[1]
-      const keyPairId = itemXml.match(/<keyPairId>(.*?)<\/keyPairId>/)?.[1]
-
-      if (name) {
-        keyPairs.push({ keyName: name, keyPairId })
-      }
-    }
-
-    return keyPairs
+    return (response.KeyPairs || []).map((kp) => ({
+      keyName: kp.KeyName,
+      keyPairId: kp.KeyPairId,
+    }))
   } catch (error) {
     // If the key doesn't exist, return empty array
-    if (error instanceof Error && error.message.includes("InvalidKeyPair.NotFound")) {
+    if (error instanceof Error && error.name === "InvalidKeyPair.NotFound") {
       return []
     }
     throw error
@@ -230,24 +96,26 @@ export async function importKeyPair(
   keyName: string,
   publicKeyMaterial: string,
 ): Promise<{ keyPairId: string | null; keyFingerprint: string | null }> {
-  // AWS expects the public key to be base64 encoded
-  const publicKeyBase64 = Buffer.from(publicKeyMaterial).toString("base64")
+  const client = createClient(accessKeyId, secretAccessKey, region)
 
-  const params: Record<string, string> = {
-    KeyName: keyName,
-    PublicKeyMaterial: publicKeyBase64,
-  }
+  // AWS SDK expects the public key as a Buffer or Uint8Array
+  const publicKeyBuffer = Buffer.from(publicKeyMaterial)
 
   try {
-    const xml = await ec2Query(accessKeyId, secretAccessKey, region, "ImportKeyPair", params)
+    const command = new ImportKeyPairCommand({
+      KeyName: keyName,
+      PublicKeyMaterial: publicKeyBuffer,
+    })
 
-    const keyPairId = xml.match(/<keyPairId>(.*?)<\/keyPairId>/)?.[1] || null
-    const keyFingerprint = xml.match(/<keyFingerprint>(.*?)<\/keyFingerprint>/)?.[1] || null
+    const response = await client.send(command)
 
-    return { keyPairId, keyFingerprint }
+    return {
+      keyPairId: response.KeyPairId || null,
+      keyFingerprint: response.KeyFingerprint || null,
+    }
   } catch (error) {
     // If key already exists, we can still use it
-    if (error instanceof Error && error.message.includes("InvalidKeyPair.Duplicate")) {
+    if (error instanceof Error && error.name === "InvalidKeyPair.Duplicate") {
       console.warn(`[EC2] Key pair '${keyName}' already exists in region ${region}`)
       // Try to get the existing key info
       const existingKeys = await describeKeyPairs(accessKeyId, secretAccessKey, region, keyName)
@@ -273,40 +141,53 @@ export async function runInstance(
     securityGroupId?: string
   },
 ): Promise<{ instanceId: string | null }> {
-  const params: Record<string, string> = {
-    ImageId: config.imageId,
-    InstanceType: config.instanceType,
-    MinCount: "1",
-    MaxCount: "1",
-    "BlockDeviceMapping.1.DeviceName": "/dev/sda1",
-    "BlockDeviceMapping.1.Ebs.VolumeSize": config.storageSize.toString(),
-    "BlockDeviceMapping.1.Ebs.VolumeType": "gp3",
-    "TagSpecification.1.ResourceType": "instance",
-    "TagSpecification.1.Tag.1.Key": "Name",
-    "TagSpecification.1.Tag.1.Value": config.instanceName,
-    UserData: Buffer.from(config.userDataScript).toString("base64"),
-  }
+  const client = createClient(accessKeyId, secretAccessKey, region)
 
+  // Verify key exists if provided
   if (config.keyName && config.keyName.trim() !== "") {
     const keyPairs = await describeKeyPairs(accessKeyId, secretAccessKey, region, config.keyName)
 
-    if (keyPairs.length > 0) {
-      // Key exists, include it
-      params.KeyName = config.keyName
-    } else {
+    if (keyPairs.length === 0) {
       // Key doesn't exist, log warning and proceed without it
       console.warn(
         `[EC2] Warning: Key pair '${config.keyName}' not found in region ${region}. Instance will launch without SSH key.`,
       )
+      config.keyName = undefined
     }
   }
 
-  if (config.securityGroupId) {
-    params["SecurityGroupId.1"] = config.securityGroupId
-  }
+  const command = new RunInstancesCommand({
+    ImageId: config.imageId,
+    InstanceType: config.instanceType as any,
+    MinCount: 1,
+    MaxCount: 1,
+    KeyName: config.keyName || undefined,
+    BlockDeviceMappings: [
+      {
+        DeviceName: "/dev/sda1",
+        Ebs: {
+          VolumeSize: config.storageSize,
+          VolumeType: "gp3",
+        },
+      },
+    ],
+    TagSpecifications: [
+      {
+        ResourceType: "instance",
+        Tags: [
+          {
+            Key: "Name",
+            Value: config.instanceName,
+          },
+        ],
+      },
+    ],
+    UserData: Buffer.from(config.userDataScript).toString("base64"),
+    SecurityGroupIds: config.securityGroupId ? [config.securityGroupId] : undefined,
+  })
 
-  const xml = await ec2Query(accessKeyId, secretAccessKey, region, "RunInstances", params)
-  const instanceId = xml.match(/<instanceId>(.*?)<\/instanceId>/)?.[1] || null
+  const response = await client.send(command)
+  const instanceId = response.Instances?.[0]?.InstanceId || null
 
   return { instanceId }
 }
@@ -316,13 +197,18 @@ export async function allocateAddress(
   secretAccessKey: string,
   region: string,
 ): Promise<{ allocationId: string | null; publicIp: string | null }> {
-  const params = { Domain: "vpc" }
-  const xml = await ec2Query(accessKeyId, secretAccessKey, region, "AllocateAddress", params)
+  const client = createClient(accessKeyId, secretAccessKey, region)
 
-  const allocationId = xml.match(/<allocationId>(.*?)<\/allocationId>/)?.[1] || null
-  const publicIp = xml.match(/<publicIp>(.*?)<\/publicIp>/)?.[1] || null
+  const command = new AllocateAddressCommand({
+    Domain: "vpc",
+  })
 
-  return { allocationId, publicIp }
+  const response = await client.send(command)
+
+  return {
+    allocationId: response.AllocationId || null,
+    publicIp: response.PublicIp || null,
+  }
 }
 
 export async function associateAddress(
@@ -332,11 +218,14 @@ export async function associateAddress(
   allocationId: string,
   instanceId: string,
 ): Promise<void> {
-  const params = {
+  const client = createClient(accessKeyId, secretAccessKey, region)
+
+  const command = new AssociateAddressCommand({
     AllocationId: allocationId,
     InstanceId: instanceId,
-  }
-  await ec2Query(accessKeyId, secretAccessKey, region, "AssociateAddress", params)
+  })
+
+  await client.send(command)
 }
 
 export async function startInstance(
@@ -345,8 +234,13 @@ export async function startInstance(
   region: string,
   instanceId: string,
 ): Promise<void> {
-  const params = { "InstanceId.1": instanceId }
-  await ec2Query(accessKeyId, secretAccessKey, region, "StartInstances", params)
+  const client = createClient(accessKeyId, secretAccessKey, region)
+
+  const command = new StartInstancesCommand({
+    InstanceIds: [instanceId],
+  })
+
+  await client.send(command)
 }
 
 export async function stopInstance(
@@ -355,8 +249,13 @@ export async function stopInstance(
   region: string,
   instanceId: string,
 ): Promise<void> {
-  const params = { "InstanceId.1": instanceId }
-  await ec2Query(accessKeyId, secretAccessKey, region, "StopInstances", params)
+  const client = createClient(accessKeyId, secretAccessKey, region)
+
+  const command = new StopInstancesCommand({
+    InstanceIds: [instanceId],
+  })
+
+  await client.send(command)
 }
 
 export async function terminateInstance(
@@ -365,8 +264,13 @@ export async function terminateInstance(
   region: string,
   instanceId: string,
 ): Promise<void> {
-  const params = { "InstanceId.1": instanceId }
-  await ec2Query(accessKeyId, secretAccessKey, region, "TerminateInstances", params)
+  const client = createClient(accessKeyId, secretAccessKey, region)
+
+  const command = new TerminateInstancesCommand({
+    InstanceIds: [instanceId],
+  })
+
+  await client.send(command)
 }
 
 export async function releaseAddress(
@@ -375,8 +279,13 @@ export async function releaseAddress(
   region: string,
   allocationId: string,
 ): Promise<void> {
-  const params = { AllocationId: allocationId }
-  await ec2Query(accessKeyId, secretAccessKey, region, "ReleaseAddress", params)
+  const client = createClient(accessKeyId, secretAccessKey, region)
+
+  const command = new ReleaseAddressCommand({
+    AllocationId: allocationId,
+  })
+
+  await client.send(command)
 }
 
 export async function describeAddresses(
@@ -385,31 +294,27 @@ export async function describeAddresses(
   region: string,
   instanceId?: string,
 ): Promise<any[]> {
-  const params: Record<string, string> = {}
+  const client = createClient(accessKeyId, secretAccessKey, region)
 
-  if (instanceId) {
-    params["Filter.1.Name"] = "instance-id"
-    params["Filter.1.Value.1"] = instanceId
-  }
+  const command = new DescribeAddressesCommand({
+    Filters: instanceId
+      ? [
+          {
+            Name: "instance-id",
+            Values: [instanceId],
+          },
+        ]
+      : undefined,
+  })
 
-  const xml = await ec2Query(accessKeyId, secretAccessKey, region, "DescribeAddresses", params)
+  const response = await client.send(command)
 
-  const addresses: any[] = []
-  const addressMatches = xml.matchAll(/<item>([\s\S]*?)<\/item>/g)
-
-  for (const match of addressMatches) {
-    const itemXml = match[1]
-    const publicIp = itemXml.match(/<publicIp>(.*?)<\/publicIp>/)?.[1]
-    const allocationId = itemXml.match(/<allocationId>(.*?)<\/allocationId>/)?.[1]
-    const associationId = itemXml.match(/<associationId>(.*?)<\/associationId>/)?.[1]
-    const instanceIdMatch = itemXml.match(/<instanceId>(.*?)<\/instanceId>/)?.[1]
-
-    if (allocationId) {
-      addresses.push({ publicIp, allocationId, associationId, instanceId: instanceIdMatch })
-    }
-  }
-
-  return addresses
+  return (response.Addresses || []).map((addr) => ({
+    publicIp: addr.PublicIp,
+    allocationId: addr.AllocationId,
+    associationId: addr.AssociationId,
+    instanceId: addr.InstanceId,
+  }))
 }
 
 export async function describeInstanceStatus(
@@ -418,12 +323,15 @@ export async function describeInstanceStatus(
   region: string,
   instanceId: string,
 ): Promise<{ state: string | null }> {
-  const params = {
-    "InstanceId.1": instanceId,
-    IncludeAllInstances: "true",
-  }
-  const xml = await ec2Query(accessKeyId, secretAccessKey, region, "DescribeInstanceStatus", params)
-  const state = xml.match(/<name>(.*?)<\/name>/)?.[1] || null
+  const client = createClient(accessKeyId, secretAccessKey, region)
+
+  const command = new DescribeInstanceStatusCommand({
+    InstanceIds: [instanceId],
+    IncludeAllInstances: true,
+  })
+
+  const response = await client.send(command)
+  const state = response.InstanceStatuses?.[0]?.InstanceState?.Name || null
 
   return { state }
 }
@@ -436,19 +344,19 @@ export async function createSecurityGroup(
   description: string,
   vpcId?: string,
 ): Promise<{ groupId: string | null }> {
-  const params: Record<string, string> = {
+  const client = createClient(accessKeyId, secretAccessKey, region)
+
+  const command = new CreateSecurityGroupCommand({
     GroupName: groupName,
-    GroupDescription: description,
+    Description: description,
+    VpcId: vpcId,
+  })
+
+  const response = await client.send(command)
+
+  return {
+    groupId: response.GroupId || null,
   }
-
-  if (vpcId) {
-    params.VpcId = vpcId
-  }
-
-  const xml = await ec2Query(accessKeyId, secretAccessKey, region, "CreateSecurityGroup", params)
-  const groupId = xml.match(/<groupId>(.*?)<\/groupId>/)?.[1] || null
-
-  return { groupId }
 }
 
 export async function authorizeSecurityGroupIngress(
@@ -458,19 +366,23 @@ export async function authorizeSecurityGroupIngress(
   groupId: string,
   rules: Array<{ ipProtocol: string; fromPort: string; toPort: string; cidrIp: string }>,
 ): Promise<void> {
-  const params: Record<string, string> = {
-    GroupId: groupId,
-  }
+  const client = createClient(accessKeyId, secretAccessKey, region)
 
-  rules.forEach((r, i) => {
-    const n = i + 1
-    params[`IpPermissions.${n}.IpProtocol`] = r.ipProtocol
-    params[`IpPermissions.${n}.FromPort`] = r.fromPort
-    params[`IpPermissions.${n}.ToPort`] = r.toPort
-    params[`IpPermissions.${n}.IpRanges.1.CidrIp`] = r.cidrIp
+  const command = new AuthorizeSecurityGroupIngressCommand({
+    GroupId: groupId,
+    IpPermissions: rules.map((rule) => ({
+      IpProtocol: rule.ipProtocol,
+      FromPort: parseInt(rule.fromPort, 10),
+      ToPort: parseInt(rule.toPort, 10),
+      IpRanges: [
+        {
+          CidrIp: rule.cidrIp,
+        },
+      ],
+    })),
   })
 
-  await ec2Query(accessKeyId, secretAccessKey, region, "AuthorizeSecurityGroupIngress", params)
+  await client.send(command)
 }
 
 export async function describeSecurityGroups(
@@ -479,50 +391,40 @@ export async function describeSecurityGroups(
   region: string,
   groupName?: string,
 ): Promise<any[]> {
-  const params: Record<string, string> = {}
+  const client = createClient(accessKeyId, secretAccessKey, region)
 
-  if (groupName) {
-    params["Filter.1.Name"] = "group-name"
-    params["Filter.1.Value.1"] = groupName
-  }
+  const command = new DescribeSecurityGroupsCommand({
+    Filters: groupName
+      ? [
+          {
+            Name: "group-name",
+            Values: [groupName],
+          },
+        ]
+      : undefined,
+  })
 
-  const xml = await ec2Query(accessKeyId, secretAccessKey, region, "DescribeSecurityGroups", params)
+  const response = await client.send(command)
 
-  const groups: any[] = []
-  const groupMatches = xml.matchAll(/<item>([\s\S]*?)<\/item>/g)
-
-  for (const match of groupMatches) {
-    const itemXml = match[1]
-    const groupId = itemXml.match(/<groupId>(.*?)<\/groupId>/)?.[1]
-    const groupNameMatch = itemXml.match(/<groupName>(.*?)<\/groupName>/)?.[1]
-    const vpcId = itemXml.match(/<vpcId>(.*?)<\/vpcId>/)?.[1]
-
-    if (groupId) {
-      groups.push({ groupId, groupName: groupNameMatch, vpcId })
-    }
-  }
-
-  return groups
+  return (response.SecurityGroups || []).map((sg) => ({
+    groupId: sg.GroupId,
+    groupName: sg.GroupName,
+    vpcId: sg.VpcId,
+  }))
 }
 
 export async function describeVpcs(accessKeyId: string, secretAccessKey: string, region: string): Promise<any[]> {
-  const xml = await ec2Query(accessKeyId, secretAccessKey, region, "DescribeVpcs")
+  const client = createClient(accessKeyId, secretAccessKey, region)
 
-  const vpcs: any[] = []
-  const vpcMatches = xml.matchAll(/<item>([\s\S]*?)<\/item>/g)
+  const command = new DescribeVpcsCommand({})
 
-  for (const match of vpcMatches) {
-    const itemXml = match[1]
-    const vpcId = itemXml.match(/<vpcId>(.*?)<\/vpcId>/)?.[1]
-    const isDefault = itemXml.match(/<isDefault>(.*?)<\/isDefault>/)?.[1] === "true"
-    const cidrBlock = itemXml.match(/<cidrBlock>(.*?)<\/cidrBlock>/)?.[1]
+  const response = await client.send(command)
 
-    if (vpcId) {
-      vpcs.push({ vpcId, isDefault, cidrBlock })
-    }
-  }
-
-  return vpcs
+  return (response.Vpcs || []).map((vpc) => ({
+    vpcId: vpc.VpcId,
+    isDefault: vpc.IsDefault || false,
+    cidrBlock: vpc.CidrBlock,
+  }))
 }
 
 export async function createOrGetDokploySecurityGroup(
@@ -568,14 +470,27 @@ export async function createOrGetDokploySecurityGroup(
 
     return { groupId }
   } catch (error) {
-    console.error("[v0] Error creating Dokploy security group:", error)
+    console.error("[EC2] Error creating Dokploy security group:", error)
     throw error
   }
 }
 
 export async function describeInstances(accessKeyId: string, secretAccessKey: string, region: string): Promise<any[]> {
-  const xml = await ec2Query(accessKeyId, secretAccessKey, region, "DescribeInstances")
-  return parseXmlInstances(xml)
+  const client = createClient(accessKeyId, secretAccessKey, region)
+
+  const command = new DescribeInstancesCommand({})
+
+  const response = await client.send(command)
+
+  const instances: ParsedInstance[] = []
+
+  for (const reservation of response.Reservations || []) {
+    for (const instance of reservation.Instances || []) {
+      instances.push(parseInstance(instance))
+    }
+  }
+
+  return instances
 }
 
 export function createEC2Client(accessKeyId: string, secretAccessKey: string, region: string) {
