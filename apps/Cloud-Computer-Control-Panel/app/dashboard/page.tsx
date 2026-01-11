@@ -70,9 +70,7 @@ export default function DashboardPage() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-500/10 rounded-lg">
-                <Server className="h-6 w-6 text-blue-500" />
-              </div>
+              <img src="/apple-touch-icon.png" alt="CCCP" className="h-10 w-10 rounded-lg" />
               <div>
                 <h1 className="text-2xl font-bold">CCCP Cloud Computer Control Panel</h1>
                 <p className="text-sm text-muted-foreground">Cloud Infrastructure Management</p>
