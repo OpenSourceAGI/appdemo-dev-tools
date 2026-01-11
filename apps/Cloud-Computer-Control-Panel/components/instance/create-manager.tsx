@@ -11,11 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Slider } from "@/components/ui/slider"
 import { Rocket, CheckCircle, HardDrive, Cpu, MapPin } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Textarea } from "@/components/ui/textarea"
-import { DockerImageSearch } from "@/components/docker-image-search"
-import { GitHubRepoSearch } from "@/components/github-repo-search"
+import { DockerImageSearch } from "@/components/search/docker-image-search"
+import { GitHubRepoSearch } from "@/components/search/github-repo-search"
 
 const INSTANCE_TYPES = [
   { value: "t3.micro", label: "t3.micro", vcpu: 2, ram: 1, cost: 7.59 },
@@ -264,15 +265,23 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="storageSize">Storage Size (GB)</Label>
-              <Input
+              <div className="flex items-center justify-between">
+                <Label htmlFor="storageSize">Storage Size</Label>
+                <span className="text-sm font-medium">{formData.storageSize} GB</span>
+              </div>
+              <Slider
                 id="storageSize"
-                type="number"
                 min={20}
                 max={200}
-                value={formData.storageSize}
-                onChange={(e) => setFormData({ ...formData, storageSize: Number.parseInt(e.target.value) })}
+                step={10}
+                value={[formData.storageSize]}
+                onValueChange={([value]) => setFormData({ ...formData, storageSize: value })}
+                className="py-4"
               />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>20 GB</span>
+                <span>200 GB</span>
+              </div>
             </div>
 
             <Alert>
@@ -281,7 +290,32 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
                 SSH key pairs will be automatically generated and saved securely when you launch the instance
               </AlertDescription>
             </Alert>
+
+            {/* Cost Estimate */}
+            <div className="border-t pt-4 mt-4">
+              <div className="text-sm font-medium mb-3">Cost Estimate</div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Instance</div>
+                  <div className="text-lg font-bold">${cost.estimatedMonthlyCost.instance.toFixed(2)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Storage ({formData.storageSize}GB)</div>
+                  <div className="text-lg font-bold">${cost.estimatedMonthlyCost.storage.toFixed(2)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Total Monthly</div>
+                  <div className="text-lg font-bold text-blue-500">${cost.estimatedMonthlyCost.total.toFixed(2)}</div>
+                </div>
+              </div>
+            </div>
           </CardContent>
+          <CardFooter className="border-t pt-6">
+            <Button type="submit" size="lg" className="w-full">
+              <Rocket className="h-4 w-4 mr-2" />
+              Create Manager
+            </Button>
+          </CardFooter>
         </Card>
 
         {/* Software Setup */}
@@ -467,41 +501,6 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
           </Card>
         )}
 
-        {/* Cost Estimate */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Cost Estimate</CardTitle>
-            <CardDescription>Estimated monthly AWS costs</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-4 gap-6">
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Instance</div>
-                <div className="text-2xl font-bold">${cost.estimatedMonthlyCost.instance.toFixed(2)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Storage ({formData.storageSize}GB)</div>
-                <div className="text-2xl font-bold">${cost.estimatedMonthlyCost.storage.toFixed(2)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Total Monthly</div>
-                <div className="text-2xl font-bold text-blue-500">${cost.estimatedMonthlyCost.total.toFixed(2)}</div>
-              </div>
-              <div className="flex items-center">
-                <Badge variant="outline" className="h-fit">
-                  <MapPin className="h-3 w-3 mr-1" />
-                  {formData.region}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="border-t pt-6">
-            <Button type="submit" size="lg" className="w-full md:w-auto">
-              <Rocket className="h-4 w-4 mr-2" />
-              Create Manager
-            </Button>
-          </CardFooter>
-        </Card>
       </div>
     </form>
   )
