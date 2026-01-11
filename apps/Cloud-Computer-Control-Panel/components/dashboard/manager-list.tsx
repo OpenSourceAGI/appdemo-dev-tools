@@ -18,8 +18,8 @@ import {
   RotateCw,
   Trash2,
 } from "lucide-react"
-import { InstanceControls } from "./instance-controls"
-import { AddSoftwareModal } from "./add-software-modal"
+import { InstanceControls } from "../instance/instance-controls"
+import { AddSoftwareModal } from "../instance/add-software-modal"
 import { useToast } from "@/hooks/use-toast"
 
 interface Manager {
