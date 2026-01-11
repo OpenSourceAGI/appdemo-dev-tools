@@ -73,7 +73,7 @@ export default function DashboardPage() {
               <img src="/apple-touch-icon.png" alt="CCCP" className="h-10 w-10 rounded-lg" />
               <div>
                 <h1 className="text-2xl font-bold">CCCP Cloud Computer Control Panel</h1>
-                <p className="text-sm text-muted-foreground">Cloud Infrastructure Management</p>
+                <p className="text-sm text-muted-foreground">Manage your own personal cloud with fully self-hosted cloud applications using Dokploy</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
