@@ -38,7 +38,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const loadManagers = () => {
-      const stored = localStorage.getItem("awsManagers")
+      const stored = localStorage.getItem("ec2Managers")
       if (stored) {
         try {
           setManagers(JSON.parse(stored))

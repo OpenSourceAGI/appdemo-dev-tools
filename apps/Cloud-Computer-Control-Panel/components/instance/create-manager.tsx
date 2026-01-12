@@ -90,10 +90,10 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
       costEstimate: calculateCost(),
     }
 
-    const existing = localStorage.getItem("awsManagers")
+    const existing = localStorage.getItem("ec2Managers")
     const managers = existing ? JSON.parse(existing) : []
     managers.push(newManager)
-    localStorage.setItem("awsManagers", JSON.stringify(managers))
+    localStorage.setItem("ec2Managers", JSON.stringify(managers))
 
     toast({
       title: "Manager Created",
