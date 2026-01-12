@@ -74,6 +74,13 @@ export function ManagerList({ credentials }: ManagerListProps) {
   useEffect(() => {
     loadManagers()
     loadAllRegionsInstances()
+
+    // Auto-refresh instances every 10 seconds
+    const interval = setInterval(() => {
+      loadAllRegionsInstances()
+    }, 10000)
+
+    return () => clearInterval(interval)
   }, [])
 
   const loadManagers = () => {
@@ -378,6 +385,19 @@ export function ManagerList({ credentials }: ManagerListProps) {
   const handleInstanceAction = async (instance: EC2Instance, action: string) => {
     setActionLoading({ instanceId: instance.instanceId, action })
 
+    // Optimistically update the state in the UI
+    const optimisticState =
+      action === "start" ? "pending" :
+      action === "stop" ? "stopping" :
+      action === "reboot" ? "stopping" :
+      action === "terminate" ? "shutting-down" : instance.state
+
+    setEc2Instances((prev) =>
+      prev.map((inst) =>
+        inst.instanceId === instance.instanceId ? { ...inst, state: optimisticState } : inst
+      )
+    )
+
     try {
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
@@ -403,21 +423,33 @@ export function ManagerList({ credentials }: ManagerListProps) {
         throw new Error(error.message || `Failed to ${action} instance`)
       }
 
+      const actionText =
+        action === "terminate" ? "Terminated" :
+        action === "reboot" ? "Rebooting" :
+        action === "start" ? "Starting" :
+        "Stopping"
+
       toast({
-        title: `Instance ${action === "terminate" ? "Terminated" : action === "reboot" ? "Rebooting" : action === "start" ? "Started" : "Stopped"}`,
-        description: `Instance ${instance.instanceId} action completed`,
+        title: `Instance ${actionText}`,
+        description: `${instance.instanceId} - Action initiated successfully`,
       })
 
-      // Refresh instances after action
+      // Immediately refresh to get the actual state from AWS
       setTimeout(() => {
         loadAllRegionsInstances()
-      }, 2000)
+      }, 1000)
     } catch (error) {
       toast({
         title: "Action Failed",
         description: error instanceof Error ? error.message : "Unknown error",
         variant: "destructive",
       })
+      // Revert the optimistic update on error
+      setEc2Instances((prev) =>
+        prev.map((inst) =>
+          inst.instanceId === instance.instanceId ? { ...inst, state: instance.state } : inst
+        )
+      )
     } finally {
       setActionLoading(null)
     }
@@ -645,7 +677,17 @@ export function ManagerList({ credentials }: ManagerListProps) {
                           </Badge>
                         )}
                         <Badge variant="outline" className={getStateColor(instance.state)}>
-                          {instance.state}
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                              {actionLoading?.action === "start" && "starting..."}
+                              {actionLoading?.action === "stop" && "stopping..."}
+                              {actionLoading?.action === "reboot" && "rebooting..."}
+                              {actionLoading?.action === "terminate" && "terminating..."}
+                            </>
+                          ) : (
+                            instance.state
+                          )}
                         </Badge>
                         {dokploy && (
                           <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">

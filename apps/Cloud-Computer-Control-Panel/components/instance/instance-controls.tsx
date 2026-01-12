@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -39,14 +39,32 @@ export function InstanceControls({ manager, apiUrl, credentials, onUpdate }: Ins
   const [snapshotDescription, setSnapshotDescription] = useState("")
   const { toast } = useToast()
 
+  // Auto-refresh status every 10 seconds if instance exists
+  useEffect(() => {
+    if (!manager.status?.instanceId) return
+
+    const interval = setInterval(() => {
+      refreshStatus()
+    }, 10000)
+
+    return () => clearInterval(interval)
+  }, [manager.status?.instanceId])
+
   const apiCall = async (action: string, body?: any) => {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    }
+
+    if (credentials.accessKeyId !== "server-env" && credentials.secretAccessKey !== "server-env") {
+      headers["x-aws-access-key-id"] = credentials.accessKeyId
+      headers["x-aws-secret-access-key"] = credentials.secretAccessKey
+    }
+    headers["x-aws-region"] = manager.config?.region || credentials.region
+
     const response = await fetch(apiUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({
-        accessKeyId: credentials.accessKeyId,
-        secretAccessKey: credentials.secretAccessKey,
-        region: credentials.region,
         action,
         instanceId: manager.status?.instanceId,
         config: manager.config,
@@ -151,14 +169,24 @@ export function InstanceControls({ manager, apiUrl, credentials, onUpdate }: Ins
     }
 
     setLoading("start")
+
+    // Optimistically update to pending state
+    onUpdate({ ...manager, status: { ...manager.status, state: "pending" } })
+
     try {
       await apiCall("start")
-      onUpdate({ ...manager, status: { ...manager.status, state: "running" } })
       toast({
-        title: "Instance Started",
-        description: "Instance is now running",
+        title: "Instance Starting",
+        description: "Instance start command sent successfully",
       })
+
+      // Refresh status after a delay
+      setTimeout(() => {
+        refreshStatus()
+      }, 3000)
     } catch (error) {
+      // Revert to stopped on error
+      onUpdate({ ...manager, status: { ...manager.status, state: "stopped" } })
       toast({
         title: "Start Failed",
         description: error instanceof Error ? error.message : "Unknown error",
@@ -180,14 +208,24 @@ export function InstanceControls({ manager, apiUrl, credentials, onUpdate }: Ins
     }
 
     setLoading("stop")
+
+    // Optimistically update to stopping state
+    onUpdate({ ...manager, status: { ...manager.status, state: "stopping" } })
+
     try {
       await apiCall("stop")
-      onUpdate({ ...manager, status: { ...manager.status, state: "stopped" } })
       toast({
-        title: "Instance Stopped",
-        description: "Instance has been stopped to save costs",
+        title: "Instance Stopping",
+        description: "Instance stop command sent successfully",
       })
+
+      // Refresh status after a delay
+      setTimeout(() => {
+        refreshStatus()
+      }, 3000)
     } catch (error) {
+      // Revert to running on error
+      onUpdate({ ...manager, status: { ...manager.status, state: "running" } })
       toast({
         title: "Stop Failed",
         description: error instanceof Error ? error.message : "Unknown error",
@@ -243,13 +281,18 @@ export function InstanceControls({ manager, apiUrl, credentials, onUpdate }: Ins
 
     setLoading("refresh")
     try {
-      const response = await fetch(
-        `${apiUrl}?${new URLSearchParams({
-          accessKeyId: credentials.accessKeyId,
-          secretAccessKey: credentials.secretAccessKey,
-          region: credentials.region,
-        })}`,
-      )
+      const headers: Record<string, string> = {}
+
+      if (credentials.accessKeyId !== "server-env" && credentials.secretAccessKey !== "server-env") {
+        headers["x-aws-access-key-id"] = credentials.accessKeyId
+        headers["x-aws-secret-access-key"] = credentials.secretAccessKey
+      }
+      headers["x-aws-region"] = manager.config?.region || credentials.region
+
+      const response = await fetch(`${apiUrl}?instanceId=${manager.status.instanceId}`, {
+        method: "GET",
+        headers,
+      })
       const data = await response.json()
 
       if (response.ok && data.instances) {
@@ -296,19 +339,30 @@ export function InstanceControls({ manager, apiUrl, credentials, onUpdate }: Ins
     }
 
     setLoading("reboot")
+
+    // Optimistically update to stopping state
+    onUpdate({ ...manager, status: { ...manager.status, state: "stopping" } })
+
     try {
       await apiCall("reboot")
-      onUpdate({ ...manager, status: { ...manager.status, state: "stopping" } })
       toast({
         title: "Instance Rebooting",
         description: "Instance is being stopped and will restart automatically",
       })
 
-      // Poll for running status after reboot
-      setTimeout(() => {
+      // Poll for status more frequently during reboot
+      const pollInterval = setInterval(() => {
         refreshStatus()
-      }, 30000) // Check after 30 seconds
+      }, 5000)
+
+      // Stop polling after 2 minutes
+      setTimeout(() => {
+        clearInterval(pollInterval)
+        refreshStatus()
+      }, 120000)
     } catch (error) {
+      // Revert to running on error
+      onUpdate({ ...manager, status: { ...manager.status, state: "running" } })
       toast({
         title: "Reboot Failed",
         description: error instanceof Error ? error.message : "Unknown error",
