@@ -440,9 +440,18 @@ export async function createOrGetDokploySecurityGroup(
       return { groupId: existingGroups[0].groupId }
     }
 
-    // Get default VPC
+    // Get VPC - prefer default VPC, but fall back to first available VPC
     const vpcs = await describeVpcs(accessKeyId, secretAccessKey, region)
     const defaultVpc = vpcs.find((v) => v.isDefault)
+    const targetVpc = defaultVpc || vpcs[0]
+
+    if (!targetVpc) {
+      throw new Error("No VPC available in this region. Please create a VPC first.")
+    }
+
+    console.log(
+      `[EC2] Using VPC ${targetVpc.vpcId} (${defaultVpc ? "default" : "first available"}) for security group`,
+    )
 
     // Create security group
     const { groupId } = await createSecurityGroup(
@@ -451,7 +460,7 @@ export async function createOrGetDokploySecurityGroup(
       region,
       "dokploy-sg",
       "Dokploy security group - SSH, HTTP, HTTPS, and port 3000",
-      defaultVpc?.vpcId,
+      targetVpc.vpcId,
     )
 
     if (!groupId) {
