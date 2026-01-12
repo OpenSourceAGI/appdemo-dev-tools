@@ -12,11 +12,12 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Slider } from "@/components/ui/slider"
-import { Rocket, CheckCircle, HardDrive, Cpu, MapPin } from "lucide-react"
+import { Rocket, CheckCircle, HardDrive, Cpu, MapPin, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Textarea } from "@/components/ui/textarea"
 import { DockerImageSearch } from "@/components/search/docker-image-search"
 import { GitHubRepoSearch } from "@/components/search/github-repo-search"
+import { storeSSHKey } from "@/lib/ssh-key-utils"
 
 const INSTANCE_TYPES = [
   { value: "t3.micro", label: "t3.micro", vcpu: 2, ram: 1, cost: 7.59 },
@@ -54,6 +55,7 @@ const DEV_TOOLS = ["git", "docker", "nodejs", "python3", "nginx"]
 
 export function CreateManager({ credentials, onSuccess }: { credentials: any; onSuccess: () => void }) {
   const { toast } = useToast()
+  const [isLaunching, setIsLaunching] = useState(false)
   const [formData, setFormData] = useState({
     instanceName: "",
     region: credentials.region || "us-east-1",
@@ -71,36 +73,116 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
     dokployApiKey: "",
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    setIsLaunching(true)
 
     const sanitizedKeyName = formData.keyName && formData.keyName.trim() !== "" ? formData.keyName : ""
 
+    const sanitizedConfig = {
+      ...formData,
+      keyName: sanitizedKeyName,
+      createdAt: new Date().toISOString(),
+    }
+
     const newManager = {
       managerId: `mgr-${Date.now()}`,
-      config: {
-        ...formData,
-        keyName: sanitizedKeyName,
-        createdAt: new Date().toISOString(),
-      },
+      config: sanitizedConfig,
       status: {
-        state: "not-launched",
+        state: "launching",
         instanceId: null,
       },
       costEstimate: calculateCost(),
     }
 
+    // Save the manager config to localStorage first
     const existing = localStorage.getItem("ec2Managers")
     const managers = existing ? JSON.parse(existing) : []
     managers.push(newManager)
     localStorage.setItem("ec2Managers", JSON.stringify(managers))
 
-    toast({
-      title: "Manager Created",
-      description: `${formData.instanceName} is ready to launch`,
-    })
+    try {
+      // Launch the instance immediately
+      const response = await fetch("/api/servers/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accessKeyId: credentials.accessKeyId,
+          secretAccessKey: credentials.secretAccessKey,
+          region: sanitizedConfig.region || credentials.region,
+          config: sanitizedConfig,
+        }),
+      })
 
-    onSuccess()
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || `HTTP ${response.status}`)
+      }
+
+      const result = await response.json()
+
+      // Store SSH key if provided
+      if (result.sshKey) {
+        storeSSHKey(result.sshKey.keyName, {
+          privateKey: result.sshKey.privateKey,
+          publicKey: result.sshKey.publicKey,
+          fingerprint: result.sshKey.fingerprint,
+        })
+      }
+
+      // Update the manager with the launched instance details
+      const updatedManagers = managers.map((mgr: any) =>
+        mgr.managerId === newManager.managerId
+          ? {
+              ...mgr,
+              config: {
+                ...sanitizedConfig,
+                keyName: result.sshKey?.keyName || sanitizedConfig.keyName,
+              },
+              status: {
+                state: "pending",
+                instanceId: result.instanceId,
+                publicIp: result.elasticIp,
+                allocationId: result.allocationId,
+              },
+            }
+          : mgr
+      )
+      localStorage.setItem("ec2Managers", JSON.stringify(updatedManagers))
+
+      toast({
+        title: "Instance Launched Successfully!",
+        description: `${formData.instanceName} is now starting with IP ${result.elasticIp || "pending"}`,
+      })
+
+      // Only call onSuccess after successful launch
+      onSuccess()
+    } catch (error) {
+      console.error("Launch error:", error)
+
+      // Update manager status to failed
+      const updatedManagers = managers.map((mgr: any) =>
+        mgr.managerId === newManager.managerId
+          ? {
+              ...mgr,
+              status: {
+                state: "launch-failed",
+                instanceId: null,
+              },
+            }
+          : mgr
+      )
+      localStorage.setItem("ec2Managers", JSON.stringify(updatedManagers))
+
+      toast({
+        title: "Launch Failed",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLaunching(false)
+    }
   }
 
   const calculateCost = () => {
@@ -187,6 +269,16 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
 
   return (
     <form onSubmit={handleSubmit}>
+      {isLaunching && (
+        <Alert className="mb-6 border-blue-500 bg-blue-50 dark:bg-blue-950/20">
+          <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+          <AlertDescription className="text-blue-900 dark:text-blue-100">
+            <strong>Launching your instance...</strong>
+            <br />
+            This may take a few minutes. Please wait while we set up your EC2 instance with Dokploy.
+          </AlertDescription>
+        </Alert>
+      )}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Basic Configuration */}
         <Card>
@@ -311,9 +403,18 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
             </div>
           </CardContent>
           <CardFooter className="border-t pt-6">
-            <Button type="submit" size="lg" className="w-full">
-              <Rocket className="h-4 w-4 mr-2" />
-              Create Manager
+            <Button type="submit" size="lg" className="w-full" disabled={isLaunching}>
+              {isLaunching ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Launching Instance...
+                </>
+              ) : (
+                <>
+                  <Rocket className="h-4 w-4 mr-2" />
+                  Launch Instance
+                </>
+              )}
             </Button>
           </CardFooter>
         </Card>
