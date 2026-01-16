@@ -11,11 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Rocket, CheckCircle, HardDrive, Cpu, MapPin } from "lucide-react"
+import { Slider } from "@/components/ui/slider"
+import { Rocket, CheckCircle, HardDrive, Cpu, MapPin, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Textarea } from "@/components/ui/textarea"
-import { DockerImageSearch } from "@/components/docker-image-search"
-import { GitHubRepoSearch } from "@/components/github-repo-search"
+import { DockerImageSearch } from "@/components/search/docker-image-search"
+import { GitHubRepoSearch } from "@/components/search/github-repo-search"
+import { storeSSHKey } from "@/lib/ssh-key-utils"
 
 const INSTANCE_TYPES = [
   { value: "t3.micro", label: "t3.micro", vcpu: 2, ram: 1, cost: 7.59 },
@@ -25,12 +27,38 @@ const INSTANCE_TYPES = [
   { value: "t3.xlarge", label: "t3.xlarge", vcpu: 4, ram: 16, cost: 121.47 },
 ]
 
+const AWS_REGIONS = [
+  { value: "us-east-1", label: "US East (N. Virginia)" },
+  { value: "us-east-2", label: "US East (Ohio)" },
+  { value: "us-west-1", label: "US West (N. California)" },
+  { value: "us-west-2", label: "US West (Oregon)" },
+  { value: "ca-central-1", label: "Canada (Central)" },
+  { value: "eu-central-1", label: "Europe (Frankfurt)" },
+  { value: "eu-west-1", label: "Europe (Ireland)" },
+  { value: "eu-west-2", label: "Europe (London)" },
+  { value: "eu-west-3", label: "Europe (Paris)" },
+  { value: "eu-north-1", label: "Europe (Stockholm)" },
+  { value: "eu-south-1", label: "Europe (Milan)" },
+  { value: "ap-east-1", label: "Asia Pacific (Hong Kong)" },
+  { value: "ap-south-1", label: "Asia Pacific (Mumbai)" },
+  { value: "ap-northeast-1", label: "Asia Pacific (Tokyo)" },
+  { value: "ap-northeast-2", label: "Asia Pacific (Seoul)" },
+  { value: "ap-northeast-3", label: "Asia Pacific (Osaka)" },
+  { value: "ap-southeast-1", label: "Asia Pacific (Singapore)" },
+  { value: "ap-southeast-2", label: "Asia Pacific (Sydney)" },
+  { value: "sa-east-1", label: "South America (São Paulo)" },
+  { value: "me-south-1", label: "Middle East (Bahrain)" },
+  { value: "af-south-1", label: "Africa (Cape Town)" },
+]
+
 const DEV_TOOLS = ["git", "docker", "nodejs", "python3", "nginx"]
 
 export function CreateManager({ credentials, onSuccess }: { credentials: any; onSuccess: () => void }) {
   const { toast } = useToast()
+  const [isLaunching, setIsLaunching] = useState(false)
   const [formData, setFormData] = useState({
     instanceName: "",
+    region: credentials.region || "us-east-1",
     instanceType: "t3.small",
     storageSize: 40,
     keyName: "",
@@ -45,37 +73,116 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
     dokployApiKey: "",
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    setIsLaunching(true)
 
     const sanitizedKeyName = formData.keyName && formData.keyName.trim() !== "" ? formData.keyName : ""
 
+    const sanitizedConfig = {
+      ...formData,
+      keyName: sanitizedKeyName,
+      createdAt: new Date().toISOString(),
+    }
+
     const newManager = {
       managerId: `mgr-${Date.now()}`,
-      config: {
-        ...formData,
-        keyName: sanitizedKeyName,
-        region: credentials.region,
-        createdAt: new Date().toISOString(),
-      },
+      config: sanitizedConfig,
       status: {
-        state: "not-launched",
+        state: "launching",
         instanceId: null,
       },
       costEstimate: calculateCost(),
     }
 
-    const existing = localStorage.getItem("awsManagers")
+    // Save the manager config to localStorage first
+    const existing = localStorage.getItem("ec2Managers")
     const managers = existing ? JSON.parse(existing) : []
     managers.push(newManager)
-    localStorage.setItem("awsManagers", JSON.stringify(managers))
+    localStorage.setItem("ec2Managers", JSON.stringify(managers))
 
-    toast({
-      title: "Manager Created",
-      description: `${formData.instanceName} is ready to launch`,
-    })
+    try {
+      // Launch the instance immediately
+      const response = await fetch("/api/servers/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accessKeyId: credentials.accessKeyId,
+          secretAccessKey: credentials.secretAccessKey,
+          region: sanitizedConfig.region || credentials.region,
+          config: sanitizedConfig,
+        }),
+      })
 
-    onSuccess()
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || `HTTP ${response.status}`)
+      }
+
+      const result = await response.json()
+
+      // Store SSH key if provided
+      if (result.sshKey) {
+        storeSSHKey(result.sshKey.keyName, {
+          privateKey: result.sshKey.privateKey,
+          publicKey: result.sshKey.publicKey,
+          fingerprint: result.sshKey.fingerprint,
+        })
+      }
+
+      // Update the manager with the launched instance details
+      const updatedManagers = managers.map((mgr: any) =>
+        mgr.managerId === newManager.managerId
+          ? {
+              ...mgr,
+              config: {
+                ...sanitizedConfig,
+                keyName: result.sshKey?.keyName || sanitizedConfig.keyName,
+              },
+              status: {
+                state: "pending",
+                instanceId: result.instanceId,
+                publicIp: result.elasticIp,
+                allocationId: result.allocationId,
+              },
+            }
+          : mgr
+      )
+      localStorage.setItem("ec2Managers", JSON.stringify(updatedManagers))
+
+      toast({
+        title: "Instance Launched Successfully!",
+        description: `${formData.instanceName} is now starting with IP ${result.elasticIp || "pending"}`,
+      })
+
+      // Only call onSuccess after successful launch
+      onSuccess()
+    } catch (error) {
+      console.error("Launch error:", error)
+
+      // Update manager status to failed
+      const updatedManagers = managers.map((mgr: any) =>
+        mgr.managerId === newManager.managerId
+          ? {
+              ...mgr,
+              status: {
+                state: "launch-failed",
+                instanceId: null,
+              },
+            }
+          : mgr
+      )
+      localStorage.setItem("ec2Managers", JSON.stringify(updatedManagers))
+
+      toast({
+        title: "Launch Failed",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLaunching(false)
+    }
   }
 
   const calculateCost = () => {
@@ -162,6 +269,16 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
 
   return (
     <form onSubmit={handleSubmit}>
+      {isLaunching && (
+        <Alert className="mb-6 border-blue-500 bg-blue-50 dark:bg-blue-950/20">
+          <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+          <AlertDescription className="text-blue-900 dark:text-blue-100">
+            <strong>Launching your instance...</strong>
+            <br />
+            This may take a few minutes. Please wait while we set up your EC2 instance with Dokploy.
+          </AlertDescription>
+        </Alert>
+      )}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Basic Configuration */}
         <Card>
@@ -179,6 +296,28 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
                 placeholder="my-dokploy-server"
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="region">Region</Label>
+              <Select value={formData.region} onValueChange={(value) => setFormData({ ...formData, region: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {AWS_REGIONS.map((region) => (
+                    <SelectItem key={region.value} value={region.value}>
+                      {region.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="flex items-center gap-1 pt-1">
+                <Badge variant="outline" className="text-xs">
+                  <MapPin className="h-3 w-3 mr-1" />
+                  {formData.region}
+                </Badge>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -218,30 +357,66 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="storageSize">Storage Size (GB)</Label>
-              <Input
+              <div className="flex items-center justify-between">
+                <Label htmlFor="storageSize">Storage Size</Label>
+                <span className="text-sm font-medium">{formData.storageSize} GB</span>
+              </div>
+              <Slider
                 id="storageSize"
-                type="number"
                 min={20}
                 max={200}
-                value={formData.storageSize}
-                onChange={(e) => setFormData({ ...formData, storageSize: Number.parseInt(e.target.value) })}
+                step={10}
+                value={[formData.storageSize]}
+                onValueChange={([value]) => setFormData({ ...formData, storageSize: value })}
+                className="py-4"
               />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>20 GB</span>
+                <span>200 GB</span>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="keyName">SSH Key Pair Name (Optional)</Label>
-              <Input
-                id="keyName"
-                value={formData.keyName}
-                onChange={(e) => setFormData({ ...formData, keyName: e.target.value })}
-                placeholder="Leave empty if you don't have a key pair"
-              />
-              <p className="text-xs text-muted-foreground">
-                You can connect via AWS Systems Manager Session Manager without a key pair
-              </p>
+            <Alert>
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription className="text-xs">
+                SSH key pairs will be automatically generated and saved securely when you launch the instance
+              </AlertDescription>
+            </Alert>
+
+            {/* Cost Estimate */}
+            <div className="border-t pt-4 mt-4">
+              <div className="text-sm font-medium mb-3">Cost Estimate</div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Instance</div>
+                  <div className="text-lg font-bold">${cost.estimatedMonthlyCost.instance.toFixed(2)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Storage ({formData.storageSize}GB)</div>
+                  <div className="text-lg font-bold">${cost.estimatedMonthlyCost.storage.toFixed(2)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Total Monthly</div>
+                  <div className="text-lg font-bold text-blue-500">${cost.estimatedMonthlyCost.total.toFixed(2)}</div>
+                </div>
+              </div>
             </div>
           </CardContent>
+          <CardFooter className="border-t pt-6">
+            <Button type="submit" size="lg" className="w-full" disabled={isLaunching}>
+              {isLaunching ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Launching Instance...
+                </>
+              ) : (
+                <>
+                  <Rocket className="h-4 w-4 mr-2" />
+                  Launch Instance
+                </>
+              )}
+            </Button>
+          </CardFooter>
         </Card>
 
         {/* Software Setup */}
@@ -427,41 +602,6 @@ export function CreateManager({ credentials, onSuccess }: { credentials: any; on
           </Card>
         )}
 
-        {/* Cost Estimate */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Cost Estimate</CardTitle>
-            <CardDescription>Estimated monthly AWS costs</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-4 gap-6">
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Instance</div>
-                <div className="text-2xl font-bold">${cost.estimatedMonthlyCost.instance.toFixed(2)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Storage ({formData.storageSize}GB)</div>
-                <div className="text-2xl font-bold">${cost.estimatedMonthlyCost.storage.toFixed(2)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Total Monthly</div>
-                <div className="text-2xl font-bold text-blue-500">${cost.estimatedMonthlyCost.total.toFixed(2)}</div>
-              </div>
-              <div className="flex items-center">
-                <Badge variant="outline" className="h-fit">
-                  <MapPin className="h-3 w-3 mr-1" />
-                  {credentials.region}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="border-t pt-6">
-            <Button type="submit" size="lg" className="w-full md:w-auto">
-              <Rocket className="h-4 w-4 mr-2" />
-              Create Manager
-            </Button>
-          </CardFooter>
-        </Card>
       </div>
     </form>
   )
