@@ -5,10 +5,10 @@
 
 import os from "os";
 import fs from "fs";
-import type { InfoContext } from "../types/internal-types.js";
-import { IS_WINDOWS, IS_MAC, IS_LINUX } from "../utils/platform.js";
-import { execCommand, commandExists } from "../utils/command.js";
-import { getCachedValue, setCachedValue } from "../cache/cache.js";
+import type { InfoContext } from "../types/internal-types";
+import { IS_WINDOWS, IS_MAC, IS_LINUX } from "../utils/platform";
+import { execCommand, commandExists } from "../utils/command";
+import { getCachedValue, setCachedValue } from "../cache/cache";
 
 /**
  * Gets the current username

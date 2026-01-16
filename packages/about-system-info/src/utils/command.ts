@@ -4,7 +4,7 @@
  */
 
 import { execSync } from "child_process";
-import { IS_WINDOWS } from "./platform.js";
+import { IS_WINDOWS } from "./platform";
 
 /**
  * Executes a shell command safely with timeout

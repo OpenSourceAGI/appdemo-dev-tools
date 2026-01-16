@@ -4,7 +4,7 @@
  */
 
 import fs from "fs";
-import { CACHE_FILE, CACHE_DURATION } from "./cache-config.js";
+import { CACHE_FILE, CACHE_DURATION } from "./cache-config";
 
 /**
  * Represents a cached value with timestamp

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://i.imgur.com/1kwKBTR.png" />
+</p>
+
 # About System Info
 
 A TypeScript/Node.js library to display comprehensive system information with customizable output. Cross-platform support for Windows, macOS, and Linux with caching for optimal performance.
@@ -80,28 +84,10 @@ about-system --refresh
 
 ## API Usage
 
-### Basic Example
-
-```typescript
-import { getSystemInfo } from "about-system";
-
-// Get all system information as JSON
-const info = await getSystemInfo();
-
-console.log(info.user); // Current username
-console.log(info.hostname); // Computer hostname
-console.log(info.os); // Operating system
-console.log(info.cpu); // CPU model
-console.log(info.ram_used); // RAM usage (e.g., "8/16GB")
-console.log(info.disk_used); // Disk usage (e.g., "45%")
-```
-
-### Using Individual Info Functions
-
 You can import and use individual system info functions:
 
 ```typescript
-import { infoFunctions } from "about-system/api";
+import { infoFunctions, getSystemInfo } from "about-system";
 
 // Create a context with cache
 const cache = {};
@@ -118,109 +104,6 @@ async function getBasicInfo() {
     user: infoFunctions.user(),
     hostname: infoFunctions.hostname(),
     uptime: infoFunctions.uptime(),
-  };
-}
-```
-
-### Multiple Import Styles
-
-```typescript
-// Default import (complete API)
-import { getSystemInfo } from "about-system";
-
-// Direct API import with individual functions
-import { getSystemInfo, infoFunctions } from "about-system/api";
-
-// CLI functions
-import { displaySystemInfo } from "about-system/cli";
-
-// Types only
-import type { SystemInfo, Platform } from "about-system/types";
-```
-
-### All Available Fields
-
-See the [systeminfo-types.d.ts](src/systeminfo-types.d.ts) file for complete TypeScript definitions with detailed JSDoc comments.
-
-```typescript
-interface SystemInfo {
-  // System Identity
-  timestamp: string; // ISO 8601 timestamp
-  hostname: string; // Computer hostname
-  user: string; // Current username
-  platform: "linux" | "windows" | "macos" | "unknown";
-
-  // Operating System
-  os: string; // OS name and version
-  kernel: string; // Kernel version
-  shell: string; // Shell program (Linux/Unix)
-
-  // Hardware
-  cpu: string; // CPU model
-  gpu: string; // GPU model
-  device: string; // Device/computer model
-
-  // Real-time Resources
-  disk_used: string; // Disk usage percentage
-  ram_used: string; // RAM usage (used/total GB)
-  top_process: string; // Top CPU-consuming process
-  uptime: string; // System uptime (Xd Yh Zm)
-
-  // Network
-  ip: string; // Public IP address
-  iplocal: string; // Local IP address(es)
-  city: string; // Geographic location
-  isp: string; // Internet service provider
-
-  // Linux-specific
-  temperature: string; // System temperature
-  battery: string; // Battery percentage
-  load_average: string; // System load
-  services_running: string; // Active services count
-
-  // And 20+ more fields...
-}
-```
-
-### Advanced Examples
-
-See [examples/api-usage.js](examples/api-usage.js) for more examples.
-
-```typescript
-import { getSystemInfo } from "about-system";
-
-// Example: Monitor system resources
-async function monitorResources() {
-  const info = await getSystemInfo();
-
-  return {
-    cpu: info.cpu,
-    ram: info.ram_used,
-    disk: info.disk_used,
-    temperature: info.temperature,
-    topProcess: info.top_process,
-  };
-}
-
-// Example: Create custom dashboard
-import { infoFunctions } from "about-system/api";
-
-async function getDashboardData(context) {
-  return {
-    hardware: {
-      cpu: infoFunctions.cpu(context),
-      gpu: infoFunctions.gpu(context),
-      device: infoFunctions.device(context),
-    },
-    resources: {
-      ram: infoFunctions.ram_used(context),
-      disk: infoFunctions.disk_used(context),
-      uptime: infoFunctions.uptime(),
-    },
-    network: {
-      localIP: infoFunctions.iplocal(),
-      publicIP: await infoFunctions.ip(context),
-    },
   };
 }
 ```
@@ -461,56 +344,6 @@ import type {
   InfoContext, // Context for functions
 } from "about-system/types";
 ```
-
-## Project Structure
-
-```
-about-system-info/
-├── src/
-│   ├── system-info-api.ts      # Core API with JSDoc (exported infoFunctions)
-│   ├── about-system-cli.ts     # CLI interface
-│   ├── index.ts                # Main entry point
-│   └── systeminfo-types.d.ts   # TypeScript type definitions
-├── dist/                       # Compiled JavaScript output (Vite build)
-│   ├── index.js                # Main entry (0.19 KB)
-│   ├── system-info-api.js      # Core API (21 KB)
-│   ├── about-system-cli.js     # CLI (10 KB)
-│   └── *.d.ts                  # Type definitions
-├── examples/
-│   └── api-usage.js           # Example API usage
-├── vite.config.ts             # Vite build configuration
-├── tsconfig.json              # TypeScript configuration
-├── package.json
-└── README.md
-```
-
-## Development
-
-```bash
-# Clone the repository
-git clone https://github.com/OpenSourceAGI/StarterDOCS.git
-cd StarterDOCS/packages/about-system-info
-
-# Install dependencies
-npm install
-
-# Build TypeScript
-npm run build
-
-# Run CLI
-npm start
-
-# Watch mode for development
-npm run dev
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-rights.institute/prosper
 
 ## Links
 

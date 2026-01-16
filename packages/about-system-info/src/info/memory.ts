@@ -5,10 +5,10 @@
 
 import os from "os";
 import fs from "fs";
-import type { InfoContext } from "../types/internal-types.js";
-import { IS_LINUX } from "../utils/platform.js";
-import { execCommand } from "../utils/command.js";
-import { getCachedValue, setCachedValue } from "../cache/cache.js";
+import type { InfoContext } from "../types/internal-types";
+import { IS_LINUX } from "../utils/platform";
+import { execCommand } from "../utils/command";
+import { getCachedValue, setCachedValue } from "../cache/cache";
 
 /**
  * Gets memory usage in gigabytes
@@ -67,9 +67,7 @@ export function memory_available(): string {
     const meminfo = fs.readFileSync("/proc/meminfo", "utf8");
     const availableMatch = meminfo.match(/MemAvailable:\s+(\d+) kB/);
     if (availableMatch) {
-      const availableGB = Math.round(
-        parseInt(availableMatch[1]) / 1024 / 1024
-      );
+      const availableGB = Math.round(parseInt(availableMatch[1]) / 1024 / 1024);
       return `${availableGB}GB available`;
     }
   } catch {}
@@ -129,9 +127,7 @@ export function disk_used(context: InfoContext): string {
         for (const line of lines) {
           if (line.trim().endsWith(" /")) {
             const parts = line.trim().split(/\s+/);
-            const percentIndex = parts.findIndex((part) =>
-              part.includes("%")
-            );
+            const percentIndex = parts.findIndex((part) => part.includes("%"));
             if (percentIndex !== -1) {
               diskUsage = parts[percentIndex];
               break;

@@ -13,20 +13,20 @@ import os from "os";
 import fs from "fs";
 import https from "https";
 import path from "path";
-import type { SystemInfo, SystemInfoOptions } from "./systeminfo-types.js";
-import { CACHE_FILE } from "./info/settings.js"; // Using CACHE_FILE from settings to ensure consistency
+import type { SystemInfo, SystemInfoOptions } from "./systeminfo-types";
+import { CACHE_FILE } from "./info/settings"; // Using CACHE_FILE from settings to ensure consistency
 
 // Import info functions from modules
-import { user, hostname, os_info, kernel, device } from "./info/platform.js";
-import { cpu, gpu, screen_resolution } from "./info/hardware.js";
+import { user, hostname, os_info, kernel, device } from "./info/platform";
+import { cpu, gpu, screen_resolution } from "./info/hardware";
 import {
   disk_used,
   ram_used,
   memory_available,
   swap_used,
   mount_points,
-} from "./info/memory.js";
-import { top_process, uptime, users_logged_in } from "./info/process.js";
+} from "./info/memory";
+import { top_process, uptime, users_logged_in } from "./info/process";
 import {
   ip,
   iplocal,
@@ -35,14 +35,14 @@ import {
   isp,
   network_interfaces,
   ports,
-} from "./info/network.js";
+} from "./info/network";
 import {
   services_running,
   temperature,
   battery,
   load_average,
-} from "./info/system-status.js";
-import { shell, packages, containers } from "./info/software.js";
+} from "./info/system-status";
+import { shell, packages, containers } from "./info/software";
 
 /**
  * Cache duration configuration for different system information types

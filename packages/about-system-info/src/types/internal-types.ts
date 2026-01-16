@@ -3,8 +3,8 @@
  * @module internal-types
  */
 
-import type { Cache, CacheEntry } from "../cache/cache.js";
-import type { IPInfo } from "../utils/network.js";
+import type { Cache, CacheEntry } from "../cache/cache";
+import type { IPInfo } from "../utils/network";
 
 /**
  * Context object passed to info collection functions

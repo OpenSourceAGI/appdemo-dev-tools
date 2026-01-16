@@ -3,8 +3,8 @@ import os from "os";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { getSystemInfo } from "./system-info-api.js";
-import type { SystemInfo, SystemInfoOptions } from "./systeminfo-types.js";
+import { getSystemInfo } from "./system-info-api";
+import type { SystemInfo, SystemInfoOptions } from "./systeminfo-types";
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -16,7 +16,7 @@ import {
   CACHE_FILE,
   loadSettings,
   saveSettings,
-} from "./info/settings.js";
+} from "./info/settings";
 
 // Platform detection
 const IS_WINDOWS = os.platform() === "win32";
@@ -210,10 +210,10 @@ function installShellGreeting(): void {
   let configDir: string, scriptPath: string;
   if (IS_WINDOWS) {
     configDir = path.join(homeDir, "AppData", "Local");
-    scriptPath = path.join(configDir, "systeminfo.js");
+    scriptPath = path.join(configDir, "systeminfo");
   } else {
     configDir = path.join(homeDir, ".config");
-    scriptPath = path.join(configDir, "systeminfo.js");
+    scriptPath = path.join(configDir, "systeminfo");
   }
 
   const currentScript = path.resolve(__filename);
@@ -251,7 +251,7 @@ function installShellGreeting(): void {
 
       if (fs.existsSync(bashrcPath)) {
         const bashrc = fs.readFileSync(bashrcPath, "utf8");
-        if (!bashrc.includes("systeminfo.js")) {
+        if (!bashrc.includes("systeminfo")) {
           fs.appendFileSync(bashrcPath, `\n${bashLine}\n`);
         }
       } else {
@@ -261,7 +261,7 @@ function installShellGreeting(): void {
       const zshrcPath = path.join(homeDir, ".zshrc");
       if (fs.existsSync(zshrcPath)) {
         const zshrc = fs.readFileSync(zshrcPath, "utf8");
-        if (!zshrc.includes("systeminfo.js")) {
+        if (!zshrc.includes("systeminfo")) {
           fs.appendFileSync(zshrcPath, `\n${bashLine}\n`);
         }
       }
@@ -274,7 +274,7 @@ function installShellGreeting(): void {
       );
       if (fs.existsSync(fishConfigPath)) {
         const fishConfig = fs.readFileSync(fishConfigPath, "utf8");
-        if (!fishConfig.includes("systeminfo.js")) {
+        if (!fishConfig.includes("systeminfo")) {
           fs.appendFileSync(
             fishConfigPath,
             `\nset -U fish_greeting ""\n${bashLine}\n`
@@ -290,7 +290,7 @@ function installShellGreeting(): void {
       );
       if (fs.existsSync(nushellConfigPath)) {
         const nushellConfig = fs.readFileSync(nushellConfigPath, "utf8");
-        if (!nushellConfig.includes("systeminfo.js")) {
+        if (!nushellConfig.includes("systeminfo")) {
           fs.appendFileSync(
             nushellConfigPath,
             `\n$env.config.show_banner = false\n${bashLine}\n`

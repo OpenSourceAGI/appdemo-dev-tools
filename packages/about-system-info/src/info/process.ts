@@ -4,10 +4,10 @@
  */
 
 import os from "os";
-import type { InfoContext } from "../types/internal-types.js";
-import { IS_LINUX } from "../utils/platform.js";
-import { execCommand } from "../utils/command.js";
-import { getCachedValue, setCachedValue } from "../cache/cache.js";
+import type { InfoContext } from "../types/internal-types";
+import { IS_LINUX } from "../utils/platform";
+import { execCommand } from "../utils/command";
+import { getCachedValue, setCachedValue } from "../cache/cache";
 
 /**
  * Gets the highest CPU-consuming process

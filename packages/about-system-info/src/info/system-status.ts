@@ -5,10 +5,10 @@
 
 import fs from "fs";
 import os from "os";
-import type { InfoContext } from "../types/internal-types.js";
-import { IS_LINUX } from "../utils/platform.js";
-import { execCommand, commandExists } from "../utils/command.js";
-import { getCachedValue, setCachedValue } from "../cache/cache.js";
+import type { InfoContext } from "../types/internal-types";
+import { IS_LINUX } from "../utils/platform";
+import { execCommand, commandExists } from "../utils/command";
+import { getCachedValue, setCachedValue } from "../cache/cache";
 
 /**
  * Gets system load averages

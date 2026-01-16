@@ -4,7 +4,10 @@
  */
 
 import https from "https";
-import { DEFAULT_IPINFO_TOKEN, DEFAULT_NETWORK_TIMEOUT } from "../cache/cache-config.js";
+import {
+  DEFAULT_IPINFO_TOKEN,
+  DEFAULT_NETWORK_TIMEOUT,
+} from "../cache/cache-config";
 
 /**
  * IP information from ipinfo.io API

@@ -5,6 +5,8 @@ title: 📊 Tool Rank
 
 ### Tool Rankings of Internet Software by Category
 
+![devranklogo](https://i.imgur.com/YBBFTnD.png)
+
 | Category | Tool Rank (best first) | Features  |
 |----------|----------------|-------------------------|
 | 🧠 Language Intelligence |  [Anthropic](https://docs.anthropic.com/en/docs/welcome),  [Perplexity](https://docs.perplexity.ai/models/model-cards), [OpenAI](https://platform.openai.com/docs/overview), [Google](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models), [Groq](https://console.groq.com/docs/overview), [XAI](https://docs.x.ai/docs#models),  [Cloudflare](https://developers.cloudflare.com/workers-ai/), [TogetherAI](https://docs.together.ai/docs/quickstart),  [Ollama](https://ollama.com/docs)  | Large language models (LLMs), next word prediction, embeddings, code, multi-modal, and advanced reasoning |
