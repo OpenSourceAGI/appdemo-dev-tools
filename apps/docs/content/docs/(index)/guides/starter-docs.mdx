@@ -8,9 +8,8 @@ title: 📦 Full-Stack Starter Docs
 
 **Docs-Driven Development**: Generate easy-to-understand docs from your JS functions and APIs, to maximize reusable value and make the options clear to everyone.
 
-**Functionally Brilliant, Elegantly Simple Toolkit:** StarterDOCS is to SvelteKit what Next.js is to React: full stack with smart defaults for common needs. It is 
+**Functionally Brilliant, Elegantly Simple Toolkit:** StarterDOCS is to SvelteKit what Next.js is to React: full stack with smart defaults for common needs. It is
 easy to switch in alternatives: Such as running on AWS/GCE instead of Cloudflare, or using Next/Supabase isntead of Svelte/Cloudflare.
-
 
 ```bash
 npx create-starter-app
@@ -30,8 +29,9 @@ npx create-starter-app
 
 ✅ [Vitest](https://vitest.dev/guide/ui) - unit testing UI
 
-## ⭐ Extras & Alternative  UI Blocks
+## ⭐ Extras & Alternative UI Blocks
 
+0. [Shadcn Blocks Templates](https://www.shadcnblocks.com/blocks)
 1. [Shadcn Sidebar](https://next.shadcn-svelte.com/blocks)
 2. [21st.dev](https://21st.dev/home)
 3. [Magic UI Animations](https://animation-svelte.vercel.app/magic)
@@ -43,11 +43,11 @@ npx create-starter-app
 9. [Shadcn Libraries](https://github.com/birobirobiro/awesome-shadcn-ui)
 
 ### 🖼️ Screenshots
+
 <p align="center">
-    <img width="350px" src="https://i.imgur.com/jIaL6yP.png" /><img width="350px" src="https://i.imgur.com/NlkjlWI.png" />
+  <img width="350px" src="https://i.imgur.com/jIaL6yP.png" />
+  <img width="350px" src="https://i.imgur.com/NlkjlWI.png" />
 </p>
-
-
 
 ### ⬇️ Installation
 
@@ -61,30 +61,30 @@ npx create-starter-app
 7.  Set OAuth origin `http://localhost` and `http://localhost:5173` on local or `https://domain.com` on server.
 8.  Set redirect `http://localhost:5173/auth/oauth/google/callback` or `https://api.domain.com/auth/oauth/google/callback`.
 9.  Optional: For email auth, get API from [Resend](https://resend.com/api-keys) mailer and verify domain.
-10.  Log in with your Cloudflare account by running: `bunx wrangler login`.
-11.  Create your D1 database via dashboard or with `bunx wrangler d1 create serverless-docs-db` or your custom db name.
-12.  Copy the console output database\_name and database\_id.
-13.  Go to `wrangler.toml` and change `database_name` and `database_id`.
-14.  Go to `drizzle.config.ts` and change db name in `dbName`.
-15.  Go to `package.json` and change db name in `db:push:*` and `db:backup:prod`.
-16.  Generate and migrate the schema to dev or prod db: `bun run db:migrate; bun run db:push:dev; bun run db:push:prod`.
-17.  Develop on local with `bun dev`.
-18.  Deploy to prod with `bun serve`.
-19.  Domain: [Cloudflare Dashboard](https://dash.cloudflare.com) -> Workers and Pages -> \[your worker name\] -> Settings
-20.  Add-to-Home on Mobile Web: Design logo and generate icons for with [PWA Asset Generator](https://github.com/elegantapp/pwa-asset-generator) or [Favicon.io](https://favicon.io)
-21.  User Analytics: Get Google Analytics ID from [Google Analytics](https://support.google.com/analytics/answer/9539598?hl=en) or [SimpleAnalytics](https://www.simpleanalytics.com) and add to `app.html`.
-22.  Email Forwarding: Setup [Cloudflare Email Routing](https://blog.cloudflare.com/introducing-email-routing/) and [GMail's Send From Verification](https://support.google.com/mail/answer/22370?hl=en)
-
-
+10. Log in with your Cloudflare account by running: `bunx wrangler login`.
+11. Create your D1 database via dashboard or with `bunx wrangler d1 create serverless-docs-db` or your custom db name.
+12. Copy the console output database_name and database_id.
+13. Go to `wrangler.toml` and change `database_name` and `database_id`.
+14. Go to `drizzle.config.ts` and change db name in `dbName`.
+15. Go to `package.json` and change db name in `db:push:*` and `db:backup:prod`.
+16. Generate and migrate the schema to dev or prod db: `bun run db:migrate; bun run db:push:dev; bun run db:push:prod`.
+17. Develop on local with `bun dev`.
+18. Deploy to prod with `bun serve`.
+19. Domain: [Cloudflare Dashboard](https://dash.cloudflare.com) -> Workers and Pages -> \[your worker name\] -> Settings
+20. Add-to-Home on Mobile Web: Design logo and generate icons for with [PWA Asset Generator](https://github.com/elegantapp/pwa-asset-generator) or [Favicon.io](https://favicon.io)
+21. User Analytics: Get Google Analytics ID from [Google Analytics](https://support.google.com/analytics/answer/9539598?hl=en) or [SimpleAnalytics](https://www.simpleanalytics.com) and add to `app.html`.
+22. Email Forwarding: Setup [Cloudflare Email Routing](https://blog.cloudflare.com/introducing-email-routing/) and [GMail's Send From Verification](https://support.google.com/mail/answer/22370?hl=en)
 
 ### 📦 Available Starter Templates
 
 The `packages/` folder contains production-ready starter templates for different use cases:
 
 #### 1. **template-svelte-auth-drizzle-shadcn** (Main Template)
+
 Full-stack SvelteKit starter with authentication and database integration.
 
 **Tech Stack:**
+
 - **Framework:** SvelteKit with Cloudflare adapter
 - **Database:** Drizzle ORM with Cloudflare D1
 - **Auth:** Better Auth with Google OAuth
@@ -95,9 +95,11 @@ Full-stack SvelteKit starter with authentication and database integration.
 - **Deployment:** Cloudflare Pages
 
 #### 2. **template-nextjs-drizzle-betterauth**
+
 Modern Next.js SaaS boilerplate with comprehensive authentication.
 
 **Tech Stack:**
+
 - **Framework:** Next.js 15 with App Router
 - **Database:** PostgreSQL with Drizzle ORM
 - **Auth:** Better Auth with Better Auth UI components
@@ -109,18 +111,22 @@ Modern Next.js SaaS boilerplate with comprehensive authentication.
 - **Linting:** Biome
 
 #### 3. **template-nextjs-betterauth-prisma-shadcn**
+
 Next.js starter focused on authentication with Prisma.
 
 **Tech Stack:**
+
 - **Framework:** Next.js 15
 - **Database:** PostgreSQL with Prisma ORM
 - **Auth:** Better Auth (Google OAuth + Credentials)
 - **UI:** shadcn + Tailwind CSS
 
 #### 4. **template-fumadocs**
+
 Documentation site template with search and API documentation.
 
 **Tech Stack:**
+
 - **Framework:** Next.js with Fumadocs
 - **UI:** Fumadocs UI components
 - **Search:** Orama search engine
@@ -128,9 +134,11 @@ Documentation site template with search and API documentation.
 - **Styling:** Tailwind CSS
 
 #### 5. **template-docusaurus**
+
 Documentation template using Docusaurus with OpenAPI support.
 
 **Tech Stack:**
+
 - **Framework:** Docusaurus 3
 - **Search:** Lunr Search
 - **API Docs:** OpenAPI Docs plugin + TypeDoc

@@ -4,13 +4,15 @@ title: 🤖 AI Code Editors
 
 | Tool | Type | Primary Focus | Major Models | Free Tier | Paid Plan | Best For | Unique Features |
 |------|------|---------------|-------------|-----------|-----------|-----------|-----------------|
-| **[v0 by Vercel](https://v0.dev/)** | UI Generator | React/Tailwind UIs | Claude, GPT-4 | $5 credits/mo | $20+/mo | Frontend prototyping | Vercel+GitHub, visual designer, UI-first |
-| **[Lovable](https://lovable.dev/)** | App Builder | Full-stack web apps | Claude, GPT-4, Gemini | 5 credits/day | $25+/mo | MVPs, non-devs | Supabase, deploy, team collaboration |
+| **[Google Antigravity](https://antigravity.dev/)** | Agentic Platform | Multi-agent orchestration | Gemini 3 Pro, Claude Sonnet 4.5, GPT-OSS | Generous limits | Free (preview) | Complex workflows, enterprise | Agent Manager for parallel agents, browser automation, Artifacts (screenshots/walkthroughs), knowledge base learning, VS Code fork |
+| **[Claude Code](https://claude.ai/code)** | Terminal CLI | Agentic terminal coding | Claude Sonnet 4.5, Opus 4.5 | None | Pro $20/mo, Max $100-200/mo | Terminal-first devs, deep codebase | Terminal integration, works alongside any IDE, MCP servers, Git/GitHub integration, multi-file edits, agentic codebase search |
 | **[Cursor](https://cursor.sh/)** | Code Editor | Productivity, multi-file | Claude, GPT-4, Gemini | 2K completions/mo | $20+/mo | Daily dev, large codebase | VS Code fork, privacy, context tracking |
+| **[v0 by Vercel](https://v0.dev/)** | UI Generator | React/Tailwind UIs | Claude, GPT-4 | $5 credits/mo | $20+/mo | Frontend prototyping | Vercel+GitHub, visual designer, UI-first |
 | **[Windsurf](https://codeium.com/windsurf)** | Agentic IDE | Complex, collaborative | Claude, Gemini | Limited | $15+/mo | Teams, deep flow | Cascade agent, write+terminal mode |
+| **[Lovable](https://lovable.dev/)** | App Builder | Full-stack web apps | Claude, GPT-4, Gemini | 5 credits/day | $25+/mo | MVPs, non-devs | Supabase, deploy, team collaboration |
 | **[JetBrains AI](https://www.jetbrains.com/ai/)** | IDE Assistant | Native JetBrains IDE | GPT-4, proprietary | JetBrains sub | $20+/mo IDE | JetBrains users | Refactor, native code understanding |
 | **[VS Code w/ Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)** | Extension | Code completion, chat | Claude, GPT-4, Gemini | 12K completions | $10/mo Indiv., $19/user | All devs, open source | Chat, Copilot Agents, GitHub context |
-| **[Cline](https://cline.bot/)** | Agentic Extension | Editor + CLI automation | Claude, GPT-4, Gemini, local | Open Source | API usage cost | CLI+editor automation | Terminal commands, browser, diff views, custom tools |
+| **[VS Code w/ Cline](https://cline.bot/)** | Agentic Extension | Editor + CLI automation | Claude, GPT-4, Gemini, local | Open Source | API usage cost | CLI+editor automation | Terminal commands, browser, diff views, custom tools |
 
 ## Major Highlights
 
