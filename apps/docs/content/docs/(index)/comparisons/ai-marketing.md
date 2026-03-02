@@ -1,8 +1,7 @@
 ---
 title: 🤑 Marketing Intelligence 
 ---
-
-
+                                                   |
 ## Content Marketing
 
 | \# | Tool | Category | Best For | Core Capabilities (Short) | Pricing (Typical Entry) |
@@ -27,7 +26,7 @@ title: 🤑 Marketing Intelligence
 | 18 | Canva Magic Studio | Content | Visuals for non-designers | AI design, templates, social & print assets | Free; Pro at $15/user/mo \[19\] |
 | 19 | HeyGen | Content (Video) | Realistic avatar videos | Text-to-video, avatars, translation, lip-sync | From $29/mo \[20\]\[21\]\[22\] |
 | 20 | Synthesia | Content (Video) | Training/explainer video at scale | Avatar-based video, text-to-video, custom avatars | From $29/mo \[20\]\[23\] |
-| 21 | AdCreative.ai | Content (Ads) | High-performing ad creatives | AI ad images/text, performance scoring, A/B testing | From \~$39/mo \[5\] |
+| 21 | Metaforms.ai                   | AI Research Ops | Market research agencies        | Survey programming (MaxDiff/segmentation), data validation, RFP/bidding, sample mgmt, voice interviews |
 | 22 | Surfer | Content / SEO | Ranking-focused SEO content | AI article writing, content editor, audit, keyword tools | From \~$89/mo; AI articles extra \[24\]\[25\]\[12\] |
 | 23 | Typeface | Content / Enterprise | Brand-safe multimodal content | Brand graph, “Arc” agents, governance, images+text | Custom enterprise pricing \[26\]\[27\] |
 | 24 | Writer | Content / Enterprise | Secure, governed writing | Proprietary LLM, style guides, knowledge, governance | Team from \~$18/user/mo; enterprise custom \[28\]\[17\] |
@@ -42,6 +41,7 @@ title: 🤑 Marketing Intelligence
 | 33 | ChatGPT | Generalist | All-purpose AI assistant | Ideation, content, planning, analysis | From $20/mo (Plus) \[2\] |
 | 34 | Semrush (with AI) | SEO / Analytics | Enterprise SEO & content | Keyword tools, audits, AI assistant, competitive intel | From $139.95/mo \[19\] |
 | 35 | ActiveCampaign | Email / Automation | Lifecycle email \+ CRM | Email automation, CRM, predictive segmentation | From \~$15/mo, scales with contacts \[19\] |
+| 36 | AdCreative.ai | Content (Ads) | High-performing ad creatives | AI ad images/text, performance scoring, A/B testing | From \~$39/mo \[5\] |
 
 
 
