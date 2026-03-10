@@ -13,20 +13,25 @@ const withMDX = createMDX({
 
 
 export const config: NextConfig = {
-  output: 'export',
-  distDir: './dist',
+  // output: 'export',
+  // distDir: './dist',
   async rewrites() {
     return [
       {
-        source: '/docs/:path*.mdx',
-        destination: '/llms.mdx/:path*',
+        source: '/docs/:path*.mdx',  
+        destination: '/llms.mdx/docs/:path*',
       },
     ];
   },
   reactStrictMode: false,
   images: {
-    domains: ['i.imgur.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+      },
+    ],
     unoptimized: true,
   },
 };
-export default withMDX(config);
+export default withMDX(config as any);

@@ -1,4 +1,8 @@
-import { source } from '@/lib/source';
+/**
+ * @file page.tsx
+ * @description Dynamic documentation page component that renders MDX content.
+ */
+import { source } from '@/lib/fumadocs/source';
 import {
   DocsBody,
   DocsDescription,
@@ -8,7 +12,8 @@ import {
 import { notFound } from 'next/navigation';
 import { getMDXComponents } from '@/mdx-components';
 import type { Metadata } from 'next';
-import { ViewOptions, LLMCopyButton } from '@/components/page-actions';
+import { AskAIDropdown, LLMCopyButton } from '@/components/fumadocs/page-actions';
+import { docsConfig } from '@/lib/fumadocs/customize-docs';
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>;
@@ -29,9 +34,9 @@ export default async function Page(props: {
       <DocsBody>
         <div className="flex flex-row gap-2 items-center border-b pt-2 pb-6">
           <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
-          <ViewOptions
+          <AskAIDropdown
             markdownUrl={`${page.url}.mdx`}
-            githubUrl={`https://github.com/vtempest/ai-research-agent/blob/dev/apps/docs/content/docs/${page.path}`}
+            githubUrl={docsConfig.githubDocs ? `${docsConfig.githubDocs}/${page.path}` : undefined}
           />
         </div>
 

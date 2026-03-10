@@ -1,7 +1,6 @@
 {
   "pages": [
-    "functions/index",
-    "...(api)",
+    "index",
     "..."
   ]
 }

@@ -1,0 +1,127 @@
+# FumaDocs Starter Template
+
+A production-ready documentation site template built with [FumaDocs](https://fumadocs.vercel.app/) and Next.js. Includes full-text search, sidebar navigation, OpenAPI docs generation, dark mode, and a polished landing page — all out of the box.
+
+## Features
+
+- **MDX Documentation** — Write docs in Markdown with embedded React components
+- **Sidebar Navigation** — Auto-generated from your file structure
+- **Full-Text Search** — Powered by [Orama](https://oramasearch.com/) with instant results
+- **OpenAPI Integration** — Generate API reference pages from a YAML/JSON spec via `fumadocs-openapi`
+- **Dark Mode** — Light and dark themes with smooth toggling
+- **Syntax Highlighting** — Code blocks with [Shiki](https://shiki.matsu.io/)
+- **Table of Contents** — Auto-generated per page from headings
+- **LLM-Friendly Export** — `/llms-full.txt` endpoint serves all docs as plain text for AI consumption
+- **Landing Page** — Hero section, feature grid, comparison table, and footer components included
+- **TypeScript** — Fully typed throughout
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router, Turbopack) |
+| Docs Engine | FumaDocs (core, ui, mdx, openapi, typescript) |
+| Search | Orama |
+| Styling | Tailwind CSS 4, Shadcn-style components |
+| Language | TypeScript 5.9 |
+| Icons | Lucide React |
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start dev server (auto-opens browser)
+npm run dev
+
+# Production build
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Project Structure
+
+```
+template-fumadocs/
+├── app/
+│   ├── (home)/              # Landing page
+│   ├── docs/[[...slug]]/    # Documentation pages (dynamic routing)
+│   ├── api/                 # Search API + LLM text endpoint
+│   ├── layout.tsx           # Root layout
+│   ├── layout.config.tsx    # Nav bar configuration
+│   └── provider.tsx         # Theme + search providers
+├── components/
+│   ├── DocsHomepage/        # Landing page sections (hero, features, footer)
+│   ├── fumadocs/            # Search dialog, API page, theme toggle
+│   └── ui/                  # Badge, button, collapsible, video modal
+├── content/
+│   └── docs/                # MDX documentation files
+│       └── (api)/           # Auto-generated OpenAPI endpoint docs
+├── lib/
+│   └── fumadocs/
+│       ├── customize-docs.ts   # Site title, GitHub URL, nav links
+│       ├── source.tsx          # Doc source loader + plugins
+│       ├── openapi.ts          # OpenAPI spec loader
+│       └── get-llm-text.ts     # LLM text export utility
+├── public/
+│   └── qwksearch-openapi.yaml  # OpenAPI specification
+├── source.config.ts         # FumaDocs source configuration
+├── next.config.ts           # Next.js config
+└── mdx-components.tsx       # Custom MDX component mappings
+```
+
+## Customization
+
+### Site Metadata
+
+Edit [customize-docs.ts](lib/fumadocs/customize-docs.ts) to set your site title, description, GitHub URL, and nav links:
+
+```ts
+export const docsConfig: DocsConfig = {
+  title: "My Project Docs",
+  description: "A short description",
+  github: "https://github.com/you/your-repo",
+  topLinks: [
+    { text: "Docs", url: "/docs" },
+    { text: "GitHub", url: "https://github.com/you/your-repo", external: true },
+  ],
+};
+```
+
+### Adding Documentation Pages
+
+Add `.mdx` files to `content/docs/`. The sidebar and routes are generated automatically. Use `meta.json` in any folder to control page ordering:
+
+```json
+{
+  "pages": ["index", "getting-started", "configuration", "..."]
+}
+```
+
+### OpenAPI Docs
+
+1. Place your OpenAPI spec at `public/your-spec.yaml`
+2. Update the path in [customize-docs.ts](lib/fumadocs/customize-docs.ts)
+3. Run `npm run build:api` to generate API reference pages
+
+### Theming
+
+Global styles and CSS variables are in [app/globals.css](app/globals.css). The template ships with a warm beige/sand color scheme in light mode and a dark brown palette in dark mode. Override the CSS custom properties to match your brand.
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start dev server with Turbopack and auto-open browser |
+| `npm run build` | Production build |
+| `npm run preview` | Serve production build and open browser |
+| `npm run build:api` | Generate API docs from OpenAPI spec |
+| `npm run check` | Run FumaDocs MDX validation + TypeScript type checking |
+| `npm run favicon` | Generate favicons from `public/favicon-512.png` |
+
+## License
+
+MIT
