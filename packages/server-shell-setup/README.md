@@ -1,28 +1,19 @@
----
-title: 🛠️ Server Shell Setup
----
-
-# 🛠️ Server Shell Setup
-
-
 <p align="center">
-    <img src="https://i.imgur.com/an3NUny.png" />
+    <img src="https://i.imgur.com/3qLFAvW.jpeg">
 </p>
-<p align="center">
-    <img alt="GitHub Stars" src="https://img.shields.io/github/stars/vtempest/server-shell-setup" />
+<p align="center"> 
+    <img alt="GitHub Stars" src="https://img.shields.io/github/stars/vtempest/server-shell-setup">
     <a href="https://github.com/vtempest/server-shell-setup/discussions">
     <img alt="GitHub Discussions"
-        src="https://img.shields.io/github/discussions/vtempest/server-shell-setup" />
+        src="https://img.shields.io/github/discussions/vtempest/server-shell-setup">
     </a>
     <a href="http://makeapullrequest.com">
-        <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome" />
+        <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome">
     </a>
     <a href="https://codespaces.new/vtempest/server-shell-setup">
-    <img src="https://github.com/codespaces/badge.svg" width="150" height="20" />
+    <img src="https://github.com/codespaces/badge.svg" width="150" height="20">
     </a>
 </p>
-
-
 
 ## The Devil Is In The Defaults
 
