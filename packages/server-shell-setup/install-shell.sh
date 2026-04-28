@@ -6,11 +6,11 @@
 # Use interactive menu to install top dev tools and shell.
 # Systems Supported: Android (Termux), macOS, Ubuntu/Debian, Fedora, Arch, Alpine
 #
-# Usage: bash -c "$( wget -q https://raw.githubusercontent.com/vtempest/server-shell-setup/refs/heads/master/install-shell.sh -O -)"
+# Usage: bash -c "$( wget -q https://raw.githubusercontent.com/OpenSourceAGI/appdemo-starter-template/refs/heads/master/packages/server-shell-setup/install-shell.sh -O -)"
 #  Headless: 
-#  wget -qO- https://raw.githubusercontent.com/vtempest/server-shell-setup/refs/heads/master/install-shell.sh | bash -s -- "all"
+#  wget -qO- https://raw.githubusercontent.com/OpenSourceAGI/appdemo-starter-template/refs/heads/master/packages/server-shell-setup/install-shell.sh | bash -s -- "all"
 # SSH With Password:
-#  wget -qO- https://raw.githubusercontent.com/vtempest/server-shell-setup/refs/heads/master/install-shell.sh | bash -s -- ssh
+#  wget -qO- https://raw.githubusercontent.com/OpenSourceAGI/appdemo-starter-template/refs/heads/master/packages/server-shell-setup/install-shell.sh | bash -s -- ssh
 # Available components:
 #   - fish: Modern shell with auto-suggestions and improved syntax highlighting
 #   - nushell: Data-oriented shell with structured data handling

@@ -4,6 +4,7 @@ import {
   frontmatterSchema,
   metaSchema,
 } from 'fumadocs-mdx/config';
+import { remarkMdxFiles } from 'fumadocs-core/mdx-plugins/remark-mdx-files';
 
 export const docs = defineDocs({
   dir: './content/docs',
@@ -19,5 +20,7 @@ export const docs = defineDocs({
 });
 
 export default defineConfig({
-  mdxOptions: {},
+  mdxOptions: {
+    remarkPlugins: [remarkMdxFiles],
+  },
 });

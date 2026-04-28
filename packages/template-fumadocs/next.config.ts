@@ -1,6 +1,5 @@
 import { createMDX } from 'fumadocs-mdx/next';
-import type { NextConfig } from 'next';
-
+import { resolve } from 'path';
 
 const withMDX = createMDX({
   // mdxOptions: {
@@ -10,16 +9,20 @@ const withMDX = createMDX({
   // },
 });
 
+type MDXNextConfig = NonNullable<Parameters<typeof withMDX>[0]>;
 
-
-export const config: NextConfig = {
+export const config = {
   // output: 'export',
   // distDir: './dist',
+  serverExternalPackages: [],
+  turbopack: {
+    root: resolve(import.meta.dirname, '.'),
+  },
   async rewrites() {
     return [
       {
-        source: '/docs/:path*.mdx',  
-        destination: '/llms.mdx/docs/:path*',
+        source: '/docs/:path*.mdx',
+        destination: '/docs/llms.mdx/docs/:path*',
       },
     ];
   },
@@ -33,5 +36,5 @@ export const config: NextConfig = {
     ],
     unoptimized: true,
   },
-};
-export default withMDX(config as any);
+} satisfies MDXNextConfig;
+export default withMDX(config);

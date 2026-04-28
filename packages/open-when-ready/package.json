@@ -1,0 +1,37 @@
+{
+  "name": "open-ready",
+  "version": "0.1.3",
+  "description": "Smart dev server launcher: error→AI search, success→auto-open browser. Any CLI tool.",
+  "type": "module",
+  "bin": {
+    "open-ready": "./open-when-ready.mjs"
+  },
+  "scripts": {
+    "ship": "bun x standard-version --release-as patch;rm CHANGELOG.md; npm publish",
+    "owr": "./open-when-ready.mjs bun run build"
+  },
+  "keywords": [
+    "devtools",
+    "nextjs",
+    "vite",
+    "cli",
+    "automation"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "minimist": "^1.2.8",
+    "opener": "^1.5.2",
+    "wait-on": "^8.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/yourusername/open-when-ready"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/open-when-ready/issues"
+  },
+  "homepage": "https://github.com/yourusername/open-when-ready#readme"
+}

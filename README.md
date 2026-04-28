@@ -43,63 +43,41 @@ bun create starter-app
 
 🖼️ [shadcn-svelte](https://github.com/huntabyte/shadcn-svelte) - popular UI components, with [lucide](https://github.com/lucide-icons/lucide) icons
 
-### 📦 Available Starter Templates
+## 📦 Packages & Apps
 
-#### 1. **template-svelte-auth-drizzle-shadcn** (Main Template)
-Full-stack SvelteKit starter with authentication and database integration.
+### Apps
 
-**Tech Stack:**
-- **Framework:** SvelteKit with Cloudflare adapter
-- **Database:** Drizzle ORM with Cloudflare D1
-- **Auth:** Better Auth with Google OAuth
-- **UI:** Tailwind CSS + shadcn-svelte + Bits UI
-- **Forms:** Formsnap + Superforms with Zod validation
-- **Email:** Resend for transactional emails
-- **Testing:** Vitest with UI
-- **Deployment:** Cloudflare Pages
+**[docs](apps/docs/)** - Main documentation site built with Fumadocs featuring AI-powered chat, full-text search, and automatic API documentation generation from TypeScript and OpenAPI specs.
 
-#### 2. **template-nextjs-drizzle-betterauth**
-Modern Next.js SaaS boilerplate with comprehensive authentication.
+**[Cloud-Computer-Control-Panel](apps/Cloud-Computer-Control-Panel/)** - AWS infrastructure management platform for provisioning EC2 instances and deploying containers with automated Dokploy integration.
 
-**Tech Stack:**
-- **Framework:** Next.js 15 with App Router
-- **Database:** PostgreSQL with Drizzle ORM
-- **Auth:** Better Auth with Better Auth UI components
-- **UI:** shadcn/ui + Tailwind CSS
-- **Payments:** Stripe integration
-- **Uploads:** UploadThing for file management
-- **Email:** Resend
-- **Monorepo:** Turborepo
-- **Linting:** Biome
+### Starter Templates
 
-#### 3. **template-nextjs-betterauth-prisma-shadcn**
-Next.js starter focused on authentication with Prisma.
+**[template-svelte-betterauth-drizzle-shadcn](packages/template-svelte-betterauth-drizzle-shadcn/)** (Main) - Full-stack SvelteKit application with Better Auth, Drizzle ORM on Cloudflare D1, Stripe payments, and Bits UI components. Deploy to Cloudflare Pages with edge database and serverless API routes.
 
-**Tech Stack:**
-- **Framework:** Next.js 15
-- **Database:** PostgreSQL with Prisma ORM
-- **Auth:** Better Auth (Google OAuth + Credentials)
-- **UI:** shadcn + Tailwind CSS
+**[template-nextjs-drizzle-betterauth-shadcn](packages/template-nextjs-drizzle-betterauth-shadcn/)** - Next.js SaaS boilerplate with PostgreSQL, Better Auth, Stripe subscriptions, and UploadThing file uploads. Includes user management UI and team/organization support with shadcn/ui components.
 
-#### 4. **template-fumadocs**
-Documentation site template with search and API documentation.
+**[template-nextjs-betterauth-prisma-shadcn](packages/template-nextjs-betterauth-prisma-shadcn/)** - Lightweight Next.js starter focused on authentication flows with Prisma ORM and Better Auth. Features Google OAuth, credential login, profile management, and protected routes with Motion animations.
 
-**Tech Stack:**
-- **Framework:** Next.js with Fumadocs
-- **UI:** Fumadocs UI components
-- **Search:** Orama search engine
-- **API Docs:** Fumadocs OpenAPI + TypeScript support
-- **Styling:** Tailwind CSS
+**[template-fumadocs](packages/template-fumadocs/)** - Documentation site template with Fumadocs featuring Orama search, OpenAPI/Swagger docs, and TypeScript API reference. Includes MDX support, code highlighting with Shiki, and collapsible sidebar navigation.
 
-#### 5. **template-docusaurus**
-Documentation template using Docusaurus with OpenAPI support.
+**[template-docusaurus](packages/template-docusaurus/)** - Docusaurus 3 documentation template with offline Lunr search and OpenAPI plugin integration. Classic documentation theme optimized for technical docs with Google Analytics and multi-language support.
 
-**Tech Stack:**
-- **Framework:** Docusaurus 3
-- **Search:** Lunr Search
-- **API Docs:** OpenAPI Docs plugin + TypeDoc
-- **Styling:** Tailwind CSS
-- **React:** React 19
+### Utility Packages
+
+**[about-system-info](packages/about-system-info/)** - Cross-platform CLI tool displaying system information with emojis including CPU, memory, disk, network details, and running services. Install globally and add to shell greeting for automatic system overview on terminal launch.
+
+**[create-cloud-db](packages/create-cloud-db/)** - Interactive CLI to create Turso edge database and automatically write connection credentials to .env file. One-command setup for SQLite-compatible serverless databases with instant global replication.
+
+**[manage-storage](packages/manage-storage/)** - Unified API for managing cloud storage across AWS S3, Cloudflare R2, and Backblaze B2. Automatically detects provider from credentials and provides consistent interface for uploads, downloads, and file management.
+
+**[open-when-ready](packages/open-when-ready/)** - Smart dev server wrapper that monitors process output and auto-opens browser when ready. Wraps any CLI command (npm, bun, vite) and detects ports from console output.
+
+**[server-shell-setup](packages/server-shell-setup/)** - Bash installation scripts for configuring Linux/macOS shells with fish, neovim, starship prompt, docker, and node. Supports interactive menu or automated installation of dev tools across Arch, Ubuntu, Debian, Fedora, Alpine, and Termux.
+
+**[docs](packages/docs/)** - Shared Fumadocs configuration package containing documentation content and settings. Used by the main docs app for centralized documentation management.
+
+---
 
 ### 🖼️ Screenshots
 

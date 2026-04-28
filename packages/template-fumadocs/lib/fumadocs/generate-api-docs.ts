@@ -6,17 +6,11 @@ import { generateFiles } from 'fumadocs-openapi';
 import { createOpenAPI } from 'fumadocs-openapi/server';
 import { rimraf } from 'rimraf';
 import { existsSync } from 'fs';
-import { docsConfig } from './customize-docs';
+import { docsConfig } from './customize-docs'
 
 const out = 'content/docs/(api)';
 
 
-/**
- * Generates MDX documentation files from an OpenAPI specification.
- * Cleans the output directory (preserving `index.mdx` and `meta.json`),
- * then writes new endpoint pages to `content/docs/(api)/`.
- * @param openapiPath - Filesystem path to the OpenAPI YAML/JSON spec.
- */
 async function generate(openapiPath: string | undefined) {
   // Validate file exists
   if (!openapiPath || !existsSync(openapiPath)) {

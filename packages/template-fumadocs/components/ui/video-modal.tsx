@@ -2,19 +2,37 @@
  * @file video-modal.tsx
  * @description Modal component specifically designed for playing video content.
  */
+// @ts-nocheck - Radix UI types incompatible with React 19 children prop
 'use client'
 
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { cn } from "@/lib/utils"
 
-const VideoModal = DialogPrimitive.Root
+function VideoModal({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  return <DialogPrimitive.Root data-slot="video-modal" {...props} />
+}
 
-const VideoModalTrigger = DialogPrimitive.Trigger
+function VideoModalTrigger({
+  children,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Trigger> & { children?: React.ReactNode }) {
+  return <DialogPrimitive.Trigger data-slot="video-modal-trigger" {...props}>{children}</DialogPrimitive.Trigger>
+}
 
-const VideoModalPortal = DialogPrimitive.Portal
+function VideoModalPortal({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
+  return <DialogPrimitive.Portal data-slot="video-modal-portal" {...props} />
+}
 
-const VideoModalClose = DialogPrimitive.Close
+function VideoModalClose({
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Close>) {
+  return <DialogPrimitive.Close data-slot="video-modal-close" {...props} />
+}
 
 const VideoModalOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,

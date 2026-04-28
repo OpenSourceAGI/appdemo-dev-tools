@@ -1,0 +1,6 @@
+{
+  "name": "AI Broker",
+  "url": "https://autoinvestment.broker",
+  "icon": "icon.png",
+  "packageName": "com.autoinvestment.app"
+}

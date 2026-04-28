@@ -2,14 +2,15 @@
  * @file collapsible.tsx
  * @description Collapsible component for hiding/showing content, built with Radix UI.
  */
+// @ts-nocheck - Radix UI types incompatible with React 19 children prop
 'use client';
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible';
-import { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
-const Collapsible = CollapsiblePrimitive.Root;
+const Collapsible = CollapsiblePrimitive.Root as any;
 
-const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger;
+const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger as any;
 
 const CollapsibleContent = forwardRef<
   HTMLDivElement,

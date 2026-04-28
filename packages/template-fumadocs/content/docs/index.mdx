@@ -6,126 +6,147 @@ sidebar_position: 1
 displayed_sidebar: lib
 ---
 
-# FumaDocs Starter Template
 
-A production-ready documentation site template built with [FumaDocs](https://fumadocs.vercel.app/) and Next.js. Includes full-text search, sidebar navigation, OpenAPI docs generation, dark mode, and a polished landing page — all out of the box.
-
-## Features
-
-- **MDX Documentation** — Write docs in Markdown with embedded React components
-- **Sidebar Navigation** — Auto-generated from your file structure
-- **Full-Text Search** — Powered by [Orama](https://oramasearch.com/) with instant results
-- **OpenAPI Integration** — Generate API reference pages from a YAML/JSON spec via `fumadocs-openapi`
-- **Dark Mode** — Light and dark themes with smooth toggling
-- **Syntax Highlighting** — Code blocks with [Shiki](https://shiki.matsu.io/)
-- **Table of Contents** — Auto-generated per page from headings
-- **LLM-Friendly Export** — `/llms-full.txt` endpoint serves all docs as plain text for AI consumption
-- **Landing Page** — Hero section, feature grid, comparison table, and footer components included
-- **TypeScript** — Fully typed throughout
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router, Turbopack) |
-| Docs Engine | FumaDocs (core, ui, mdx, openapi, typescript) |
-| Search | Orama |
-| Styling | Tailwind CSS 4, Shadcn-style components |
-| Language | TypeScript 5.9 |
-| Icons | Lucide React |
-
-## Getting Started
-
-```bash
-# Install dependencies
-npm install
-
-# Start dev server (auto-opens browser)
-npm run dev
-
-# Production build
-npm run build
-
-# Preview production build
-npm run preview
-```
-
-## Project Structure
+<p align="center">
+    <img width="400px" src="https://i.imgur.com/RH80JGZ.png" />
+</p>
+<p align="center" >
+  <a href="https://discord.gg/SJdBqBz3tV">
+      <img src="https://img.shields.io/discord/1110227955554209923.svg?label=Chat&logo=Discord&colorB=7289da&style=flat"
+            alt="Join Discord" />
+    </a>     <a href="https://github.com/vtempest/GRAB-URL/discussions">
+     <img alt="GitHub Stars" src="https://img.shields.io/github/stars/vtempest/GRAB-URL" /></a> <a href="https://npmjs.org/package/grab-url">
+    <img alt="NPM Version" src="https://img.shields.io/npm/v/grab-url" />
+  </a>    <a href="https://github.com/vtempest/GRAB-URL/discussions">
+    <img alt="GitHub Discussions"
+        src="https://img.shields.io/github/discussions/vtempest/GRAB-URL" />
+    </a> <a href="https://github.blog/developer-skills/github/beginners-guide-to-github-creating-a-pull-request/">
+        <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"/>
+    </a> <a href="https://codespaces.new/vtempest/GRAB-URL">
+    <img src="https://github.com/codespaces/badge.svg" width="150" height="20"/>
+    </a>
+</p>
+<h3 align="center">
+  <a href="https://grab.js.org"> 📑 Docs (grab.js.org)</a>
+  <a href="https://grab.js.org/docs/Examples"> 🎯 Example Strategies </a>
+</h3>
 
 ```
-template-fumadocs/
-├── app/
-│   ├── (home)/              # Landing page
-│   ├── docs/[[...slug]]/    # Documentation pages (dynamic routing)
-│   ├── api/                 # Search API + LLM text endpoint
-│   ├── layout.tsx           # Root layout
-│   ├── layout.config.tsx    # Nav bar configuration
-│   └── provider.tsx         # Theme + search providers
-├── components/
-│   ├── DocsHomepage/        # Landing page sections (hero, features, footer)
-│   ├── fumadocs/            # Search dialog, API page, theme toggle
-│   └── ui/                  # Badge, button, collapsible, video modal
-├── content/
-│   └── docs/                # MDX documentation files
-│       └── (api)/           # Auto-generated OpenAPI endpoint docs
-├── lib/
-│   └── fumadocs/
-│       ├── customize-docs.ts   # Site title, GitHub URL, nav links
-│       ├── source.tsx          # Doc source loader + plugins
-│       ├── openapi.ts          # OpenAPI spec loader
-│       └── get-llm-text.ts     # LLM text export utility
-├── public/
-│   └── qwksearch-openapi.yaml  # OpenAPI specification
-├── source.config.ts         # FumaDocs source configuration
-├── next.config.ts           # Next.js config
-└── mdx-components.tsx       # Custom MDX component mappings
+npm i grab-url
 ```
 
-## Customization
+### GRAB: Generate Request to API from Browser
 
-### Site Metadata
+1. **GRAB is the FBEST Request Manager: Functionally Brilliant, Elegantly Simple Tool**: One Function, no dependencies, minimalist syntax, [more features than alternatives](https://grab.js.org/docs/Comparisons)
+2. **Auto-JSON Convert**: Pass parameters and get response or error in JSON, handling other data types as is.
+3. **isLoading Status**: Sets `.isLoading=true` on the pre-initialized response object so you can show a "Loading..." in any framework
+4. **[Claude Skill](https://grab.js.org/docs/claude-skill)** Copy this link as markdown and paste into ~/.claude/skills/use-grab-request/SKILL.md or similar for Antigravity, Cursor, Gemini, Codex, etc...
+5. **Mock Server Support**: Configure `window.grab.mock` for development and testing environments
+6. **Cancel Duplicates**: Prevent this request if one is ongoing to same path & params, or cancel the ongoing request.
+7. **Timeout & Retry**: Customizable request timeout, default 20s, and auto-retry on error
+8. **DevTools**: `Ctrl+Alt+I` overlays webpage with devtools showing all requests and responses, timing, and JSON structure.
+9. **Request History**: Stores all request and response data in global `grab.log` object
+10. **Pagination Infinite Scroll**: Built-in pagination for infinite scroll to auto-load and merge next result page, with scroll position recovery.
+11. **Base URL Based on Environment**: Configure `grab.defaults.baseURL` once at the top, overide with `SERVER_API_URL` in `.env`.
+12. **Frontend Cache**: Set cache headers and retrieve from frontend memory for repeat requests to static data.
+13. **Regrab On Error**: Regrab on timeout error, or on window refocus, or on network change, or on stale data.
+14. **Framework Agnostic**: Alternatives like TanStack work only in component initialization and depend on React & others.
+15. **Globals**: Adds to window in browser or global in Node.js so you only import once: `grab()`, `log()`, `grab.log`, `grab.mock`, `grab.defaults`
+16. **Debug Logging**: Adds global `log()` and prints colored JSON structure, response, timing for requests in test.
+17. **Request Stategies**: [🎯 Examples](https://grab.js.org/docs/Examples) show common stategies like debounce, repeat, proxy, unit tests, interceptors, file upload, etc
+18. **Rate Limiting**: Built-in rate limiting to prevent multi-click cascading responses, require to wait seconds between requests.
+19. **Repeat**: Repeat request this many times, or repeat every X seconds to poll for updates.
+20. **Loading Icons**: Import from `grab-url/icons` to get enhanced animated loading icons.
 
-Edit [customize-docs.ts](lib/fumadocs/customize-docs.ts) to set your site title, description, GitHub URL, and nav links:
+### Examples
 
 ```ts
-export const docsConfig: DocsConfig = {
-  title: "My Project Docs",
-  description: "A short description",
-  github: "https://github.com/you/your-repo",
-  topLinks: [
-    { text: "Docs", url: "/docs" },
-    { text: "GitHub", url: "https://github.com/you/your-repo", external: true },
-  ],
+import grab from 'grab-url';
+
+let res = $state({}) as {
+  results: Array<{title:string}>,
+  isLoading: boolean,
+  error: string,
 };
+
+await grab('search', {
+  response: res,
+  query: "search words",
+  post: true
+})
+ 
+grab('user').then(log)
+
+//in svelte component
+{#if res.results}
+    {res.results}
+{:else if res.isLoading}
+    ...
+{:else if res.error}
+    {res.error}
+{/if}
+
+ //Setup Mock testing server, response is object or function
+ window.grab.mock["search"] = {
+   response: (params) => {
+     return { results: [{title:`Result about ${params.query}`}] };
+   },
+   method: "POST"
+ };
+
+ //set defaults for all requests
+ grab("", { 
+   setDefaults: true,
+   baseURL: "http://localhost:8080",
+   timeout: 30,
+   debug: true,
+   rateLimit: 1,
+   cache: true,
+   cancelOngoingIfNew: true,
+ });
+
+ grab.defaults.baseURL = "http://localhost:8080/api/";
 ```
 
-### Adding Documentation Pages
+### Screenshots
 
-Add `.mdx` files to `content/docs/`. The sidebar and routes are generated automatically. Use `meta.json` in any folder to control page ordering:
+**Animated SVG Loading Icons with Customizable Colors**
+![icons](https://i.imgur.com/OqpWya1.gif)
 
-```json
-{
-  "pages": ["index", "getting-started", "configuration", "..."]
-}
-```
+**Debug Colorized log(JSON)**
+![Debug log](https://i.imgur.com/R8Qp6Vg.png)
 
-### OpenAPI Docs
+**Autocomplete option names**
 
-1. Place your OpenAPI spec at `public/your-spec.yaml`
-2. Update the path in [customize-docs.ts](lib/fumadocs/customize-docs.ts)
-3. Run `npm run build:api` to generate API reference pages
+![Autocomplete](https://i.imgur.com/XlxILJ0.png)
 
-### Theming
+**Hover over options for info**
 
-Global styles and CSS variables are in [app/globals.css](app/globals.css). The template ships with a warm beige/sand color scheme in light mode and a dark brown palette in dark mode. Override the CSS custom properties to match your brand.
+![Info Tooltip](https://i.imgur.com/vV5jbZo.png)
 
-## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start dev server with Turbopack and auto-open browser |
-| `npm run build` | Production build |
-| `npm run preview` | Serve production build and open browser |
-| `npm run build:api` | Generate API docs from OpenAPI spec |
-| `npm run check` | Run FumaDocs MDX validation + TypeScript type checking |
-| `npm run favicon` | Generate favicons from `public/favicon-512.png` |
+##  Comparison of HTTP Request Libraries
+
+| Feature | [GRAB](https://github.com/vtempest/GRAB-URL) | [Axios](https://github.com/axios/axios) | [TanStack Query](https://github.com/TanStack/query) | [SWR](https://github.com/vercel/swr) | [Alova](https://github.com/alovajs/alova) | [SuperAgent](https://github.com/ladjs/superagent) | [Apisauce](https://github.com/infinitered/apisauce) | [Ky](https://github.com/sindresorhus/ky) |
+| :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | 
+| Size | ✅ 4KB | ❌ 13KB | ❌ 39KB | ✅ 4.2KB | ✅ 4KB | ❌ 19KB | ❌ 15KB (with axios) | ✅ 4KB |
+| Zero Dependencies | ✅ Yes | ❌ No | ❌ No | ❌ No | ✅ Yes | ❌ No | ❌ Needs Axios | ✅ Yes |
+| isLoading State Handling | ✅ Auto-managed | ❌ Manual | ✅ Yes | ✅ Yes | ✅ Yes | ❌ Manual | ❌ Manual | ❌ Manual |
+| Auto JSON Handling | ✅ Automatic | ✅ Configurable | ❌ Manual | ❌ Manual | ✅ Automatic | ✅ Automatic | ✅ Automatic | ✅ Automatic |
+| Request Deduplication | ✅ Built-in | ❌ No | ✅ Yes | ✅ Yes | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| Caching | ✅ Multi-level | ❌ No | ✅ Advanced | ✅ Advanced | ✅ Multi-level | ❌ No | ❌ No | ❌ No |
+| Mock Testing | ✅ Easy setup | ❌ Needs MSW/etc | ❌ Needs MSW/etc | ❌ Needs MSW/etc | ⚠️ Basic | ❌ Needs separate lib | ❌ Needs separate lib | ❌ Needs MSW/etc |
+| Rate Limiting | ✅ Built-in | ❌ Manual | ❌ Manual | ❌ Manual | ⚠️ Basic | ❌ Manual | ❌ Manual | ❌ Manual |
+| Automatic Retry | ✅ Configurable | ⚠️ Via interceptors | ✅ Built-in | ✅ Built-in | ✅ Built-in | ✅ Built-in | ❌ Manual | ✅ Built-in |
+| Request Cancellation | ✅ Auto + manual | ✅ Manual | ✅ Automatic | ✅ Automatic | ✅ Manual | ✅ Manual | ✅ Manual | ✅ Manual |
+| Pagination Support | ✅ Infinite scroll | ❌ Manual | ✅ Advanced | ⚠️ Basic | ✅ Built-in | ❌ Manual | ❌ Manual | ❌ Manual |
+| Interceptors | ✅ Advanced | ✅ Advanced | ⚠️ Limited | ⚠️ Limited | ✅ Advanced | ✅ Plugins | ✅ Transforms | ✅ Hooks system |
+| Debug Logging | ✅ Colored output | ⚠️ Basic | ✅ DevTools | ✅ DevTools | ⚠️ Basic | ⚠️ Basic | ⚠️ Basic | ⚠️ Basic |
+| Request History | ✅ Built-in | ❌ Manual | ✅ DevTools | ✅ DevTools | ❌ Manual | ❌ Manual | ❌ Manual | ❌ Manual |
+| Easy Syntax | ✅ Minimal | ⚠️ Medium | ❌ High | ❌ High | ⚠️ Medium | ⚠️ Medium | ✅ Low | ✅ Minimal |
+
+**Stop trying to make fetch happen!** [*](https://knowyourmeme.com/memes/stop-trying-to-make-fetch-happen)
+
+**Why fetch things when you can just GRAB?**
+
+**Debugging requests is a bitch. [Make the switch!](https://grab.js.org/docs/Comparisons)**

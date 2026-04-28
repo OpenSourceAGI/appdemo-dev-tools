@@ -15,7 +15,7 @@ export function Footer() {
             Ready to <span className="text-primary">GRAB</span> your data?
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Debugging requests is a pain. Make the switch to GRAB and simplify your HTTP layer today.
+            Debugging fetch requests is a bitch. Make the switch!
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">

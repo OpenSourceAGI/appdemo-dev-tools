@@ -21,22 +21,26 @@
 
 Setup server shell with `fish`, `nvim`, `nu`, `bun`, `node`, `helix`, `starship prompt`, `git0`, `systeminfo`, `pacstall installer`,  `docker`,  and other dev tools. Fish aliases: `service_manager`, `killport`, and `search [query]`.
 
-**System Support**: Arch, Ubuntu/Debian, Android Termux, macOS, Fedora, Alpine 
+**System Support**: Arch, Ubuntu/Debian, Android Termux, macOS, Fedora, Alpine
 
 ## Install: Bash Script to Setup Shell
 
 Launch Linux server instance, connect and on first time login you will need to run `sudo passwd` to set root password and  `sudo passwd $USER` to set non-root password. You will need sudo password when running this setup script:
 
 **Install Interactive Menu** (short URL to `./install-shell.sh`):
+
 ```bash
 wget -qO- tinyurl.com/shellsetup | bash
 ```
 
 **Install all automated:**
+
 ```bash
  wget -qO- tinyurl.com/shellsetup | bash -s -- all
 ```
+
 **Install specific apps only:**
+
 ```bash
  wget -qO- tinyurl.com/shellsetup | bash -s -- starship,docker,node
 ```
@@ -44,7 +48,7 @@ wget -qO- tinyurl.com/shellsetup | bash
 **Install Node with Volta** (no sudo permission issues)
 
 ```
-wget -qO- dub.sh/getnode | bash
+span
 ```
 
 ## Example: System Info When Opening Shell

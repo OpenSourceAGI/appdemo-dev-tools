@@ -1,28 +1,27 @@
-
 /**
  * @file customize-docs.ts
  * @description Documentation configuration object and types.
  */
 export const docsConfig: DocsConfig = {
-  title: "Docs Template",
-  description: "Docs Template for Fumadocs",
-  github: "https://github.com/OpenSourceAGI/StarterDOCS",
-  githubDocs: "https://github.com/OpenSourceAGI/StarterDOCS/blob/dev/docs",
+  title: "GRAB-URL",
+  description: "📥 Generate Request to API from Browser",
+  github: "https://github.com/vtempest/grab-url",
+  githubPackages: "https://github.com/vtempest/grab-url/tree/master/packages",
+  githubDocs:
+    "https://github.com/vtempest/GRAB-URL/tree/master/docs/content/docs",
   favicon: "/favicon.ico",
-  apiDocsPath: "./public/qwksearch-openapi.yaml",
   topLinks: [
     {
-      text: 'Docs',
-      url: '/docs',
+      text: "Docs",
+      url: "/docs",
     },
     {
-      text: 'GitHub',
-      url: 'https://github.com/OpenSourceAGI/StarterDOCS',
+      text: "GitHub",
+      url: "https://github.com/vtempest/grab-url",
       external: true,
     },
   ],
 };
-
 
 export interface DocsConfig {
   /** The title of the documentation site */
@@ -33,6 +32,8 @@ export interface DocsConfig {
   github?: string;
   /** Base URL for document editing on GitHub */
   githubDocs?: string;
+  /** Base URL for the packages directory on GitHub */
+  githubPackages?: string;
   /** Path to the favicon */
   favicon?: string;
   /** Path to the OpenAPI specification file */
@@ -44,4 +45,3 @@ export interface DocsConfig {
     external?: boolean;
   }[];
 }
-

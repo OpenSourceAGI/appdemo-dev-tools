@@ -138,7 +138,7 @@ export function FeaturesGrid() {
         <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 mb-16">
           <div className="relative" style={{ animation: "float 6s ease-in-out infinite" }}>
             <Image
-              src="https://i.imgur.com/Rwl5P3p.png"
+              src="https://i.imgur.com/RH80JGZ.png"
               alt="GRAB - Generate Request to API from Browser"
               width={200}
               height={200}

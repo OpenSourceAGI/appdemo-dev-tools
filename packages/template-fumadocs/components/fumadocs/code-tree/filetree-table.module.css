@@ -1,0 +1,290 @@
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--fd-border, #27272a);
+  background: transparent;
+  transition: border-color 0.15s;
+}
+
+.searchBox:focus-within {
+  border-color: var(--fd-primary, rgb(59, 130, 246));
+}
+
+.searchIcon {
+  color: var(--fd-muted-foreground, #a1a1aa);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--fd-foreground, #18181b);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.searchInput::placeholder {
+  color: var(--fd-muted-foreground, #71717a);
+}
+
+:global([data-theme="dark"]) .searchInput,
+:global(.dark) .searchInput {
+  color: var(--fd-foreground, #fafafa);
+}
+
+.highlight {
+  background: rgba(250, 204, 21, 0.3);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+.noResults {
+  padding: 2rem 0.6rem;
+  text-align: center;
+  color: var(--fd-muted-foreground, #71717a);
+  font-size: 0.88rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.thead th {
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fd-muted-foreground, #a1a1aa);
+  border-bottom: 1px solid var(--fd-border, #27272a);
+  position: sticky;
+  top: 0;
+  background: transparent;
+  z-index: 2;
+}
+
+.headerName {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.headerSliderWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.headerStepButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--fd-border, #27272a);
+  background: rgba(15, 23, 42, 0.55);
+  color: var(--fd-foreground, #fafafa);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.headerStepButton:hover {
+  border-color: var(--fd-primary, rgb(59, 130, 246));
+  color: var(--fd-primary, rgb(59, 130, 246));
+}
+
+.headerSliderLabel {
+  color: var(--fd-primary, rgb(59, 130, 246));
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.headerSelectWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--fd-border, #27272a);
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.headerSelect {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--fd-foreground, #fafafa);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.row {
+  border-bottom: 1px solid var(--fd-border, rgba(39, 39, 42, 0.4));
+}
+
+.row:hover {
+  background: color-mix(in srgb, var(--fd-accent, rgba(39, 39, 42, 0.3)) 82%, rgba(14, 165, 233, 0.08));
+}
+
+.rowFolder {
+  composes: row;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rowFolder:hover {
+  background: color-mix(in srgb, var(--fd-accent, rgba(39, 39, 42, 0.4)) 78%, rgba(59, 130, 246, 0.12));
+}
+
+.cell {
+  padding: 0.45rem 0.6rem;
+  vertical-align: top;
+}
+
+.cellName {
+  composes: cell;
+  font-weight: 500;
+}
+
+.descLine {
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: var(--fd-secondary-foreground, #27272a);
+  margin-top: 0.15rem;
+  line-height: 1.5;
+}
+
+:global([data-theme="dark"]) .descLine,
+:global(.dark) .descLine {
+  color: var(--fd-secondary-foreground, #e4e4e7);
+}
+
+.cellBadges {
+  composes: cell;
+}
+
+.badgeWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+}
+
+.folderToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 0.25rem;
+  color: var(--fd-muted-foreground, #a1a1aa);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+
+.folderToggleOpen {
+  composes: folderToggle;
+  transform: rotate(90deg);
+}
+
+.folderName {
+  font-weight: 700;
+  color: #2563eb;
+  letter-spacing: 0.01em;
+}
+
+.fileName {
+  color: #0f766e;
+  text-decoration: none;
+  font-weight: 550;
+  transition: color 0.15s ease;
+}
+
+.fileName:hover {
+  color: #14b8a6;
+  text-decoration: underline;
+}
+
+:global([data-theme="dark"]) .folderName,
+:global(.dark) .folderName {
+  color: #60a5fa;
+}
+
+:global([data-theme="dark"]) .fileName,
+:global(.dark) .fileName {
+  color: #5eead4;
+}
+
+:global([data-theme="dark"]) .fileName:hover,
+:global(.dark) .fileName:hover {
+  color: #99f6e4;
+}
+
+.colName {
+  width: 36%;
+  min-width: 200px;
+}
+
+.colImports {
+  width: 22%;
+}
+
+.colInternal {
+  width: 21%;
+}
+
+.colExports {
+  width: 21%;
+}
+
+.sortableHeader {
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sortableHeader:hover {
+  background: rgba(59, 130, 246, 0.08);
+  color: var(--fd-primary, rgb(59, 130, 246));
+}
+
+.headerInlineButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.headerCellContent {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sortIconMuted {
+  opacity: 0.3;
+}
+
+.sortIconActive {
+  color: var(--fd-primary, rgb(59, 130, 246));
+}

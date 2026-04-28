@@ -1,0 +1,57 @@
+.expo/
+node_modules/
+npm-debug.log
+yarn-error.log
+
+android/*
+android
+.expo/*
+**/.expo/
+# Node / JS
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+.build/
+.expo/
+.expo-shared/
+
+# Expo / EAS
+.easl
+.eas/
+*.expo/*
+web-build/
+
+# OS / Editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Env / secrets
+.env
+.env.*
+*.keystore
+*.jks
+*.p12
+*.pem
+
+# Android build artifacts
+android/.gradle/
+android/.cxx/
+android/**/build/
+android/**/captures/
+android/*.iml
+android/local.properties
+android/**/.settings/
+android/**/.project
+android/**/.classpath
+android/**/.idea/
+*.hprof
+
+# Bundles / generated JS
+*.jsbundle
+*.map

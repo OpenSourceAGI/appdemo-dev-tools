@@ -27,15 +27,15 @@ export function HeroSection() {
 
       <div className="container mx-auto px-4  relative">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-          <div className="mb-8 relative" style={{ animation: "float 6s ease-in-out infinite" }}>
+          {/* <div className="mb-8 relative" style={{ animation: "float 6s ease-in-out infinite" }}>
             <Image
-              src="https://i.imgur.com/Rwl5P3p.png"
+              src="https://i.imgur.com/RH80JGZ.png"
               alt="GRAB - Generate Request to API from Browser"
               width={200}
               height={200}
               className="drop-shadow-2xl"
             />
-          </div>
+          </div> */}
 
           <Badge variant="outline" className="mb-6 px-4 py-1.5 border-primary/30 text-primary">
             v1.0 — Zero Dependencies, 4KB
