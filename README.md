@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="350px" src="https://i.imgur.com/PE4kQWy.png" />
+    <img width="350px" src="https://i.imgur.com/gGcme8r.png" />
 </p>
 <p align="center">
     <a href="https://github.com/vtempest/Svelte-Starter-DOCS/discussions">
@@ -82,5 +82,3 @@ bun create starter-app
 ### 🖼️ Screenshots
 
 <img width="350px" src="https://i.imgur.com/jIaL6yP.png" />
-
-<img width="350px" src="https://i.imgur.com/NlkjlWI.png" />
