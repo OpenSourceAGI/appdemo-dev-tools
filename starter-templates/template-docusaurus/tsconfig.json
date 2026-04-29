@@ -1,14 +1,10 @@
 {
-  "include": [
-    "../src/**/*"
-   ],
+  "include": ["./**/*"],
   "compilerOptions": {
     "jsx": "react",
-
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
     "allowJs": true,
     "checkJs": false,
     "noEmitOnError": false,
@@ -17,11 +13,5 @@
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "noEmit": true
-  },
- 
-  "exclude": [
-    "../node_modules",
-    "../docs",
-    "pages/**/*"
-  ]
+  }
 }

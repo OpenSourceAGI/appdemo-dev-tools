@@ -1,0 +1,30 @@
+{
+  "name": "create-starter-app",
+  "version": "1.0.0",
+  "description": "Interactive CLI to scaffold a starter app from curated templates",
+  "type": "module",
+  "bin": {
+    "create-starter-app": "./bin/create-starter-app.js"
+  },
+  "files": [
+    "bin",
+    "starters"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "create-app",
+    "starter",
+    "template",
+    "nextjs",
+    "svelte",
+    "drizzle",
+    "betterauth",
+    "shadcn",
+    "fumadocs",
+    "docusaurus"
+  ],
+  "author": "vtempest <grokthiscontact@gmail.com>",
+  "license": "MIT"
+}

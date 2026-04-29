@@ -18,11 +18,10 @@
     <a href="https://starterdocs.js.org">📑 Docs</a>
     <a href="https://starterdocs.js.org/docs/guides/starter-docs#%EF%B8%8F-installation">⬇️ Install </a>
     <a href="https://v0.app/templates/dashboard-landing-auth-billing-teams-docs-themes-ExDfusFzX6P"> 🎨 v0 Template </a>
-    
+
 </h3>
 
 ### ⚒️ Starter DOCS: Drizzle OAuth Cloudflare Shadcn
-
 
 ```bash
 bun create starter-app
@@ -32,14 +31,11 @@ bun create starter-app
 
 **Functionally Brilliant, Elegantly Simple Toolkit:** StarterDOCS is to Starter Apps what Next.js is to React: full stack with smart defaults for common needs. It is easy to switch in alternatives: Such as running on AWS, Vercel or Cloudflare, or using React Next.js vs Svelte.
 
-
-
 📚 [Drizzle ORM](https://orm.drizzle.team/kit-docs/quick) - lightweight ORM compatible with Cloudflare D1 and drizzle-kit to manage schema migrations
 
 👤 [Better Auth](https://www.better-auth.com/docs/introduction)- Google oAuth sign-in and/or email signup via Resend mailer api, Stripe built-in, API docs, One Tap, with 4 email templates: reset password, change email, verify email, welcome. Settings and admin panel for users.
 
-☁️ [Cloudflare](https://developers.cloudflare.com/pages/framework-guides) - serverless autoscaling API and D1 database, great hosting platform with free tier 
-
+☁️ [Cloudflare](https://developers.cloudflare.com/pages/framework-guides) - serverless autoscaling API and D1 database, great hosting platform with free tier
 
 🖼️ [shadcn-svelte](https://github.com/huntabyte/shadcn-svelte) - popular UI components, with [lucide](https://github.com/lucide-icons/lucide) icons
 
@@ -47,37 +43,58 @@ bun create starter-app
 
 ### Apps
 
-**[docs](apps/docs/)** - Main documentation site built with Fumadocs featuring AI-powered chat, full-text search, and automatic API documentation generation from TypeScript and OpenAPI specs.
+**[docs](apps/docs/)** - Documentation site with AI chat, full-text search, and auto-generated API docs from TypeScript and OpenAPI specs.
+`bun dev`
 
-**[Cloud-Computer-Control-Panel](apps/Cloud-Computer-Control-Panel/)** - AWS infrastructure management platform for provisioning EC2 instances and deploying containers with automated Dokploy integration.
+**[Cloud-Computer-Control-Panel](apps/Cloud-Computer-Control-Panel/)** - Open-source cloud infrastructure management platform with automated Dokploy deployment for container orchestration on AWS EC2.
+`bun dev`
 
 ### Starter Templates
 
-**[template-svelte-betterauth-drizzle-shadcn](packages/template-svelte-betterauth-drizzle-shadcn/)** (Main) - Full-stack SvelteKit application with Better Auth, Drizzle ORM on Cloudflare D1, Stripe payments, and Bits UI components. Deploy to Cloudflare Pages with edge database and serverless API routes.
+**[template-svelte-betterauth-drizzle-shadcn](starter-templates/template-svelte-betterauth-drizzle-shadcn/)** - Full-stack SvelteKit app with Better Auth, Drizzle ORM on Cloudflare D1, Stripe payments, and shadcn-svelte components.
+`bun create starter-app`
 
-**[template-nextjs-drizzle-betterauth-shadcn](packages/template-nextjs-drizzle-betterauth-shadcn/)** - Next.js SaaS boilerplate with PostgreSQL, Better Auth, Stripe subscriptions, and UploadThing file uploads. Includes user management UI and team/organization support with shadcn/ui components.
+**[template-nextjs-betterauth-shadcn-drizzle](starter-templates/template-nextjs-betterauth-shadcn-drizzle/)** - Next.js SaaS boilerplate with PostgreSQL, Better Auth, Stripe subscriptions, and shadcn/ui components.
+`bun create starter-app`
 
-**[template-nextjs-betterauth-prisma-shadcn](packages/template-nextjs-betterauth-prisma-shadcn/)** - Lightweight Next.js starter focused on authentication flows with Prisma ORM and Better Auth. Features Google OAuth, credential login, profile management, and protected routes with Motion animations.
+**[template-nextjs-betterauth-shadcn-prisma](starter-templates/template-nextjs-betterauth-shadcn-prisma/)** - Lightweight Next.js starter with Prisma ORM, Better Auth, Google OAuth, credential login, and protected routes.
+`bun create starter-app`
 
-**[template-fumadocs](packages/template-fumadocs/)** - Documentation site template with Fumadocs featuring Orama search, OpenAPI/Swagger docs, and TypeScript API reference. Includes MDX support, code highlighting with Shiki, and collapsible sidebar navigation.
+**[template-fumadocs](starter-templates/template-fumadocs/)** - Documentation site with Fumadocs, Orama search, OpenAPI/Swagger docs, MDX support, and collapsible sidebar.
+`bun create starter-app`
 
-**[template-docusaurus](packages/template-docusaurus/)** - Docusaurus 3 documentation template with offline Lunr search and OpenAPI plugin integration. Classic documentation theme optimized for technical docs with Google Analytics and multi-language support.
+**[template-docusaurus](starter-templates/template-docusaurus/)** - Docusaurus 3 docs template with offline Lunr search, OpenAPI plugin, and classic theme optimized for technical docs.
+`bun create starter-app`
 
 ### Utility Packages
 
-**[about-system-info](packages/about-system-info/)** - Cross-platform CLI tool displaying system information with emojis including CPU, memory, disk, network details, and running services. Install globally and add to shell greeting for automatic system overview on terminal launch.
+**[create-starter-app](packages/create-starter-app/)** - Interactive CLI to scaffold a starter app from curated templates, picking framework, auth, database, and UI library.
+`bun create starter-app`
 
-**[create-cloud-db](packages/create-cloud-db/)** - Interactive CLI to create Turso edge database and automatically write connection credentials to .env file. One-command setup for SQLite-compatible serverless databases with instant global replication.
+**[about-system-info](packages/about-system-info/)** - Cross-platform CLI showing CPU, memory, disk, network, and running services with emojis. Add to shell greeting for instant system overview on terminal launch.
+`npx about-system`
 
-**[manage-storage](packages/manage-storage/)** - Unified API for managing cloud storage across AWS S3, Cloudflare R2, and Backblaze B2. Automatically detects provider from credentials and provides consistent interface for uploads, downloads, and file management.
+**[api2ai-mcp-generator](packages/api2ai-mcp-generator/)** - Generate production-ready MCP servers from any OpenAPI spec using the mcp-use framework (8k+ GitHub stars). Bring any REST API to AI agents in minutes.
+`npx api2ai <openapi-spec-url>`
 
-**[open-when-ready](packages/open-when-ready/)** - Smart dev server wrapper that monitors process output and auto-opens browser when ready. Wraps any CLI command (npm, bun, vite) and detects ports from console output.
+**[create-cloud-db](packages/create-cloud-db/)** - Interactive CLI to create a Turso edge database and write `TURSO_*` connection credentials directly to your `.env` file.
+`npx create-cloud-db`
 
-**[server-shell-setup](packages/server-shell-setup/)** - Bash installation scripts for configuring Linux/macOS shells with fish, neovim, starship prompt, docker, and node. Supports interactive menu or automated installation of dev tools across Arch, Ubuntu, Debian, Fedora, Alpine, and Termux.
+**[manage-storage](packages/manage-storage/)** - Unified API for AWS S3, Cloudflare R2, and Backblaze B2. Auto-detects provider from credentials for consistent uploads, downloads, and file management.
+`npm install manage-storage`
 
-**[docs](packages/docs/)** - Shared Fumadocs configuration package containing documentation content and settings. Used by the main docs app for centralized documentation management.
+**[open-when-ready](packages/open-when-ready/)** - Smart dev server wrapper that monitors output, auto-opens browser on ready, and routes errors to AI search. Works with any CLI tool.
+`npx open-ready <command>`
 
----
+**[shadcn-theme-menu](packages/shadcn-theme-menu/)** - Drop-in theme switcher component for shadcn/ui with 24+ color themes, dark/light mode toggle, and smooth animations.
+`npm install shadcn-themes`
+
+**[vscode-cloud](packages/vscode-cloud/)** - Per-user VS Code (code-server) instances on Cloudflare Containers, protected by Cloudflare Access with auto-generated per-user passwords in Durable Object SQLite.
+`bun deploy`
+
+**[web2mobile-generator](packages/web2mobile-generator/)** - Transform any website into a native mobile app wrapper for iOS and Android. No coding required — just provide your URL.
+`npx create-mobile-wrapper`
+
 
 ### 🖼️ Screenshots
 

@@ -1,53 +1,25 @@
-# Packages & Apps Documentation
+### ⚒️ Starter DOCS: Drizzle OAuth Cloudflare Shadcn
 
-This document provides a comprehensive overview of all packages and applications in the Starter-DOCS monorepo.
+```bash
+bun create starter-app
+```
 
-## Apps
+**Docs-Driven Development**: Generate easy-to-understand docs from your JS functions and APIs, to maximize reusable value and make the options clear to everyone.
 
-### 1. apps/docs
-**Main documentation site built with Fumadocs**
+**Functionally Brilliant, Elegantly Simple Toolkit:** StarterDOCS is to Starter Apps what Next.js is to React: full stack with smart defaults for common needs. It is easy to switch in alternatives: Such as running on AWS, Vercel or Cloudflare, or using React Next.js vs Svelte.
 
-- **Description**: Comprehensive documentation site featuring search, docs sidebar, API docs, AI-powered chat, and TypeScript/OpenAPI integration
-- **Framework**: Next.js 16 with React 19
-- **Key Features**:
-  - Fumadocs UI with MDX support
-  - Orama search engine
-  - OpenAPI documentation generation
-  - TypeScript API docs generation
-  - AI-powered chat with LangChain integration (OpenAI, Groq)
-  - Math rendering with KaTeX
-  - Code highlighting with Shiki
-  - Mermaid diagram support
-  - Dark mode with next-themes
-- **Tech Stack**: Fumadocs, Next.js, React, TypeScript, Biome (linting), Tailwind CSS
-- **Commands**:
-  - `bun dev` - Start development server
-  - `bun build` - Build for production
-  - `bun check` - Run Biome checks
-  - `bun typecheck` - Type checking
+📚 [Drizzle ORM](https://orm.drizzle.team/kit-docs/quick) - lightweight ORM compatible with Cloudflare D1 and drizzle-kit to manage schema migrations
 
-### 2. apps/Cloud-Computer-Control-Panel
-**Cloud infrastructure management platform**
+👤 [Better Auth](https://www.better-auth.com/docs/introduction)- Google oAuth sign-in and/or email signup via Resend mailer api, Stripe built-in, API docs, One Tap, with 4 email templates: reset password, change email, verify email, welcome. Settings and admin panel for users.
 
-- **Description**: Open-source cloud infrastructure management platform with automated Dokploy deployment for seamless container orchestration on AWS EC2
-- **Framework**: Next.js 16 with React 19
-- **Key Features**:
-  - AWS EC2 instance management via AWS SDK
-  - SSH connection management
-  - API documentation with Scalar
-  - Real-time infrastructure monitoring
-  - Container orchestration integration
-- **Tech Stack**: Next.js, React, AWS SDK, SSH2, Vercel Analytics, shadcn/ui components, Tailwind CSS
-- **Commands**:
-  - `npm dev` - Start development server
-  - `npm build` - Build for production
-  - `npm start` - Start production server
+☁️ [Cloudflare](https://developers.cloudflare.com/pages/framework-guides) - serverless autoscaling API and D1 database, great hosting platform with free tier
 
-## Packages
+🖼️ [shadcn-svelte](https://github.com/huntabyte/shadcn-svelte) - popular UI components, with [lucide](https://github.com/lucide-icons/lucide) icons
 
-### Starter Templates
+# Starter Templates
 
 #### 1. packages/template-svelte-betterauth-drizzle-shadcn
+
 **Full-stack SvelteKit starter (Main Template)**
 
 - **Name**: create-starter-app
@@ -83,6 +55,7 @@ This document provides a comprehensive overview of all packages and applications
   - `db:push:prod` - Apply migrations to production
 
 #### 2. packages/template-nextjs-drizzle-betterauth-shadcn
+
 **Next.js SaaS boilerplate**
 
 - **Name**: template-nextjs-shadcn-drizzle
@@ -110,6 +83,7 @@ This document provides a comprehensive overview of all packages and applications
   - `npm lint` - Run Biome checks
 
 #### 3. packages/template-nextjs-betterauth-prisma-shadcn
+
 **Next.js starter with Prisma**
 
 - **Name**: better-auth
@@ -133,6 +107,7 @@ This document provides a comprehensive overview of all packages and applications
   - `npm postinstall` - Generate Prisma client
 
 #### 4. packages/template-fumadocs
+
 **Documentation site template**
 
 - **Name**: template-fumadocs-starter
@@ -159,6 +134,7 @@ This document provides a comprehensive overview of all packages and applications
   - `npm preview` - Preview production build
 
 #### 5. packages/template-docusaurus
+
 **Docusaurus documentation template**
 
 - **Name**: grab-api.js-api-docs
@@ -185,6 +161,7 @@ This document provides a comprehensive overview of all packages and applications
 ### Utility Packages
 
 #### 6. packages/about-system-info
+
 **System information display tool**
 
 - **Name**: about-system
@@ -213,6 +190,7 @@ This document provides a comprehensive overview of all packages and applications
   - `about-system --settings-reset` - Reset settings
 
 #### 7. packages/create-cloud-db
+
 **Turso database setup CLI**
 
 - **Name**: create-cloud-db
@@ -228,6 +206,7 @@ This document provides a comprehensive overview of all packages and applications
 - **Use Case**: Quick setup for SQLite-compatible edge databases
 
 #### 8. packages/manage-storage
+
 **Multi-cloud storage manager**
 
 - **Name**: manage-storage
@@ -247,6 +226,7 @@ This document provides a comprehensive overview of all packages and applications
 - **Usage**: Import and configure with provider credentials
 
 #### 9. packages/open-when-ready
+
 **Smart dev server launcher**
 
 - **Name**: open-ready
@@ -265,6 +245,7 @@ This document provides a comprehensive overview of all packages and applications
 - **Dependencies**: wait-on (server readiness), opener (browser), minimist (CLI args)
 
 #### 10. packages/server-shell-setup
+
 **Server shell configuration scripts**
 
 - **Description**: Bash scripts to setup and configure shell environment with modern development tools
@@ -289,6 +270,7 @@ This document provides a comprehensive overview of all packages and applications
   - Cross-platform compatibility
 
 #### 11. packages/docs (Fumadocs configuration)
+
 **Shared documentation package for grab-url**
 
 - **Name**: grab-url-docs
@@ -299,6 +281,7 @@ This document provides a comprehensive overview of all packages and applications
 ## Technology Stack Summary
 
 ### Frontend Frameworks
+
 - **Next.js 15/16**: Modern React framework with App Router
 - **SvelteKit 2**: Full-stack Svelte framework with Svelte 5
 - **React 19**: Latest React with concurrent features
@@ -306,6 +289,7 @@ This document provides a comprehensive overview of all packages and applications
 - **Docusaurus 3**: Static site generator for docs
 
 ### UI & Styling
+
 - **Tailwind CSS 4**: Utility-first CSS framework
 - **shadcn/ui**: High-quality React components
 - **Bits UI**: Headless Svelte components
@@ -313,17 +297,20 @@ This document provides a comprehensive overview of all packages and applications
 - **Lucide Icons**: Beautiful consistent icon set
 
 ### Database & ORM
+
 - **Drizzle ORM**: TypeScript ORM for SQL databases
 - **Prisma**: Next-generation ORM
 - **Cloudflare D1**: Edge SQLite database
 - **PostgreSQL**: Relational database
 
 ### Authentication
+
 - **Better Auth**: Modern authentication library
 - **OAuth Providers**: Google, GitHub, etc.
 - **Session Management**: Secure token handling
 
 ### Developer Tools
+
 - **TypeScript 5**: Type safety
 - **Biome**: Fast formatter and linter
 - **Vitest**: Fast unit testing
@@ -332,12 +319,14 @@ This document provides a comprehensive overview of all packages and applications
 - **pnpm/bun**: Fast package managers
 
 ### Cloud & Deployment
+
 - **Cloudflare**: Pages, Workers, D1, R2
 - **AWS**: EC2, S3
 - **Vercel**: Deployment platform
 - **Docker**: Containerization
 
 ### Additional Integrations
+
 - **Stripe**: Payment processing
 - **Resend**: Transactional email
 - **UploadThing**: File uploads
@@ -371,11 +360,13 @@ Starter-DOCS/
 ### Using Starter Templates
 
 **Create new app with SvelteKit template:**
+
 ```bash
 bun create starter-app
 ```
 
 **Use specific template:**
+
 ```bash
 git clone https://github.com/vtempest/Starter-DOCS
 cd Starter-DOCS/packages/template-[name]
@@ -386,22 +377,26 @@ bun dev
 ### Installing Utility Packages
 
 **System info display:**
+
 ```bash
 npm install -g about-system
 about-system
 ```
 
 **Create Turso database:**
+
 ```bash
 npx create-cloud-db
 ```
 
 **Smart dev server launcher:**
+
 ```bash
 npx open-ready npm run dev
 ```
 
 **Setup shell environment:**
+
 ```bash
 wget -qO- tinyurl.com/shellsetup | bash
 ```
@@ -415,8 +410,3 @@ wget -qO- tinyurl.com/shellsetup | bash
 ## Contributing
 
 Contributions are welcome! Please check the individual package READMEs for specific contribution guidelines.
-
-## License
-
-- Most packages: MIT License
-- about-system: rights.institute/prosper
