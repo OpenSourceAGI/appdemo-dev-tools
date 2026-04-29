@@ -1,0 +1,78 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vscode-cloud",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // ── Container definition ──────────────────────────────────────────────────
+  "containers": [
+    {
+      "class_name": "CodeServerContainer",
+      "image": "./Dockerfile",
+      // standard-1 = 1 vCPU / 2 GB RAM — minimum for code-server
+      // upgrade to standard-2 (2 vCPU / 4 GB) for heavier workloads
+      "instance_type": "standard-1",
+      // Max simultaneously running containers across all users
+      "max_instances": 50,
+    },
+  ],
+
+  // ── Durable Object binding ─────────────────────────────────────────────────
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CODE_SERVER",
+        "class_name": "CodeServerContainer",
+      },
+    ],
+  },
+
+  // IMPORTANT: must use new_sqlite_classes (not new_classes) for container-backed DOs
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["CodeServerContainer"],
+    },
+  ],
+
+  // ── Environment variables ──────────────────────────────────────────────────
+  "vars": {
+    // How long to keep an idle container alive before hibernating
+    "SLEEP_AFTER": "30m",
+
+    // Set these to enable Cloudflare Access JWT validation.
+    // Leave empty / omit for local dev (auth falls back to x-user-id header).
+    //
+    // TEAM_DOMAIN:  https://<your-team-name>.cloudflareaccess.com
+    // POLICY_AUD:   Find in CF One → Access controls → Applications → your app → AUD tag
+    "TEAM_DOMAIN": "",
+    "POLICY_AUD": "",
+
+    // R2 bucket name passed through to the container entrypoint
+    "R2_BUCKET_NAME": "vscode-cloud-workspaces",
+  },
+
+  // ── R2 bucket binding ─────────────────────────────────────────────────────
+  // One shared bucket; each user's workspace lives under users/{userId}/
+  "r2_buckets": [
+    {
+      "binding": "WORKSPACE_BUCKET",
+      "bucket_name": "vscode-cloud-workspaces",
+    },
+  ],
+
+  // ── Secrets (set via CLI, never committed) ────────────────────────────────
+  // After creating the R2 bucket and generating an API token with R2 read/write,
+  // set these secrets so the container can mount the bucket via geesefs (FUSE):
+  //
+  //   wrangler secret put R2_ACCESS_KEY_ID
+  //   wrangler secret put R2_SECRET_ACCESS_KEY
+  //   wrangler secret put R2_ACCOUNT_ID
+  //
+  // Bucket name is passed as R2_BUCKET_NAME env var (see vars below).
+  // To set up:
+  //   wrangler login
+  //   wrangler r2 bucket create vscode-cloud-workspaces
+  //   wrangler deploy
+}

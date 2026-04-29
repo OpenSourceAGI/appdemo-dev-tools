@@ -1,0 +1,20 @@
+{
+  "name": "vscode-cloud",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "type-check": "tsc --noEmit",
+    "build": "tsc --noEmit && echo 'Type check passed — wrangler bundles on deploy'"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "^0.3.3",
+    "jose": "^6.2.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260426.1",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.85.0"
+  }
+}
