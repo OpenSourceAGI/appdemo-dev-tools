@@ -1,0 +1,40 @@
+{
+    "name": "git0",
+    "description": "CLI tool to search GitHub repositories, download source & releases for your system, and instantly set up, then install dependencies and open code editor.",
+    "version": "0.2.13",
+    "author": "vtempest",
+    "scripts": {
+        "build": "bun build src/cli.ts --outdir dist --target node --format esm --sourcemap",
+        "test": "bun test",
+        "docs": "cd docs-config && bun run build:docs",
+        "demo": "bun src/cli.ts react template",
+        "publish:npm": "npm version patch && npm publish --access public"
+    },
+    "dependencies": {
+        "chalk": "^5.4.1",
+        "git-url-parse": "^16.1.0",
+        "grab-api.js": "^0.9.127",
+        "inquirer": "^12.6.3",
+        "ora": "^8.2.0",
+        "tar": "^7.4.3"
+    },
+    "exports": {
+        ".": "./dist/cli.js"
+    },
+    "bin": {
+        "g": "./dist/cli.js",
+        "gg": "./dist/cli.js",
+        "fm": "./src/fm.js",
+        "git0": "./dist/cli.js"
+    },
+    "type": "module",
+    "keywords": [
+        "github",
+        "git",
+        "package",
+        "manager",
+        "cli",
+        "download"
+    ],
+    "license": "MIT"
+}
