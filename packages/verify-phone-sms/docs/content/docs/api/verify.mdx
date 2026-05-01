@@ -1,0 +1,34 @@
+---
+title: Verify SMS code
+---
+
+#### Verify Code
+`GET /api/verify-code`
+- Verifies the submitted code against the sent verification code.
+
+**Query Parameters:**
+- `phoneNumber` (required): Phone number in E.164 format
+- `code` (required): 6-digit verification code
+
+**Example Request:**
+```
+GET /api/verify-code?phoneNumber=%2B1234567890&code=654321
+```
+
+**Response (success):**
+```json
+{
+  "success": true,
+  "message": "Phone number verified successfully",
+  "verificationToken": "unique-verification-token",
+  "phoneNumber": "+1234567890"
+}
+```
+
+**Response (error):**
+```json
+{
+  "error": "Invalid verification code",
+  "attemptsRemaining": 3
+}
+```

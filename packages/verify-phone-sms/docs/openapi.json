@@ -1,0 +1,329 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "SMS Verification API",
+    "description": "A comprehensive SMS verification API using AWS SNS HTTP API with Hono server on Cloudflare Workers. **Authentication Required**: All endpoints except `/health`, `/docs`, and `/openapi.json` require API key authentication.",
+    "contact": { "name": "API Support", "email": "support@example.com" },
+    "license": { "name": "MIT", "url": "https://opensource.org/licenses/MIT" }
+  },
+  "servers": [
+    {
+      "url": "https://sms-verification-api.your-subdomain.workers.dev",
+      "description": "Production server"
+    },
+    {
+      "url": "https://sms-verification-api-staging.your-subdomain.workers.dev",
+      "description": "Staging server"
+    }
+  ],
+  "components": { "schemas": {}, "parameters": {} },
+  "security": [{ "ApiKeyAuth": [] }, { "BearerAuth": [] }],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["health"],
+        "summary": "Health check",
+        "description": "Returns the health status of the API server",
+        "responses": {
+          "200": {
+            "description": "Health check successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" },
+                    "timestamp": {
+                      "type": "string",
+                      "example": "2024-01-01T00:00:00.000Z"
+                    },
+                    "server": {
+                      "type": "string",
+                      "example": "Hono on Cloudflare Workers"
+                    }
+                  },
+                  "required": ["status", "timestamp", "server"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/send-verification": {
+      "post": {
+        "tags": ["verification"],
+        "summary": "Send SMS verification code",
+        "description": "Sends a 6-digit verification code to the specified phone number via SMS. Optionally accepts a custom code.",
+        "security": [{ "ApiKeyAuth": [] }, { "BearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phoneNumber": {
+                    "type": "string",
+                    "pattern": "^\\+[1-9]\\d{1,14}$",
+                    "description": "Phone number in E.164 format",
+                    "example": "+1234567890"
+                  },
+                  "code": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 6,
+                    "pattern": "^\\d{6}$",
+                    "description": "Optional custom 6-digit verification code. If not provided, a random code will be generated.",
+                    "example": "123456"
+                  }
+                },
+                "required": ["phoneNumber"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification code sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Verification code sent successfully"
+                    },
+                    "messageId": {
+                      "type": "string",
+                      "example": "aws-message-id-123"
+                    },
+                    "expiresIn": {
+                      "type": "number",
+                      "description": "Expiration time in seconds",
+                      "example": 600
+                    }
+                  },
+                  "required": ["success", "message", "messageId", "expiresIn"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid phone number or other validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Validation error"
+                    },
+                    "details": {
+                      "type": "string",
+                      "example": "Additional error details"
+                    }
+                  },
+                  "required": ["error"]
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests - rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Please wait before requesting another code"
+                    },
+                    "retryAfter": {
+                      "type": "number",
+                      "description": "Seconds to wait before retry",
+                      "example": 30
+                    }
+                  },
+                  "required": ["error", "retryAfter"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Validation error"
+                    },
+                    "details": {
+                      "type": "string",
+                      "example": "Additional error details"
+                    }
+                  },
+                  "required": ["error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/verify-code": {
+      "post": {
+        "tags": ["verification"],
+        "summary": "Verify SMS code",
+        "description": "Verifies the submitted code against the sent verification code",
+        "security": [{ "ApiKeyAuth": [] }, { "BearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phoneNumber": {
+                    "type": "string",
+                    "pattern": "^\\+[1-9]\\d{1,14}$",
+                    "description": "Phone number in E.164 format",
+                    "example": "+1234567890"
+                  },
+                  "code": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 6,
+                    "pattern": "^\\d{6}$",
+                    "description": "6-digit verification code",
+                    "example": "123456"
+                  }
+                },
+                "required": ["phoneNumber", "code"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Phone number verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Phone number verified successfully"
+                    },
+                    "verificationToken": {
+                      "type": "string",
+                      "example": "unique-verification-token"
+                    },
+                    "phoneNumber": {
+                      "type": "string",
+                      "pattern": "^\\+[1-9]\\d{1,14}$",
+                      "description": "Phone number in E.164 format",
+                      "example": "+1234567890"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "message",
+                    "verificationToken",
+                    "phoneNumber"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid code or expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "string",
+                          "example": "Validation error"
+                        },
+                        "details": {
+                          "type": "string",
+                          "example": "Additional error details"
+                        }
+                      },
+                      "required": ["error"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "string",
+                          "example": "Invalid verification code"
+                        },
+                        "attemptsRemaining": { "type": "number", "example": 3 }
+                      },
+                      "required": ["error", "attemptsRemaining"]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many verification attempts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Validation error"
+                    },
+                    "details": {
+                      "type": "string",
+                      "example": "Additional error details"
+                    }
+                  },
+                  "required": ["error"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Validation error"
+                    },
+                    "details": {
+                      "type": "string",
+                      "example": "Additional error details"
+                    }
+                  },
+                  "required": ["error"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

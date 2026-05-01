@@ -1,0 +1,66 @@
+{
+  "name": "sms-verification-api",
+  "version": "0.9.0",
+  "description": "SMS Phone Verification API using AWS SNS HTTP API with Hono server on Cloudflare Workers",
+  "main": "src/verify-phone.js",
+  "type": "module",
+  "types": "./src/verify-phone.d.ts",
+  "module": "./src/verify-phone.js",
+  "exports": {
+    ".": {
+      "types": "./src/verify-phone.d.ts",
+      "import": "./src/verify-phone.js",
+      "require": "./src/verify-phone.js"
+    }
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "ship": "bun run standard-version --release-as patch; bun publish",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:production": "wrangler deploy --env production",
+    "deploy:docs": "cd docs && bun run build && wrangler deploy",
+    "deploy:docs:staging": "cd docs && bun run build && wrangler deploy --env staging",
+    "deploy:docs:production": "cd docs && bun run build && wrangler deploy --env production",
+    "deploy:all": "bun run deploy && bun run deploy:docs",
+    "deploy:all:staging": "bun run deploy:staging && bun run deploy:docs:staging",
+    "deploy:all:production": "bun run deploy:production && bun run deploy:docs:production",
+    "build": "echo 'No build step needed for Workers'",
+    "build:docs": "cd docs && bun run build",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "sms",
+    "verification",
+    "aws",
+    "sns",
+    "phone",
+    "otp",
+    "2fa",
+    "hono",
+    "cloudflare-workers",
+    "wrangler"
+  ],
+  "author": "vtempest",
+  "license": "MIT",
+  "dependencies": {
+    "@hono/swagger-ui": "^0.5.2",
+    "@hono/zod-openapi": "^0.19.9",
+    "grab-api.js": "^0.9.131",
+    "hono": "^3.12.8",
+    "hono-rate-limiter": "^0.2.2",
+    "libphonenumber-js": "^1.12.13"
+  },
+  "devDependencies": {
+    "wrangler": "^4.24.0",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "supertest": "^6.3.3"
+  }
+}

@@ -1,0 +1,20 @@
+# Environment Variables for SMS Verification API
+# Copy this file to .env and fill in your values
+
+# AWS Configuration
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_aws_access_key_id
+AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+
+# SMS Configuration
+SMS_SENDER_ID=Verify
+
+# API Configuration
+API_KEY=your_api_key_here
+
+# Environment
+ENVIRONMENT=development
+
+# Cloudflare Configuration (for deployment)
+CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
+CLOUDFLARE_API_TOKEN=your_cloudflare_api_token

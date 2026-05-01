@@ -1,0 +1,35 @@
+---
+title: Send SMS verification code
+---
+
+
+![phone_logo](https://i.imgur.com/2adfBGT.png)
+
+
+A comprehensive SMS verification API using AWS SNS HTTP API with Hono server on Cloudflare Workers. The API is fully documented and driven by an OpenAPI 3.0 spec, available at:
+## Features
+- **Cloudflare Workers**: Serverless deployment with global edge network
+- **Modern OpenAPI-driven contract**: Fully documented API with Swagger UI
+- **SMS verification with optional custom code**: Send random or custom verification codes
+- **VoIP number blocking**: Optional protection against VoIP numbers using phone lookup API
+- **Code verification endpoint**: Verify submitted codes with attempt tracking
+- **Health check endpoint**: Monitor API status
+- **API Key Authentication**: Secure access control for all endpoints
+- **Strong input validation**: E.164 phone numbers, 6-digit codes
+- **Rate limiting and error handling**: Built-in protection against abuse
+- **More info like names, emails**: See [Trestle](https://trestle-api.redoc.ly/Current/#section/Overview)
+- **MIT licensed**: Open source and free to use
+
+
+
+#### Send Verification Code
+`GET /api/send-verification`
+- Sends a 6-digit verification code to the specified phone number via SMS.
+- Optionally accepts a custom code (for testing or admin use).
+- Optionally blocks VoIP numbers using phone lookup API.
+
+**Query Parameters:**
+- `phoneNumber` (required): Phone number in E.164 format (e.g., +1234567890)
+- `code` (optional): Custom 6-digit verification code
+- `blockVoip` (optional): Boolean flag to block VoIP numbers
+<APIPage document={"openapi.json"} operations={[{"path":"/api/send-verification","method":"post"}]} webhooks={[]} hasHead={false} />
