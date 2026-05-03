@@ -1,0 +1,34 @@
+{
+  // ── Core ────────────────────────────────────────────────────────────────────
+  "name": "cloudflare-to-claude-fix",
+  "main": "src/index.js",
+  "compatibility_date": "2025-11-01",
+
+  // ── Queue consumer ──────────────────────────────────────────────────────────
+  // Create the queues first:
+  //   wrangler queues create workers-build-events
+  //   wrangler queues create workers-build-events-dlq
+  "queues": {
+    "consumers": [
+      {
+        "queue": "workers-build-events",
+        // Max messages pulled per invocation
+        "max_batch_size": 10,
+        // Seconds to wait to fill a batch before invoking early
+        "max_batch_timeout": 30,
+        // Per-message retry attempts before routing to DLQ
+        "max_retries": 3,
+        // Catches messages that exhaust all retries
+        "dead_letter_queue": "workers-build-events-dlq",
+      },
+    ],
+  },
+
+  // ── Secrets ─────────────────────────────────────────────────────────────────
+  // Set these with `wrangler secret put <NAME>` — never hardcode values here.
+  //
+  // ROUTINE_FIRE_URL   — https://api.anthropic.com/v1/claude_code/routines/trig_<id>/fire
+  // ROUTINE_FIRE_TOKEN — sk-ant-oat01-... (from Claude Code routine API trigger)
+  // NOTIFY_WEBHOOK_URL — (optional) Slack or Discord incoming webhook URL
+  "vars": {},
+}
