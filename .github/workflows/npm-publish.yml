@@ -1,0 +1,72 @@
+name: Publish to npm
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  publish-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Publish all non-private packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          for dir in packages/*/; do
+            pkg="$dir/package.json"
+
+            if [ ! -f "$pkg" ]; then
+              echo "⏭ Skipping $dir (no package.json)"
+              continue
+            fi
+
+            is_private=$(node -e "const p=require('./$pkg'); console.log(!!p.private)")
+            if [ "$is_private" = "true" ]; then
+              name=$(node -e "const p=require('./$pkg'); console.log(p.name)")
+              echo "⏭ Skipping $name (private)"
+              continue
+            fi
+
+            name=$(node -e "const p=require('./$pkg'); console.log(p.name)")
+            echo "📦 Publishing $name ($dir)"
+
+            (
+              cd "$dir"
+
+              npm version patch --no-git-tag-version
+
+              npm install
+
+              has_build=$(node -e "const p=require('./package.json'); console.log(!!(p.scripts && p.scripts.build))")
+              if [ "$has_build" = "true" ]; then
+                npm run build
+              fi
+
+              npm publish --provenance --access public
+            )
+          done
+
+      - name: Commit version bumps
+        run: |
+          git add packages/*/package.json packages/*/package-lock.json
+          git diff --staged --quiet && echo "No version changes to commit" && exit 0
+          git commit -m "chore: bump package versions [skip ci]"
+          git push
