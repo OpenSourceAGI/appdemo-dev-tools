@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="350px" src="https://i.imgur.com/gGcme8r.png" />
+    <img width="350px" src="https://i.imgur.com/OKnr9ns.png" />
 <h3 align="center">
      <a href="https://starterdocs.vtempest.workers.dev">🎮 Demo</a>
     <a href="https://starterdocs.js.org">📑 Docs</a>
@@ -31,75 +31,75 @@
     <a href="https://codespaces.new/OpenSourceAGI/appdemo-dev-tools">
     <img src="https://github.com/codespaces/badge.svg" width="150" height="20" />
     </a>
-    </p>
+</p>
 
 ### 📦 Packages & Apps
 
 ### Apps
 
-**[docs](apps/docs/)** - Documentation site with AI chat, full-text search, and auto-generated API docs from TypeScript and OpenAPI specs.
-`bun dev`
+**[docs](apps/docs/)** - Documentation site built with Next.js featuring AI chat, full-text search, and auto-generated API reference from TypeScript types and OpenAPI specs. Serves as the central hub for all starter template documentation.
+`bun dev` · `npm run dev`
 
-**[Cloud-Computer-Control-Panel](apps/Cloud-Computer-Control-Panel/)** - Open-source cloud infrastructure management platform with automated Dokploy deployment for container orchestration on AWS EC2.
-`bun dev`
+**[Cloud-Computer-Control-Panel](apps/Cloud-Computer-Control-Panel/)** - Open-source cloud infrastructure management platform. Automates Dokploy deployment for container orchestration on AWS EC2 — provision servers, manage containers, and monitor services from a single dashboard.
+`bun dev` · `npm run dev`
 
-**[vscode-cloud](apps/vscode-cloud/)** - Per-user VS Code (code-server) instances on Cloudflare Containers, protected by Cloudflare Access with auto-generated per-user passwords in Durable Object SQLite.
-`bun deploy`
+**[vscode-cloud](apps/vscode-cloud/)** - Per-user VS Code (code-server) instances on Cloudflare Containers. Each user gets a fully isolated environment: Cloudflare Access handles SSO, a Durable Object stores the per-user password in SQLite, and a Worker routes traffic to the right container.
+`bun deploy` · `wrangler deploy`
 
 ### Starter Templates
 
 **[template-svelte-betterauth-drizzle-shadcn](starter-templates/template-svelte-betterauth-drizzle-shadcn/)** - Full-stack SvelteKit app with Better Auth, Drizzle ORM on Cloudflare D1, Stripe payments, and shadcn-svelte components.
-`bun create starter-app`
+`bun create starter-app` · `npx create-starter-app`
 
 **[template-nextjs-betterauth-shadcn-drizzle](starter-templates/template-nextjs-betterauth-shadcn-drizzle/)** - Next.js SaaS boilerplate with PostgreSQL, Better Auth, Stripe subscriptions, and shadcn/ui components.
-`bun create starter-app`
+`bun create starter-app` · `npx create-starter-app`
 
 **[template-nextjs-betterauth-shadcn-prisma](starter-templates/template-nextjs-betterauth-shadcn-prisma/)** - Lightweight Next.js starter with Prisma ORM, Better Auth, Google OAuth, credential login, and protected routes.
-`bun create starter-app`
+`bun create starter-app` · `npx create-starter-app`
 
 **[template-fumadocs](starter-templates/template-fumadocs/)** - Documentation site with Fumadocs, Orama search, OpenAPI/Swagger docs, MDX support, and collapsible sidebar.
-`bun create starter-app`
+`bun create starter-app` · `npx create-starter-app`
 
 **[template-docusaurus](starter-templates/template-docusaurus/)** - Docusaurus 3 docs template with offline Lunr search, OpenAPI plugin, and classic theme optimized for technical docs.
-`bun create starter-app`
+`bun create starter-app` · `npx create-starter-app`
 
 ### Utility Packages
 
-**[create-starter-app](packages/create-starter-app/)** - Interactive CLI to scaffold a starter app from curated templates, picking framework, auth, database, and UI library.
-`bun create starter-app`
+**[about-system-info](packages/about-system-info/)** - Cross-platform CLI that prints CPU, memory, disk, uptime, public IP, ISP, and installed tools as a compact emoji line. Add to your shell config (`config.fish`, `.zshrc`) for an instant system snapshot on every terminal launch. Supports Windows, macOS, and Linux.
+`npx about-system` · `npm install -g about-system`
 
-**[about-system-info](packages/about-system-info/)** - Cross-platform CLI showing CPU, memory, disk, network, and running services with emojis. Add to shell greeting for instant system overview on terminal launch.
-`npx about-system`
+**[api2ai-mcp-generator](packages/api2ai-mcp-generator/)** - Generate production-ready MCP servers from any OpenAPI spec using the mcp-use framework (8k+ GitHub stars). Supports HTTP, SSE, and Streamable HTTP transports; includes a built-in inspector UI at `/inspector`, Zod schema validation, bearer/API-key auth, and Docker/PM2/Kubernetes deployment configs.
+`npx api2ai <openapi-spec-url>` · `npm install -g api2ai`
 
-**[api2ai-mcp-generator](packages/api2ai-mcp-generator/)** - Generate production-ready MCP servers from any OpenAPI spec using the mcp-use framework (8k+ GitHub stars). Bring any REST API to AI agents in minutes.
-`npx api2ai <openapi-spec-url>`
+**[cloudflare-to-claude-fix](packages/cloudflare-to-claude-fix/)** - Cloudflare Workers Queue consumer that fires a Claude Code routine automatically whenever a Workers build fails. Subscribes to Cloudflare build events via a Workers Queue and dead-letter queue, then triggers an AI-powered fix routine. Requires Workers Paid plan and Claude Pro.
+`bun deploy` · `wrangler deploy`
 
-**[create-cloud-db](packages/create-cloud-db/)** - Interactive CLI to create a Turso edge database and write `TURSO_*` connection credentials directly to your `.env` file.
-`npx create-cloud-db`
+**[create-cloud-db](packages/create-cloud-db/)** - Interactive CLI that creates a Turso edge database and writes `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` directly into your `.env` file. Handles Turso login, database creation, token generation, and env-file patching in one command.
+`npx create-cloud-db [db-name]` · `npm install -g create-cloud-db`
 
-**[manage-storage](packages/manage-storage/)** - Unified API for AWS S3, Cloudflare R2, and Backblaze B2. Auto-detects provider from credentials for consistent uploads, downloads, and file management.
-`npm install manage-storage`
+**[create-starter-app](packages/create-starter-app/)** - Interactive CLI to scaffold a starter app from curated templates. Prompts for framework, auth provider, database, and UI library, then downloads and configures the right template.
+`npx create-starter-app` · `bun create starter-app`
 
-**[open-when-ready](packages/open-when-ready/)** - Smart dev server wrapper that monitors output, auto-opens browser on ready, and routes errors to AI search. Works with any CLI tool.
-`npx open-ready <command>`
+**[git0-repo-downloader](packages/git0-repo-downloader/)** - CLI to search GitHub repositories by keyword, download source archives or platform-matched release binaries, install dependencies, and open the project in your editor. Short aliases `g` and `gg` for speed.
+`npx git0 <repo>` · `npm install -g git0`
 
-**[shadcn-theme-menu](packages/shadcn-theme-menu/)** - Drop-in theme switcher component for shadcn/ui with 24+ color themes, dark/light mode toggle, and smooth animations.
-`npm install shadcn-themes`
+**[manage-storage](packages/manage-storage/)** - Unified storage API for AWS S3, Cloudflare R2, and Backblaze B2 built on AWS SDK v3. Auto-detects the configured provider from environment variables. Single function interface for upload, download, delete, and list — returns data directly with no filesystem dependency, ideal for serverless and edge environments.
+`npm install manage-storage` · `bun add manage-storage`
 
-**[cloudflare-to-claude-fix](packages/cloudflare-to-claude-fix/)** - Cloudflare Workers Queue consumer that fires a Claude Code routine whenever a Workers build fails. Requires Workers Paid and Claude Pro.
-`bun deploy`
+**[open-when-ready](packages/open-when-ready/)** - Smart dev server wrapper for Next.js, Vite, or any CLI tool. Watches server output, auto-opens the browser when a ready signal is detected, and on error extracts context and launches your AI assistant (Perplexity, ChatGPT, or custom URL) with a pre-filled prompt.
+`npx open-ready <command>` · `npm install -g open-ready`
 
-**[git0-repo-downloader](packages/git0-repo-downloader/)** - CLI to search GitHub repositories, download source & releases for your system, install dependencies, and open the code editor.
-`git0 <repo>`
+**[react-download-app-buttons](packages/react-download-app-buttons/)** - React badge components for 8 app store and platform download links: iOS App Store, Google Play, Chrome Web Store, Mac App Store, Microsoft Store, Linux, and Snap Store. Detects the user's OS and highlights the matching button with a golden glow; generates native deep links (`itms-apps://`, `market://`, `ms-windows-store://`) so the store app opens directly. Badges ship as bundled assets — no CDN required.
+`npm install react-download-app-buttons` · `bun add react-download-app-buttons`
 
-**[react-download-app-buttons](packages/react-download-app-buttons/)** - React components for app store and platform download buttons (App Store, Google Play, Chrome Extension, Windows, macOS, Linux).
-`npm install react-download-app-buttons`
-
-**[server-shell-setup](packages/server-shell-setup/)** - One-command setup for a modern dev environment: fish, nvim, nushell, bun, node, helix, starship, docker, and more. Supports Arch, Ubuntu/Debian, Android (Termux), macOS, Fedora, Alpine.
+**[server-shell-setup](packages/server-shell-setup/)** - One-command bootstrap for a modern dev environment: installs fish, nvim, nushell, bun, node, helix, starship, docker, and more. Offers an interactive menu or a fully unattended `all` mode. Includes fish aliases for `service_manager`, `killport`, and `search`. Supports Arch, Ubuntu/Debian, Android (Termux), macOS, Fedora, and Alpine.
 `wget -qO- tinyurl.com/shellsetup | bash`
 
-**[verify-phone-sms](packages/verify-phone-sms/)** - SMS phone verification API using AWS SNS with Hono server on Cloudflare Workers. Includes VoIP blocking, API key auth, and rate limiting.
-`bun deploy`
+**[shadcn-theme-menu](packages/shadcn-theme-menu/)** - Drop-in theme switcher for shadcn/ui with 24+ color themes, dark/light/system mode toggle, and smooth animations. Includes `ThemeToggle`, `ThemeDropdown`, and `CinematicThemeSwitcher` components. Wrap your app with `ThemeProvider` and import the bundled CSS — no extra config required.
+`npm install shadcn-themes` · `bun add shadcn-themes`
 
-**[web2mobile-wrapper](packages/web2mobile-wrapper/)** - Transform any website into a native mobile app wrapper for iOS and Android. No coding required — just provide your URL.
-`npx create-mobile-wrapper`
+**[verify-phone-sms](packages/verify-phone-sms/)** - SMS phone verification API server built with Hono on Cloudflare Workers, backed by AWS SNS. Sends one-time codes, blocks VoIP numbers, enforces API-key authentication, applies rate limiting, and exposes auto-generated OpenAPI documentation. Includes health-check endpoints and CORS/security-header middleware.
+`bun deploy` · `wrangler deploy`
+
+**[web2mobile-wrapper](packages/web2mobile-wrapper/)** - Transform any website URL into a native mobile app wrapper for iOS and Android. No coding required — generates a Capacitor project pre-configured with your URL, push notifications, and app store metadata. Boosts discoverability via App Store and Google Play presence.
+`npx create-mobile-wrapper` · `npm install -g create-mobile-wrapper`

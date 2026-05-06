@@ -1,4 +1,33 @@
-# shadcn-themes
+<p align="center">
+    <img width="350px" src="https://i.imgur.com/7yMcnSI.png" />
+<p align="center">
+    <a href="https://discord.gg/SJdBqBz3tV">
+        <img src="https://img.shields.io/discord/1110227955554209923.svg?label=Chat&logo=Discord&colorB=7289da&style=flat"
+            alt="Join Discord" />
+    </a>
+     <a href="https://github.com/OpenSourceAGI/appdemo-dev-tools/discussions">
+     <img alt="GitHub Stars" src="https://img.shields.io/github/stars/OpenSourceAGI/appdemo-dev-tools" /></a>
+    <a href="https://github.com/OpenSourceAGI/appdemo-dev-tools/discussions">
+    <img alt="GitHub Discussions"
+        src="https://img.shields.io/github/discussions/OpenSourceAGI/appdemo-dev-tools" />
+    </a>
+<br />
+    <a href="https://github.com/OpenSourceAGI/appdemo-dev-tools/pulse" alt="Activity">
+        <img src="https://img.shields.io/github/commit-activity/m/OpenSourceAGI/appdemo-dev-tools" />
+    </a>
+    <img src="https://img.shields.io/github/last-commit/OpenSourceAGI/appdemo-dev-tools.svg" alt="GitHub last commit" />
+<br />
+    <img src="https://img.shields.io/badge/Next.js-16-black" alt="Next.js" />
+    <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request">
+        <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"
+            alt="PRs Welcome" />
+    </a>
+    <a href="https://codespaces.new/OpenSourceAGI/appdemo-dev-tools">
+    <img src="https://github.com/codespaces/badge.svg" width="150" height="20" />
+    </a>
+</p>
+
+# shadcn-theme-menu
 
 Beautiful theme components for shadcn/ui with 24+ color themes, dark/light mode, and animations.
 
@@ -6,7 +35,7 @@ Beautiful theme components for shadcn/ui with 24+ color themes, dark/light mode,
 
 ```bash
 # The package includes all required dependencies
-pnpm add shadcn-themes
+pnpm add shadcn-theme-menu
 
 # Peer dependencies (usually already in your project)
 pnpm add react react-dom next-themes lucide-react
@@ -16,17 +45,17 @@ pnpm add react react-dom next-themes lucide-react
 
 ```tsx
 // 1. Import CSS
-import 'shadcn-themes/themes.css';
+import 'shadcn-theme-menu/themes.css';
 
 // 2. Wrap app with ThemeProvider
-import { ThemeProvider } from 'shadcn-themes';
+import { ThemeProvider } from 'shadcn-theme-menu';
 
 <ThemeProvider attribute="class" defaultTheme="system">
   {children}
 </ThemeProvider>
 
 // 3. Use components
-import { ThemeToggle, ThemeDropdown, CinematicThemeSwitcher } from 'shadcn-themes';
+import { ThemeToggle, ThemeDropdown, CinematicThemeSwitcher } from 'shadcn-theme-menu';
 
 <ThemeToggle />
 <ThemeDropdown />
@@ -106,7 +135,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 ## Programmatic Usage
 
 ```tsx
-import { themeNames, themeColors, formatThemeName } from 'shadcn-themes';
+import { themeNames, themeColors, formatThemeName } from 'shadcn-theme-menu';
 
 // Set theme programmatically
 const setTheme = (themeName: string) => {
@@ -126,7 +155,7 @@ console.log(formatThemeName('modern-minimal')); // 'Modern Minimal'
 Full TypeScript support with exported types:
 
 ```tsx
-import type { ThemeProviderProps } from 'shadcn-themes';
+import type { ThemeProviderProps } from 'shadcn-theme-menu';
 ```
 
 ## Demo
@@ -143,9 +172,3 @@ cd demo
 pnpm install
 pnpm dev
 ```
-
-Opens at `http://localhost:3001`
-
-## License
-
-MIT
