@@ -6,6 +6,9 @@
   "bin": {
     "create-starter-app": "./bin/create-starter-app.js"
   },
+   "scripts": {
+    "ship": "npm run build && npx standard-version --release-as patch; rm CHANGELOG.md; npm publish"
+   },
   "files": [
     "bin",
     "starters"

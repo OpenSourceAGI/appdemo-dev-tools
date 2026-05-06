@@ -1,45 +1,39 @@
 <p align="center">
     <img width="350px" src="https://i.imgur.com/gGcme8r.png" />
-</p>
-<p align="center">
-    <a href="https://github.com/vtempest/Svelte-Starter-DOCS/discussions">
-        <img alt="GitHub Discussions"
-            src="https://img.shields.io/github/discussions/vtempest/Svelte-Starter-DOCS" />
-    </a>
-     <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request">
-        <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" />
-    </a>
-    <a href="https://codespaces.new/vtempest/Svelte-Starter-DOCS">
-        <img src="https://github.com/codespaces/badge.svg" width="150" height="20" />
-    </a>
-</p>
 <h3 align="center">
-    <a href="https://starterdocs.vtempest.workers.dev">🎮 Demo</a>
+     <a href="https://starterdocs.vtempest.workers.dev">🎮 Demo</a>
     <a href="https://starterdocs.js.org">📑 Docs</a>
     <a href="https://starterdocs.js.org/docs/guides/starter-docs#%EF%B8%8F-installation">⬇️ Install </a>
     <a href="https://v0.app/templates/dashboard-landing-auth-billing-teams-docs-themes-ExDfusFzX6P"> 🎨 v0 Template </a>
-
 </h3>
+<p align="center">
+    <a href="https://discord.gg/SJdBqBz3tV">
+        <img src="https://img.shields.io/discord/1110227955554209923.svg?label=Chat&logo=Discord&colorB=7289da&style=flat"
+            alt="Join Discord" />
+    </a>
+     <a href="https://github.com/OpenSourceAGI/appdemo-dev-tools/discussions">
+     <img alt="GitHub Stars" src="https://img.shields.io/github/stars/OpenSourceAGI/appdemo-dev-tools" /></a>
+    <a href="https://github.com/OpenSourceAGI/appdemo-dev-tools/discussions">
+    <img alt="GitHub Discussions"
+        src="https://img.shields.io/github/discussions/OpenSourceAGI/appdemo-dev-tools" />
+    </a>
+<br />
+    <a href="https://github.com/OpenSourceAGI/appdemo-dev-tools/pulse" alt="Activity">
+        <img src="https://img.shields.io/github/commit-activity/m/OpenSourceAGI/appdemo-dev-tools" />
+    </a>
+    <img src="https://img.shields.io/github/last-commit/OpenSourceAGI/appdemo-dev-tools.svg" alt="GitHub last commit" />
+<br />
+    <img src="https://img.shields.io/badge/Next.js-16-black" alt="Next.js" />
+    <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request">
+        <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"
+            alt="PRs Welcome" />
+    </a>
+    <a href="https://codespaces.new/OpenSourceAGI/appdemo-dev-tools">
+    <img src="https://github.com/codespaces/badge.svg" width="150" height="20" />
+    </a>
+    </p>
 
-### ⚒️ Starter DOCS: Drizzle OAuth Cloudflare Shadcn
-
-```bash
-bun create starter-app
-```
-
-**Docs-Driven Development**: Generate easy-to-understand docs from your JS functions and APIs, to maximize reusable value and make the options clear to everyone.
-
-**Functionally Brilliant, Elegantly Simple Toolkit:** StarterDOCS is to Starter Apps what Next.js is to React: full stack with smart defaults for common needs. It is easy to switch in alternatives: Such as running on AWS, Vercel or Cloudflare, or using React Next.js vs Svelte.
-
-📚 [Drizzle ORM](https://orm.drizzle.team/kit-docs/quick) - lightweight ORM compatible with Cloudflare D1 and drizzle-kit to manage schema migrations
-
-👤 [Better Auth](https://www.better-auth.com/docs/introduction)- Google oAuth sign-in and/or email signup via Resend mailer api, Stripe built-in, API docs, One Tap, with 4 email templates: reset password, change email, verify email, welcome. Settings and admin panel for users.
-
-☁️ [Cloudflare](https://developers.cloudflare.com/pages/framework-guides) - serverless autoscaling API and D1 database, great hosting platform with free tier
-
-🖼️ [shadcn-svelte](https://github.com/huntabyte/shadcn-svelte) - popular UI components, with [lucide](https://github.com/lucide-icons/lucide) icons
-
-## 📦 Packages & Apps
+### 📦 Packages & Apps
 
 ### Apps
 
@@ -48,6 +42,9 @@ bun create starter-app
 
 **[Cloud-Computer-Control-Panel](apps/Cloud-Computer-Control-Panel/)** - Open-source cloud infrastructure management platform with automated Dokploy deployment for container orchestration on AWS EC2.
 `bun dev`
+
+**[vscode-cloud](apps/vscode-cloud/)** - Per-user VS Code (code-server) instances on Cloudflare Containers, protected by Cloudflare Access with auto-generated per-user passwords in Durable Object SQLite.
+`bun deploy`
 
 ### Starter Templates
 
@@ -89,13 +86,20 @@ bun create starter-app
 **[shadcn-theme-menu](packages/shadcn-theme-menu/)** - Drop-in theme switcher component for shadcn/ui with 24+ color themes, dark/light mode toggle, and smooth animations.
 `npm install shadcn-themes`
 
-**[vscode-cloud](packages/vscode-cloud/)** - Per-user VS Code (code-server) instances on Cloudflare Containers, protected by Cloudflare Access with auto-generated per-user passwords in Durable Object SQLite.
+**[cloudflare-to-claude-fix](packages/cloudflare-to-claude-fix/)** - Cloudflare Workers Queue consumer that fires a Claude Code routine whenever a Workers build fails. Requires Workers Paid and Claude Pro.
 `bun deploy`
 
-**[web2mobile-generator](packages/web2mobile-generator/)** - Transform any website into a native mobile app wrapper for iOS and Android. No coding required — just provide your URL.
+**[git0-repo-downloader](packages/git0-repo-downloader/)** - CLI to search GitHub repositories, download source & releases for your system, install dependencies, and open the code editor.
+`git0 <repo>`
+
+**[react-download-app-buttons](packages/react-download-app-buttons/)** - React components for app store and platform download buttons (App Store, Google Play, Chrome Extension, Windows, macOS, Linux).
+`npm install react-download-app-buttons`
+
+**[server-shell-setup](packages/server-shell-setup/)** - One-command setup for a modern dev environment: fish, nvim, nushell, bun, node, helix, starship, docker, and more. Supports Arch, Ubuntu/Debian, Android (Termux), macOS, Fedora, Alpine.
+`wget -qO- tinyurl.com/shellsetup | bash`
+
+**[verify-phone-sms](packages/verify-phone-sms/)** - SMS phone verification API using AWS SNS with Hono server on Cloudflare Workers. Includes VoIP blocking, API key auth, and rate limiting.
+`bun deploy`
+
+**[web2mobile-wrapper](packages/web2mobile-wrapper/)** - Transform any website into a native mobile app wrapper for iOS and Android. No coding required — just provide your URL.
 `npx create-mobile-wrapper`
-
-
-### 🖼️ Screenshots
-
-<img width="350px" src="https://i.imgur.com/jIaL6yP.png" />

@@ -4,9 +4,7 @@
 
 # About System Info
 
-A TypeScript/Node.js library to display comprehensive system information with customizable output. Cross-platform support for Windows, macOS, and Linux with caching for optimal performance.
-
-## Features
+A TypeScript/Node.js library to display comprehensive system information with customizable output.
 
 - 📊 **Comprehensive**: 30+ system metrics including CPU, GPU, network, containers, and more
 - 🌍 **Cross-platform**: Works on Linux, macOS, and Windows, and Android
@@ -110,8 +108,8 @@ async function getBasicInfo() {
 
 ### Available Info Blocks
 
-| Block         | Description                | Example Output               |
-| ------------- | -------------------------- | ---------------------------- |
+| Block           | Description                | Example Output                 |
+| --------------- | -------------------------- | ------------------------------ |
 | `user`        | Current username           | `👤 username`                |
 | `hostname`    | System hostname            | `🏠 hostname`                |
 | `ip`          | Public IP address          | `🌎 192.168.1.1`             |
@@ -125,7 +123,7 @@ async function getBasicInfo() {
 | `disk_used`   | Disk usage percentage      | `📁 75%`                     |
 | `ram_used`    | Memory usage               | `💾 8/16GB`                  |
 | `top_process` | Highest CPU process        | `🔝 15% chrome`              |
-| `uptime`      | System uptime              | `⏱️ 2d 5h 30m`               |
+| `uptime`      | System uptime              | `⏱️ 2d 5h 30m`             |
 | `device`      | Device model               | `💻 MacBook Pro`             |
 | `kernel`      | Kernel version             | `🔧 5.15.0-56-generic`       |
 | `shell`       | Current shell              | `🐚 fish`                    |
