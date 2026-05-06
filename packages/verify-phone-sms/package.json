@@ -51,7 +51,7 @@
     "@hono/swagger-ui": "^0.5.2",
     "@hono/zod-openapi": "^0.19.9",
     "grab-api.js": "^0.9.131",
-    "hono": "^3.12.8",
+    "hono": "^4.0.0",
     "hono-rate-limiter": "^0.2.2",
     "libphonenumber-js": "^1.12.13"
   },
