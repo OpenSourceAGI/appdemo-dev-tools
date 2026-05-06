@@ -1,6 +1,6 @@
 {
   "name": "shadcn-themes",
-  "version": "0.1.0",
+  "version": "1.1.1",
   "description": "A collection of beautiful shadcn/ui theme components with dynamic theme switching and animations",
   "author": "vtempest",
   "type": "module",
@@ -17,6 +17,7 @@
     "src"
   ],
   "scripts": {
+    "ship": "npx standard-version --release-as patch; rm CHANGELOG.md; npm publish",
     "demo": "cd demo && pnpm dev"
   },
   "sideEffects": [
