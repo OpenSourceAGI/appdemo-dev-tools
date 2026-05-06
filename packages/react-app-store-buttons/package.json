@@ -1,0 +1,60 @@
+{
+  "name": "react-app-store-buttons",
+  "version": "0.1.4",
+  "description": "React components for app store and platform download buttons (App Store, Google Play, Chrome Extension, Windows, macOS, Linux)",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles": "./dist/style.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "ship": "npx standard-version --release-as patch; rm CHANGELOG.md; npm publish",
+    "build": "vite build && tsc --emitDeclarationOnly --declaration --declarationDir dist",
+    "dev": "vite --config vite.demo.config.ts",
+    "build:demo": "vite build --config vite.demo.config.ts",
+    "preview": "vite build --config vite.demo.config.ts && vite preview --config vite.demo.config.ts"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.0",
+    "vite": "^5.4.0",
+    "vite-plugin-dts": "^4.3.0"
+  },
+  "keywords": [
+    "react",
+    "download",
+    "app-store",
+    "google-play",
+    "chrome-extension",
+    "buttons",
+    "badges",
+    "components"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenSourceAGI/appdemo-dev-tools/tree/master/packages/react-download-app-buttons"
+  },
+  "homepage": "https://github.com/OpenSourceAGI/appdemo-dev-tools/tree/master/packages/react-download-app-buttons"
+}
