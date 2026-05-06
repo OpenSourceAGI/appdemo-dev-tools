@@ -27,11 +27,8 @@
     "node": ">=18.0.0"
   },
   "repository": {
-    "type": "github",
-    "url": "https://github.com/OpenSourceAGI/appdemo-dev-tools"
+    "type": "git",
+    "url": "https://github.com/OpenSourceAGI/appdemo-dev-tools/tree/master/packages/open-when-ready"
   },
-  "bugs": {
-    "url": "https://github.com/OpenSourceAGI/appdemo-dev-tools"
-  },
-  "homepage": "https://github.com/OpenSourceAGI/appdemo-dev-tools/tree/master/packages/open-when-ready#readme"
+  "homepage": "https://github.com/OpenSourceAGI/appdemo-dev-tools/tree/master/packages/open-when-ready"
 }

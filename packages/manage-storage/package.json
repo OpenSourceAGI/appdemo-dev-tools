@@ -24,13 +24,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vtempest/Starter-DOCS.git",
-    "directory": "storage"
+    "url": "https://github.com/OpenSourceAGI/appdemo-dev-tools/tree/master/packages/manage-storage"
   },
-  "bugs": {
-    "url": "https://github.com/vtempest/Starter-DOCS/issues"
-  },
-  "homepage": "https://github.com/vtempest/Starter-DOCS#readme",
+  "homepage": "https://github.com/OpenSourceAGI/appdemo-dev-tools/tree/master/packages/manage-storage",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.965.0",
     "dotenv": "^17.2.3"

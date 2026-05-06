@@ -12,5 +12,10 @@
   },
   "bin": {
     "export-svg-typescript": "./export-svg-typescript.js"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenSourceAGI/appdemo-dev-tools/tree/master/packages/export-svg-icons-typescript"
+  },
+  "homepage": "https://github.com/OpenSourceAGI/appdemo-dev-tools/tree/master/packages/export-svg-icons-typescript"
 }

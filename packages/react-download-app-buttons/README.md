@@ -2,6 +2,8 @@
     <img src="https://i.imgur.com/5lsiepL.png" width="300" >
 </p>
 
+> **💍One Code to rule them all — and in the cloud compile them.**
+
 # react-native-app-buttons
 
 React badge components for app store and platform download links. Badges ship as bundled assets — no CDN required.

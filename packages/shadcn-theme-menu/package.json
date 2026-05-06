@@ -4,6 +4,11 @@
   "description": "A collection of beautiful shadcn/ui theme components with dynamic theme switching and animations",
   "author": "vtempest",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenSourceAGI/appdemo-dev-tools/tree/master/packages/shadcn-theme-menu"
+  },
+  "homepage": "https://github.com/OpenSourceAGI/appdemo-dev-tools/tree/master/packages/shadcn-theme-menu",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
