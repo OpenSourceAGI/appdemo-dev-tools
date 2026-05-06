@@ -1,6 +1,6 @@
 {
   "name": "react-download-app-buttons",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React components for app store and platform download buttons (App Store, Google Play, Chrome Extension, Windows, macOS, Linux)",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -14,13 +14,15 @@
     },
     "./styles": "./dist/style.css"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "ship": "npx standard-version --release-as patch; rm CHANGELOG.md; npm publish",
     "build": "vite build && tsc --emitDeclarationOnly --declaration --declarationDir dist",
     "dev": "vite --config vite.demo.config.ts",
     "build:demo": "vite build --config vite.demo.config.ts",
-    "preview": "vite build --config vite.demo.config.ts && vite preview --config vite.demo.config.ts",
-    "typecheck": "tsc --noEmit"
+    "preview": "vite build --config vite.demo.config.ts && vite preview --config vite.demo.config.ts"
   },
   "peerDependencies": {
     "react": ">=17.0.0",
