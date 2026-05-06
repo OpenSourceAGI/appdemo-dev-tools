@@ -1,6 +1,6 @@
 {
   "name": "open-ready",
-  "version": "0.1.6",
+  "version": null,
   "description": "Smart dev server launcher: error→AI search, success→auto-open browser. Any CLI tool.",
   "type": "module",
   "bin": {
@@ -28,10 +28,10 @@
   },
   "repository": {
     "type": "github",
-    "url": "https://github.com/yourusername/open-when-ready"
+    "url": "https://github.com/OpenSourceAGI/appdemo-dev-tools"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/open-when-ready/issues"
+    "url": "https://github.com/OpenSourceAGI/appdemo-dev-tools"
   },
-  "homepage": "https://github.com/yourusername/open-when-ready#readme"
+  "homepage": "https://github.com/OpenSourceAGI/appdemo-dev-tools/tree/master/packages/open-when-ready#readme"
 }
