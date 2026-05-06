@@ -2,20 +2,20 @@
     <img src="https://i.imgur.com/5lsiepL.png" width="300" >
 </p>
 
-# react-download-app-buttons
+# react-native-app-buttons
 
 React badge components for app store and platform download links. Badges ship as bundled assets — no CDN required.
 
 ## Install
 
 ```bash
-npm install react-download-app-buttons
+npm install react-native-app-buttons
 ```
 
 Import the bundled stylesheet if your project doesn't use Tailwind:
 
 ```ts
-import "react-download-app-buttons/styles";
+import "react-native-app-buttons/styles";
 ```
 
 ## Features
@@ -32,7 +32,7 @@ import "react-download-app-buttons/styles";
 ## Usage
 
 ```tsx
-import { DownloadAppButton } from "react-download-app-buttons";
+import { DownloadAppButton } from "react-native-app-buttons";
 
 <DownloadAppButton platform="ios"              appId="6474268307"               autoHighlight />
 <DownloadAppButton platform="android"          appId="com.example.app"          autoHighlight />
@@ -77,7 +77,7 @@ Pass `href` instead of `appId` to use an explicit URL:
 ## Utilities
 
 ```ts
-import { getOS, OS, platformMatchesOS, buildStoreUrl, buildDeepLink, resolveHref } from "react-download-app-buttons";
+import { getOS, OS, platformMatchesOS, buildStoreUrl, buildDeepLink, resolveHref } from "react-native-app-buttons";
 
 getOS()                                             // → OS.macOS | OS.Windows | OS.Linux | …
 platformMatchesOS("macos", getOS())                 // → true on macOS
@@ -89,7 +89,7 @@ resolveHref("android", "com.example.app", getOS()) // → deep link on Android, 
 ## Dev
 
 ```bash
-npm run dev       # demo at http://localhost:5173
-npm run build     # library build → dist/
-npm run typecheck
+npm run dev        # demo at http://localhost:5173
+        build      # library build → dist/
+        typecheck
 ```

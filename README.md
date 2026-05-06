@@ -80,6 +80,9 @@
 **[create-starter-app](packages/create-starter-app/)** - Interactive CLI to scaffold a starter app from curated templates. Prompts for framework, auth provider, database, and UI library, then downloads and configures the right template.
 `npx create-starter-app` · `bun create starter-app`
 
+**[export-svg-icons-typescript](packages/export-svg-icons-typescript/)** - Convert a folder of SVG icons into a color-customizable, tree-shakable TypeScript `index.ts` that works with any component framework. Exports all icons as named functions for tree shaking, includes JSDoc tooltip previews of each icon, and supports runtime color, size, and dimension changes. Returns SVG strings or IMG tags with inline SVG sources.
+`npx export-svg-typescript -i ./src/icons` · `npm install -g export-svg-typescript`
+
 **[git0-repo-downloader](packages/git0-repo-downloader/)** - CLI to search GitHub repositories by keyword, download source archives or platform-matched release binaries, install dependencies, and open the project in your editor. Short aliases `g` and `gg` for speed.
 `npx git0 <repo>` · `npm install -g git0`
 
@@ -89,8 +92,8 @@
 **[open-when-ready](packages/open-when-ready/)** - Smart dev server wrapper for Next.js, Vite, or any CLI tool. Watches server output, auto-opens the browser when a ready signal is detected, and on error extracts context and launches your AI assistant (Perplexity, ChatGPT, or custom URL) with a pre-filled prompt.
 `npx open-ready <command>` · `npm install -g open-ready`
 
-**[react-download-app-buttons](packages/react-download-app-buttons/)** - React badge components for 8 app store and platform download links: iOS App Store, Google Play, Chrome Web Store, Mac App Store, Microsoft Store, Linux, and Snap Store. Detects the user's OS and highlights the matching button with a golden glow; generates native deep links (`itms-apps://`, `market://`, `ms-windows-store://`) so the store app opens directly. Badges ship as bundled assets — no CDN required.
-`npm install react-download-app-buttons` · `bun add react-download-app-buttons`
+**[react-native-app-buttons](packages/react-native-app-buttons/)** - React badge components for 8 app store and platform download links: iOS App Store, Google Play, Chrome Web Store, Mac App Store, Microsoft Store, Linux, and Snap Store. Detects the user's OS and highlights the matching button with a golden glow; generates native deep links (`itms-apps://`, `market://`, `ms-windows-store://`) so the store app opens directly. Badges ship as bundled assets — no CDN required.
+`npm install react-native-app-buttons` · `bun add react-native-app-buttons`
 
 **[server-shell-setup](packages/server-shell-setup/)** - One-command bootstrap for a modern dev environment: installs fish, nvim, nushell, bun, node, helix, starship, docker, and more. Offers an interactive menu or a fully unattended `all` mode. Includes fish aliases for `service_manager`, `killport`, and `search`. Supports Arch, Ubuntu/Debian, Android (Termux), macOS, Fedora, and Alpine.
 `wget -qO- tinyurl.com/shellsetup | bash`
